@@ -1,5 +1,5 @@
 <template>
-  <div class="viewport">
+  <div class="viewport treeclass">
   </div>
 </template>
 <script>
@@ -187,31 +187,31 @@ export default {
 </script>
 
 <style>
-.nodetree circle {
+.treeclass .nodetree  circle {
   fill: #999;
   r: 2.5;
 }
 
-.node--internal circle {
+.treeclass .node--internal circle {
   cursor: pointer;
   fill:  #555;
   r: 3;
 }
 
-.nodetree text {
+.treeclass .nodetree text {
   font: 10px sans-serif;
   cursor: pointer;
 }
 
-.nodetree.selected text{
+.treeclass .nodetree.selected text{
   font-weight: bold;
 }
 
-.node--internal text {
+.treeclass .node--internal text {
   text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
 }
 
-.linktree {
+.treeclass .linktree {
   fill: none;
   stroke: #555;
   stroke-opacity: 0.4;

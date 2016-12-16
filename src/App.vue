@@ -31,7 +31,8 @@ export default {
   margin-top: 60px;
 }
 
-tree{
+.tree {
   height: 500px;
+  width: 100%;
 }
 </style>
