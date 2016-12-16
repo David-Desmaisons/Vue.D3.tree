@@ -1,0 +1,220 @@
+<template>
+  <div class="viewport">
+  </div>
+</template>
+<script>
+import * as d3 from 'd3'
+import * as d3Hierarchy from 'd3-hierarchy'
+var i = 0
+var currentSelected = null
+
+Object.assign(d3, d3Hierarchy)
+
+const props = {
+  data: Object,
+  height: {
+    type: Number,
+    default: 500
+  },
+  duration: {
+    type: Number,
+    default: 750
+  }
+}
+
+function compareString (a, b) {
+  return (a < b) ? -1 : (a > b) ? 1 : 0
+}
+
+function drawLink (source, target) {
+  return 'M' + source.y + ',' + source.x +
+         'C' + (source.y + target.y) / 2 + ',' + source.x +
+         ' ' + (source.y + target.y) / 2 + ',' + target.x +
+         ' ' + target.y + ',' + target.x
+}
+
+function hasChildren (d) {
+  return d.children || d._children
+}
+
+function removeTextAndGraph (selection) {
+  selection.selectAll('circle').remove()
+  selection.selectAll('text').remove()
+}
+
+function translate (vector) {
+  return 'translate(' + vector.y + ',' + vector.x + ')'
+}
+
+export default {
+  props,
+
+  mounted () {
+    var size = this.getSize()
+    var svg = d3.select(this.$el).append('svg')
+          .attr('width', size.width)
+          .attr('height', size.height)
+    var g = svg.append('g').attr('transform', 'translate(40,0)')
+    var tree = d3.tree().size([size.height, size.width - 160])
+
+    this.internaldata = {
+      svg,
+      g,
+      tree
+    }
+
+    window.onresize = this.resize.bind(this)
+
+    if (this.data) {
+      this.onData(this.data)
+    }
+  },
+
+  methods: {
+
+    getSize () {
+      var width = this.$el.clientWidth
+      var height = this.$el.clientHeight
+      return { width, height }
+    },
+
+    resize () {
+      var size = this.getSize()
+      this.internaldata.svg.attr('width', size.width)
+             .attr('height', size.height)
+
+      this.internaldata.tree.size([size.height, size.width - 160])
+      this.redraw()
+    },
+
+    updateGraph (source) {
+      const origin = {
+        x: source.x0,
+        y: source.y0
+      }
+
+      const root = this.internaldata.root
+      var links = this.internaldata.g.selectAll('.linktree')
+         .data(this.internaldata.tree(root).descendants().slice(1), d => { return d.id })
+
+      var updateLinks = links.enter().append('path').attr('class', 'linktree')
+                   .attr('d', d => { return drawLink(origin, origin) })
+
+      var updateAndNewLinks = links.merge(updateLinks)
+      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent) })
+
+      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source) }).remove()
+
+      var node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
+
+      var newNodes = node.enter().append('g')
+                .attr('class', 'nodetree')
+                .attr('transform', d => { return translate(origin) })
+
+      var allNodes = newNodes.merge(node)
+      allNodes.classed('node--internal', d => { return hasChildren(d) })
+        .classed('node--leaf', d => { return !hasChildren(d) })
+        .classed('selected', d => { return d === currentSelected })
+        .on('click', this.onNodeClick)
+
+      allNodes.transition().duration(this.duration)
+        .attr('transform', d => { return translate(d) })
+        .attr('opacity', 1)
+
+      removeTextAndGraph(node)
+
+      allNodes.append('circle')
+
+      allNodes.append('text')
+        .attr('x', d => { return hasChildren(d) ? -13 : 13 })
+        .attr('dy', '.35em')
+        .attr('text-anchor', d => { return hasChildren(d) ? 'end' : 'start' })
+        .text(d => { return d.data.text })
+        .on('click', d => {
+          currentSelected = (currentSelected === d) ? null : d
+          this.redraw()
+        })
+
+      allNodes.each(function (d) {
+        d.x0 = d.x
+        d.y0 = d.y
+      })
+
+      const exitingNodes = node.exit().transition().duration(this.duration)
+                              .attr('transform', d => { return translate(source) })
+                              .attr('opacity', 0).remove()
+
+      exitingNodes.select('circle').attr('r', 1e-6)
+    },
+
+    onNodeClick (d) {
+      if (d.children) {
+        d._children = d.children
+        d.children = null
+      } else {
+        d.children = d._children
+        d._children = null
+      }
+      this.updateGraph(d)
+    },
+
+    onData (data) {
+      var root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
+      console.log(root)
+      this.internaldata.root = root
+      root.each(d => {
+        d.id = i++
+      })
+      var size = this.getSize()
+      root.x = size.height / 2
+      root.y = 0
+      root.x0 = root.x
+      root.y0 = root.y
+      this.redraw()
+    },
+
+    redraw () {
+      this.updateGraph(this.internaldata.root)
+    }
+  },
+
+  watch: {
+    data (current, old) {
+      this.onData(current)
+    }
+  }
+}
+</script>
+
+<style>
+.nodetree circle {
+  fill: #999;
+  r: 2.5;
+}
+
+.node--internal circle {
+  cursor: pointer;
+  fill:  #555;
+  r: 3;
+}
+
+.nodetree text {
+  font: 10px sans-serif;
+  cursor: pointer;
+}
+
+.nodetree.selected text{
+  font-weight: bold;
+}
+
+.node--internal text {
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.linktree {
+  fill: none;
+  stroke: #555;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
+}
+</style>

@@ -1,20 +1,22 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <hello></hello>
+    <d3tree :data="Graph.tree" class="tree"></d3tree>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+import D3tree from './components/D3tree'
 import data from '../data/data'
 
 console.log(data)
 
 export default {
   name: 'app',
+  data () {
+    return data
+  },
   components: {
-    Hello
+    D3tree
   }
 }
 </script>
@@ -27,5 +29,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+tree{
+  height: 500px;
 }
 </style>
