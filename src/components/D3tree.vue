@@ -12,13 +12,13 @@ Object.assign(d3, d3Hierarchy)
 
 const props = {
   data: Object,
-  height: {
-    type: Number,
-    default: 500
-  },
   duration: {
     type: Number,
     default: 750
+  },
+  type: {
+    type: String,
+    default: 'tree'
   }
 }
 
@@ -50,12 +50,12 @@ export default {
   props,
 
   mounted () {
-    var size = this.getSize()
-    var svg = d3.select(this.$el).append('svg')
+    const size = this.getSize()
+    const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
-    var g = svg.append('g').attr('transform', 'translate(40,0)')
-    var tree = d3.tree().size([size.height, size.width - 160])
+    const g = svg.append('g').attr('transform', 'translate(40,0)')
+    const tree = this.tree
 
     this.internaldata = {
       svg,
@@ -79,9 +79,10 @@ export default {
     },
 
     resize () {
-      var size = this.getSize()
-      this.internaldata.svg.attr('width', size.width)
-             .attr('height', size.height)
+      const size = this.getSize()
+      this.internaldata.svg
+              .attr('width', size.width)
+              .attr('height', size.height)
 
       this.internaldata.tree.size([size.height, size.width - 160])
       this.redraw()
@@ -94,24 +95,25 @@ export default {
       }
 
       const root = this.internaldata.root
-      var links = this.internaldata.g.selectAll('.linktree')
+      const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => { return d.id })
 
-      var updateLinks = links.enter().append('path').attr('class', 'linktree')
-                   .attr('d', d => { return drawLink(origin, origin) })
+      const updateLinks = links.enter().append('path')
+                    .attr('class', 'linktree')
+                    .attr('d', d => { return drawLink(origin, origin) })
 
-      var updateAndNewLinks = links.merge(updateLinks)
+      const updateAndNewLinks = links.merge(updateLinks)
       updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent) })
 
       links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source) }).remove()
 
-      var node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
+      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
 
-      var newNodes = node.enter().append('g')
+      const newNodes = node.enter().append('g')
                 .attr('class', 'nodetree')
                 .attr('transform', d => { return translate(origin) })
 
-      var allNodes = newNodes.merge(node)
+      const allNodes = newNodes.merge(node)
       allNodes.classed('node--internal', d => { return hasChildren(d) })
         .classed('node--leaf', d => { return !hasChildren(d) })
         .classed('selected', d => { return d === currentSelected })
@@ -140,10 +142,10 @@ export default {
         d.y0 = d.y
       })
 
-      const exitingNodes = node.exit().transition().duration(this.duration)
-                              .attr('transform', d => { return translate(source) })
-                              .attr('opacity', 0).remove()
-
+      const exitingNodes = node.exit()
+      exitingNodes.transition().duration(this.duration)
+                  .attr('transform', d => { return translate(source) })
+                  .attr('opacity', 0).remove()
       exitingNodes.select('circle').attr('r', 1e-6)
     },
 
@@ -160,11 +162,8 @@ export default {
 
     onData (data) {
       var root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
-      console.log(root)
       this.internaldata.root = root
-      root.each(d => {
-        d.id = i++
-      })
+      root.each(d => { d.id = i++ })
       var size = this.getSize()
       root.x = size.height / 2
       root.y = 0
@@ -178,9 +177,26 @@ export default {
     }
   },
 
+  computed: {
+    tree () {
+      const size = this.getSize()
+      const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
+      tree.size([size.height, size.width - 160])
+      return tree
+    }
+  },
+
   watch: {
     data (current, old) {
       this.onData(current)
+    },
+
+    type () {
+      if (!this.internaldata.tree) {
+        return
+      }
+      this.internaldata.tree = this.tree
+      this.redraw()
     }
   }
 }
@@ -203,7 +219,7 @@ export default {
   cursor: pointer;
 }
 
-.treeclass .nodetree.selected text{
+.treeclass .nodetree.selected text {
   font-weight: bold;
 }
 

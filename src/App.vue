@@ -1,14 +1,23 @@
 <template>
   <div id="app">
-    <d3tree :data="Graph.tree" class="tree"></d3tree>
+
+    <label for="velocity">Transtion velocity {{duration}}ms</label>
+    <input id="velocity" type="range" min="0" max="1000" v-model.number="duration">
+
+    <label for="type">Tree type</label>
+    <select id="type" v-model="type">
+      <option>tree</option>
+      <option>cluster</option>
+    </select>
+
+    <d3tree :data="Graph.tree" :type="type" :duration="duration" class="tree"></d3tree>
   </div>
 </template>
 
 <script>
 import D3tree from './components/D3tree'
 import data from '../data/data'
-
-console.log(data)
+Object.assign(data, {type: 'tree', duration: 750})
 
 export default {
   name: 'app',
