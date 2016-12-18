@@ -38,8 +38,9 @@ function hasChildren (d) {
 }
 
 function removeTextAndGraph (selection) {
-  selection.selectAll('circle').remove()
-  selection.selectAll('text').remove()
+  ['circle', 'text'].forEach(select => {
+    selection.selectAll().remove(select)
+  })
 }
 
 function translate (vector) {
@@ -134,6 +135,7 @@ export default {
         .text(d => { return d.data.text })
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
+          d3.event.stopPropagation()
           this.redraw()
         })
 
@@ -161,6 +163,11 @@ export default {
     },
 
     onData (data) {
+      if (!data) {
+        this.internaldata.root = null
+        this.clean()
+        return
+      }
       var root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
       root.each(d => { d.id = i++ })
@@ -172,8 +179,17 @@ export default {
       this.redraw()
     },
 
+    clean () {
+      ['.linktree', '.nodetree', 'text', 'circle'].forEach(selector => {
+        this.internaldata.g.selectAll(selector).transition().duration(this.duration).attr('opacity', 0).remove()
+      })
+    },
+
     redraw () {
-      this.updateGraph(this.internaldata.root)
+      const root = this.internaldata.root
+      if (root) {
+        this.updateGraph(root)
+      }
     }
   },
 
