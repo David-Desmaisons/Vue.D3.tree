@@ -39,12 +39,20 @@ function hasChildren (d) {
 
 function removeTextAndGraph (selection) {
   ['circle', 'text'].forEach(select => {
-    selection.selectAll().remove(select)
+    selection.selectAll(select).remove()
   })
 }
 
 function translate (vector) {
   return 'translate(' + vector.y + ',' + vector.x + ')'
+}
+
+const euclidianLayout = {
+  size (tree, size) {
+    tree.size([size.height, size.width - 160])
+  },
+  transform (x, y) {
+  }
 }
 
 export default {
@@ -56,13 +64,12 @@ export default {
           .attr('width', size.width)
           .attr('height', size.height)
     const g = svg.append('g').attr('transform', 'translate(40,0)')
-    const tree = this.tree
-
     this.internaldata = {
       svg,
       g,
-      tree
+      layout: euclidianLayout
     }
+    this.internaldata.tree = this.tree
 
     window.onresize = this.resize.bind(this)
 
@@ -85,7 +92,7 @@ export default {
               .attr('width', size.width)
               .attr('height', size.height)
 
-      this.internaldata.tree.size([size.height, size.width - 160])
+      this.internaldata.layout.size(this.internaldata.tree, size)
       this.redraw()
     },
 
@@ -197,7 +204,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
-      tree.size([size.height, size.width - 160])
+      this.internaldata.size(tree, size)
       return tree
     }
   },
