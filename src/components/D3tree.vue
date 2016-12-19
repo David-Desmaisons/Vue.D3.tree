@@ -26,11 +26,12 @@ function compareString (a, b) {
   return (a < b) ? -1 : (a > b) ? 1 : 0
 }
 
-function drawLink (source, target) {
-  return 'M' + source.y + ',' + source.x +
-         'C' + (source.y + target.y) / 2 + ',' + source.x +
-         ' ' + (source.y + target.y) / 2 + ',' + target.x +
-         ' ' + target.y + ',' + target.x
+function drawLink (source, target, {transform}) {
+  // const transform = layout.transform
+  return 'M' + transform(source.x, source.y) +
+         'C' + transform(source.x, (source.y + target.y) / 2) +
+         ' ' + transform(target.x, (source.y + target.y) / 2) +
+         ' ' + transform(target.x, target.y)
 }
 
 function hasChildren (d) {
@@ -52,6 +53,7 @@ const euclidianLayout = {
     tree.size([size.height, size.width - 160])
   },
   transform (x, y) {
+    return y + ',' + x
   }
 }
 
@@ -106,14 +108,16 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => { return d.id })
 
+      const layout = this.internaldata.layout
+
       const updateLinks = links.enter().append('path')
                     .attr('class', 'linktree')
-                    .attr('d', d => { return drawLink(origin, origin) })
+                    .attr('d', d => { return drawLink(origin, origin, layout) })
 
       const updateAndNewLinks = links.merge(updateLinks)
-      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent) })
+      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, layout) })
 
-      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source) }).remove()
+      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source, layout) }).remove()
 
       const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
 
@@ -204,7 +208,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
-      this.internaldata.size(tree, size)
+      this.internaldata.layout.size(tree, size)
       return tree
     }
   },
