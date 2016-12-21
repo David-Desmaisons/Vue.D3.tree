@@ -3,12 +3,13 @@
   </div>
 </template>
 <script>
+import euclidianLayout from './euclidianLayout'
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
+Object.assign(d3, d3Hierarchy)
+
 var i = 0
 var currentSelected = null
-
-Object.assign(d3, d3Hierarchy)
 
 const props = {
   data: Object,
@@ -55,18 +56,18 @@ function translate (vector) {
   return 'translate(' + vector.y + ',' + vector.x + ')'
 }
 
-const euclidianLayout = {
-  size (tree, size) {
-    tree.size([size.height, size.width - 160])
-  },
-  transformNode (x, y) {
-    return y + ',' + x
-  },
-  transformSvg (svg, margin) {
-    svg.attr('transform', 'translate(' + margin.x * 2 + ',0)')
-    return svg
-  }
-}
+// const euclidianLayout = {
+//   size (tree, size) {
+//     tree.size([size.height, size.width - 160])
+//   },
+//   transformNode (x, y) {
+//     return y + ',' + x
+//   },
+//   transformSvg (svg, margin) {
+//     svg.attr('transform', 'translate(' + margin.x * 2 + ',0)')
+//     return svg
+//   }
+// }
 
 export default {
   props,
