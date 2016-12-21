@@ -19,6 +19,14 @@ const props = {
   type: {
     type: String,
     default: 'tree'
+  },
+  marginX: {
+    type: Number,
+    default: 20
+  },
+  marginY: {
+    type: Number,
+    default: 20
   }
 }
 
@@ -26,12 +34,11 @@ function compareString (a, b) {
   return (a < b) ? -1 : (a > b) ? 1 : 0
 }
 
-function drawLink (source, target, {transform}) {
-  // const transform = layout.transform
-  return 'M' + transform(source.x, source.y) +
-         'C' + transform(source.x, (source.y + target.y) / 2) +
-         ' ' + transform(target.x, (source.y + target.y) / 2) +
-         ' ' + transform(target.x, target.y)
+function drawLink (source, target, {transformNode}) {
+  return 'M' + transformNode(source.x, source.y) +
+         'C' + transformNode(source.x, (source.y + target.y) / 2) +
+         ' ' + transformNode(target.x, (source.y + target.y) / 2) +
+         ' ' + transformNode(target.x, target.y)
 }
 
 function hasChildren (d) {
@@ -52,8 +59,12 @@ const euclidianLayout = {
   size (tree, size) {
     tree.size([size.height, size.width - 160])
   },
-  transform (x, y) {
+  transformNode (x, y) {
     return y + ',' + x
+  },
+  transformSvg (svg, margin) {
+    svg.attr('transform', 'translate(' + margin.x * 2 + ',0)')
+    return svg
   }
 }
 
@@ -65,13 +76,14 @@ export default {
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
-    const g = svg.append('g').attr('transform', 'translate(40,0)')
+    const g = svg
     this.internaldata = {
       svg,
       g,
       layout: euclidianLayout
     }
     this.internaldata.tree = this.tree
+    this.sizeSvg()
 
     window.onresize = this.resize.bind(this)
 
@@ -81,6 +93,10 @@ export default {
   },
 
   methods: {
+
+    sizeSvg () {
+      this.internaldata.layout.transformSvg(this.internaldata.svg, this.margin)
+    },
 
     getSize () {
       var width = this.$el.clientWidth
@@ -210,6 +226,10 @@ export default {
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
       this.internaldata.layout.size(tree, size)
       return tree
+    },
+
+    margin () {
+      return {x: this.marginX, y: this.marginY}
     }
   },
 
