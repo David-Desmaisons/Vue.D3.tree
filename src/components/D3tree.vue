@@ -72,17 +72,18 @@ export default {
   props,
 
   mounted () {
+    this.layout = euclidianLayout
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
     const g = svg
+    const tree = this.tree
     this.internaldata = {
       svg,
       g,
-      layout: euclidianLayout
+      tree
     }
-    this.internaldata.tree = this.tree
     this.sizeSvg()
 
     window.onresize = this.resize.bind(this)
@@ -95,7 +96,7 @@ export default {
   methods: {
 
     sizeSvg () {
-      this.internaldata.layout.transformSvg(this.internaldata.svg, this.margin)
+      this.layout.transformSvg(this.internaldata.svg, this.margin)
     },
 
     getSize () {
@@ -110,7 +111,7 @@ export default {
               .attr('width', size.width)
               .attr('height', size.height)
 
-      this.internaldata.layout.size(this.internaldata.tree, size)
+      this.layout.size(this.internaldata.tree, size)
       this.redraw()
     },
 
@@ -124,16 +125,14 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => { return d.id })
 
-      const layout = this.internaldata.layout
-
       const updateLinks = links.enter().append('path')
                     .attr('class', 'linktree')
-                    .attr('d', d => { return drawLink(origin, origin, layout) })
+                    .attr('d', d => { return drawLink(origin, origin, this.layout) })
 
       const updateAndNewLinks = links.merge(updateLinks)
-      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, layout) })
+      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, this.layout) })
 
-      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source, layout) }).remove()
+      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source, this.layout) }).remove()
 
       const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
 
@@ -224,7 +223,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
-      this.internaldata.layout.size(tree, size)
+      this.layout.size(tree, size)
       return tree
     },
 
