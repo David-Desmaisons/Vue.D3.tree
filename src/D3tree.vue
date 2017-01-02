@@ -3,7 +3,8 @@
   </div>
 </template>
 <script>
-import euclidianLayout from './euclidianLayout'
+import euclidianLayout from './euclidian-layout'
+import circularLayout from './circular-layout'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
@@ -11,6 +12,7 @@ Object.assign(d3, d3Hierarchy)
 
 var i = 0
 var currentSelected = null
+const types = ['tree', 'cluster']
 
 const props = {
   data: Object,
@@ -20,7 +22,10 @@ const props = {
   },
   type: {
     type: String,
-    default: 'tree'
+    default: 'tree',
+    validator (value) {
+      return types.indexOf(value) !== -1
+    }
   },
   marginX: {
     type: Number,
@@ -53,8 +58,8 @@ function removeTextAndGraph (selection) {
   })
 }
 
-function translate (vector) {
-  return 'translate(' + vector.y + ',' + vector.x + ')'
+function translate (vector, {transformNode}) {
+  return 'translate(' + transformNode(vector.x, vector.y) + ')'
 }
 
 export default {
@@ -62,6 +67,7 @@ export default {
 
   mounted () {
     this.layout = euclidianLayout
+    this.layout = circularLayout
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
@@ -84,7 +90,7 @@ export default {
 
   methods: {
     sizeSvg () {
-      this.layout.transformSvg(this.internaldata.svg, this.margin)
+      this.layout.transformSvg(this.internaldata.svg, this.margin, this.getSize())
     },
 
     getSize () {
@@ -99,7 +105,7 @@ export default {
               .attr('width', size.width)
               .attr('height', size.height)
 
-      this.layout.size(this.internaldata.tree, size)
+      this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
 
@@ -126,7 +132,7 @@ export default {
 
       const newNodes = node.enter().append('g')
                 .attr('class', 'nodetree')
-                .attr('transform', d => { return translate(origin) })
+                .attr('transform', d => { return translate(origin, this.layout) })
 
       const allNodes = newNodes.merge(node)
       allNodes.classed('node--internal', d => { return hasChildren(d) })
@@ -135,7 +141,7 @@ export default {
         .on('click', this.onNodeClick)
 
       allNodes.transition().duration(this.duration)
-        .attr('transform', d => { return translate(d) })
+        .attr('transform', d => { return translate(d, this.layout) })
         .attr('opacity', 1)
 
       removeTextAndGraph(node)
@@ -160,7 +166,7 @@ export default {
 
       const exitingNodes = node.exit()
       exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => { return translate(source) })
+                  .attr('transform', d => { return translate(source, this.layout) })
                   .attr('opacity', 0).remove()
       exitingNodes.select('circle').attr('r', 1e-6)
     },
@@ -182,10 +188,10 @@ export default {
         this.clean()
         return
       }
-      var root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
+      const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
       root.each(d => { d.id = i++ })
-      var size = this.getSize()
+      const size = this.getSize()
       root.x = size.height / 2
       root.y = 0
       root.x0 = root.x
@@ -211,7 +217,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
-      this.layout.size(tree, size)
+      this.layout.size(tree, size, this.margin)
       return tree
     },
 
