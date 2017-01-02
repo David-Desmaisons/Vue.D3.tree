@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import D3tree from './components/D3tree'
+import D3tree from '../src/D3tree'
 import data from '../data/data'
 Object.assign(data, {type: 'tree', duration: 750})
 
