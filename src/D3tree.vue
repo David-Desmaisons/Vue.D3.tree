@@ -83,7 +83,6 @@ export default {
   },
 
   methods: {
-
     sizeSvg () {
       this.layout.transformSvg(this.internaldata.svg, this.margin)
     },
