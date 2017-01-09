@@ -1,14 +1,14 @@
 <template>
-  <div class="viewport treeclass">
+  <div class="viewport treeclass" v-resize="resize">
   </div>
 </template>
 <script>
-import euclidianLayout from './euclidian-layout'
-import circularLayout from './circular-layout'
-
+import resize from 'vue-resize-directive'
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
 Object.assign(d3, d3Hierarchy)
+import euclidianLayout from './euclidian-layout'
+import circularLayout from './circular-layout'
 
 var i = 0
 var currentSelected = null
@@ -35,6 +35,10 @@ const props = {
     type: Number,
     default: 20
   }
+}
+
+const directives = {
+  resize
 }
 
 function compareString (a, b) {
@@ -65,9 +69,11 @@ function translate (vector, {transformNode}) {
 export default {
   props,
 
+  directives,
+
   mounted () {
-    this.layout = euclidianLayout
     this.layout = circularLayout
+    this.layout = euclidianLayout
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
@@ -80,8 +86,6 @@ export default {
       tree
     }
     this.sizeSvg()
-
-    window.onresize = this.resize.bind(this)
 
     if (this.data) {
       this.onData(this.data)

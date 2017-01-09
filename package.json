@@ -13,7 +13,8 @@
   "dependencies": {
     "d3": "^4.4.0",
     "d3-hierarchy": "^1.0.3",
-    "vue": "^2.1.0"
+    "vue": "^2.1.0",
+    "vue-resize-directive": "^1.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
