@@ -32,6 +32,12 @@ var webpackConfig = merge(baseWebpackConfig, {
       commonjs2: 'd3-hierarchy',
       commonjs: 'd3-hierarchy',
       amd: 'd3-hierarchy'
+    },
+    "vue-resize-directive": {
+      root: 'Vueresize',
+      commonjs2: 'vue-resize-directive',
+      commonjs: 'vue-resize-directive',
+      amd: 'vue-resize-directive'
     }
   },
   module: {
