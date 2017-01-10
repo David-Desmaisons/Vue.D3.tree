@@ -29,7 +29,7 @@ const props = {
   },
   marginX: {
     type: Number,
-    default: 20
+    default: 100
   },
   marginY: {
     type: Number,
@@ -78,7 +78,7 @@ export default {
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
-    const g = svg
+    const g = this.layout.transformSvg(svg.append('g'), this.margin, size)
     const tree = this.tree
     this.internaldata = {
       svg,
@@ -94,7 +94,7 @@ export default {
 
   methods: {
     sizeSvg () {
-      this.layout.transformSvg(this.internaldata.svg, this.margin, this.getSize())
+      this.internaldata.g = this.layout.transformSvg(this.internaldata.g, this.margin, this.getSize())
     },
 
     getSize () {

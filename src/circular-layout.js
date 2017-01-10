@@ -12,7 +12,6 @@ export default {
   },
 
   transformSvg (svg, {x, y}, {width, height}) {
-    svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
-    return svg
+    return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
   }
 }
