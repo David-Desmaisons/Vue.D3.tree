@@ -72,8 +72,8 @@ export default {
   directives,
 
   mounted () {
-    this.layout = circularLayout
     this.layout = euclidianLayout
+    this.layout = circularLayout
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
