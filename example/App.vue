@@ -10,14 +10,24 @@
       <option>cluster</option>
     </select>
 
-    <d3tree :data="Graph.tree" :type="type" :duration="duration" class="tree"></d3tree>
+    <label for="layout-type">Layout type</label>
+    <select id="layout-type" v-model="layoutType">
+      <option>euclidian</option>
+      <option>circular</option>
+    </select>
+
+    <d3tree :data="Graph.tree" :type="type" :layout-type="layoutType" :duration="duration" class="tree"></d3tree>
   </div>
 </template>
 
 <script>
 import D3tree from '../src/D3tree'
 import data from '../data/data'
-Object.assign(data, {type: 'tree', duration: 750})
+Object.assign(data, {
+  type: 'tree',
+  layoutType: 'euclidian',
+  duration: 750
+})
 
 export default {
   name: 'app',

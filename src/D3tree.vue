@@ -7,12 +7,18 @@ import resize from 'vue-resize-directive'
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
 Object.assign(d3, d3Hierarchy)
-import euclidianLayout from './euclidian-layout'
-import circularLayout from './circular-layout'
+import euclidian from './euclidian-layout'
+import circular from './circular-layout'
+
+const layout = {
+  euclidian,
+  circular
+}
 
 var i = 0
 var currentSelected = null
 const types = ['tree', 'cluster']
+const layouts = ['circular', 'euclidian']
 
 const props = {
   data: Object,
@@ -25,6 +31,13 @@ const props = {
     default: 'tree',
     validator (value) {
       return types.indexOf(value) !== -1
+    }
+  },
+  layoutType: {
+    type: String,
+    default: 'euclidian',
+    validator (value) {
+      return layouts.indexOf(value) !== -1
     }
   },
   marginX: {
@@ -72,8 +85,6 @@ export default {
   directives,
 
   mounted () {
-    this.layout = euclidianLayout
-    this.layout = circularLayout
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
@@ -227,6 +238,10 @@ export default {
 
     margin () {
       return {x: this.marginX, y: this.marginY}
+    },
+
+    layout () {
+      return layout[this.layoutType]
     }
   },
 
@@ -240,6 +255,14 @@ export default {
         return
       }
       this.internaldata.tree = this.tree
+      this.redraw()
+    },
+
+    layoutType () {
+      const g = this.internaldata.g.transition().duration(this.duration)
+      const size = this.getSize()
+      this.layout.transformSvg(g, this.margin, size)
+      this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     }
   }
