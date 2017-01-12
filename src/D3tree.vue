@@ -163,7 +163,7 @@ export default {
 
       allNodes.append('circle')
 
-      allNodes.append('text')
+      const text = allNodes.append('text')
         .attr('x', d => { return hasChildren(d) ? -13 : 13 })
         .attr('dy', '.35em')
         .attr('text-anchor', d => { return hasChildren(d) ? 'end' : 'start' })
@@ -173,6 +173,8 @@ export default {
           d3.event.stopPropagation()
           this.redraw()
         })
+
+      this.layout.transformText(text.transition().duration(this.duration))
 
       allNodes.each(function (d) {
         d.x0 = d.x

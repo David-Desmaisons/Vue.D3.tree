@@ -13,5 +13,10 @@ export default {
 
   transformSvg (svg, {x, y}, {width, height}) {
     return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
+  },
+
+  transformText (text) {
+    return text.attr('transform', (d) => { return 'rotate(' + (d.x < 180 ? d.x - 90 : d.x + 90) + ')' })
+    // return text.attr('transform', (d) => { return 'rotate(' + (d.x - 90) + ')' })
   }
 }

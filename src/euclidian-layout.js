@@ -9,5 +9,9 @@ export default {
 
   transformSvg (svg, margin) {
     return svg.attr('transform', 'translate(' + margin.x + ',' + margin.y + ')')
+  },
+
+  transformText (text) {
+    return text
   }
 }
