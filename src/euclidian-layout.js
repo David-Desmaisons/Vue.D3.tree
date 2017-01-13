@@ -11,7 +11,8 @@ export default {
     return svg.attr('transform', 'translate(' + margin.x + ',' + margin.y + ')')
   },
 
-  transformText (text) {
-    return text
+  transformText (text, hasChildren) {
+    return text.attr('x', d => { return hasChildren(d) ? -13 : 13 })
+              .attr('text-anchor', d => { return hasChildren(d) ? 'end' : 'start' })
   }
 }

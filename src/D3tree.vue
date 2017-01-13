@@ -42,7 +42,7 @@ const props = {
   },
   marginX: {
     type: Number,
-    default: 100
+    default: 20
   },
   marginY: {
     type: Number,
@@ -164,9 +164,7 @@ export default {
       allNodes.append('circle')
 
       const text = allNodes.append('text')
-        .attr('x', d => { return hasChildren(d) ? -13 : 13 })
         .attr('dy', '.35em')
-        .attr('text-anchor', d => { return hasChildren(d) ? 'end' : 'start' })
         .text(d => { return d.data.text })
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
@@ -174,7 +172,7 @@ export default {
           this.redraw()
         })
 
-      this.layout.transformText(text.transition().duration(this.duration))
+      this.layout.transformText(text.transition().duration(this.duration), hasChildren)
 
       allNodes.each(function (d) {
         d.x0 = d.x
