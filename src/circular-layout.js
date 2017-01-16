@@ -16,8 +16,14 @@ export default {
   },
 
   transformText (text, hasChildren) {
-    return text.attr('x', (d) => { return d.x < 180 === !hasChildren(d) ? 6 : -6 })
-              .attr('transform', (d) => { return 'rotate(' + (d.x < 180 ? d.x - 90 : d.x + 90) + ')' })
-              .style('text-anchor', (d) => { return d.x < 180 === !hasChildren(d) ? 'start' : 'end' })
+    return text.each(d => {
+      const children = hasChildren(d)
+      const textInfo = {
+        x: d.x < 180 === !children ? 6 : -6,
+        rotate: d.x < 180 ? d.x - 90 : d.x + 90,
+        anchor: d.x < 180 === !children ? 'start' : 'end'
+      }
+      Object.assign(d, {textInfo})
+    })
   }
 }

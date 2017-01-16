@@ -172,7 +172,15 @@ export default {
           this.redraw()
         })
 
-      this.layout.transformText(text.transition().duration(this.duration), hasChildren)
+      text.attr('x', (d) => { return d.textInfo ? d.textInfo.x : 0 })
+          .attr('transform', (d) => { return 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0)v + ')' })
+          .style('text-anchor', (d) => { return d.textInfo ? d.textInfo.anchor : 'start' })
+
+      this.layout.transformText(allNodes, hasChildren)
+      text.transition().duration(this.duration)
+          .attr('x', (d) => { return d.textInfo.x })
+          .attr('transform', (d) => { return 'rotate(' + d.textInfo.rotate + ')' })
+          .style('text-anchor', (d) => { return d.textInfo.anchor })
 
       allNodes.each(function (d) {
         d.x0 = d.x

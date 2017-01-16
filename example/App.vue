@@ -2,7 +2,7 @@
   <div id="app">
 
     <label for="velocity">Transtion velocity {{duration}}ms</label>
-    <input id="velocity" type="range" min="0" max="2000" v-model.number="duration">
+    <input id="velocity" type="range" min="0" max="3000" v-model.number="duration">
 
     <label for="type">Tree type</label>
     <select id="type" v-model="type">

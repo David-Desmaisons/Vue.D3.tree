@@ -12,7 +12,14 @@ export default {
   },
 
   transformText (text, hasChildren) {
-    return text.attr('x', d => { return hasChildren(d) ? -13 : 13 })
-              .attr('text-anchor', d => { return hasChildren(d) ? 'end' : 'start' })
+    return text.each(d => {
+      const children = hasChildren(d)
+      const textInfo = {
+        x: !children ? 6 : -6,
+        rotate: 0,
+        anchor: !children ? 'start' : 'end'
+      }
+      Object.assign(d, {textInfo})
+    })
   }
 }
