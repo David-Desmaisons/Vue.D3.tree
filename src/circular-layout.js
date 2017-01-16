@@ -15,15 +15,11 @@ export default {
     return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
   },
 
-  transformText (text, hasChildren) {
-    return text.each(d => {
-      const children = hasChildren(d)
-      const textInfo = {
-        x: d.x < 180 === !children ? 6 : -6,
-        rotate: d.x < 180 ? d.x - 90 : d.x + 90,
-        anchor: d.x < 180 === !children ? 'start' : 'end'
-      }
-      Object.assign(d, {textInfo})
-    })
+  transformText (d, children) {
+    return {
+      x: d.x < 180 === !children ? 6 : -6,
+      rotate: d.x < 180 ? d.x - 90 : d.x + 90,
+      anchor: d.x < 180 === !children ? 'start' : 'end'
+    }
   }
 }
