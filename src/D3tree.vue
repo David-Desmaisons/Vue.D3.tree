@@ -130,6 +130,7 @@ export default {
               .attr('height', size.height)
 
       this.layout.size(this.internaldata.tree, size, this.margin)
+      this.layout.transformSvg(this.internaldata.g.transition().duration(this.duration), this.margin, size)
       this.redraw()
     },
 
