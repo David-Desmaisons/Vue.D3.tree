@@ -48,7 +48,7 @@ export default {
   methods: {
     onClick (evt) {
       console.log(evt)
-  }
+    }
   }
 }
 </script>
