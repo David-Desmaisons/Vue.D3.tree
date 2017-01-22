@@ -81,9 +81,9 @@ function translate (vector, {transformNode}) {
 
 function anchorTodx (d, el) {
   if (d === 'middle') {
-    return -el.getBBox().width / 2 + 'px'
+    return -el.getBBox().width / 2
   } else if (d === 'end') {
-    return -el.getBBox().width + 'px'
+    return -el.getBBox().width
   }
   return 0
 }
@@ -129,6 +129,14 @@ export default {
               .attr('width', size.width)
               .attr('height', size.height)
 
+      this.layout.size(this.internaldata.tree, size, this.margin)
+      this.redraw()
+    },
+
+    completeRedraw () {
+      const g = this.internaldata.g.transition().duration(this.duration)
+      const size = this.getSize()
+      this.layout.transformSvg(g, this.margin, size)
       this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
@@ -184,14 +192,12 @@ export default {
       text.attr('x', (d) => { return d.textInfo ? d.textInfo.x : 0 })
           .attr('transform', (d) => { return 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')' })
            .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
-          // .style('text-anchor', (d) => { return d.textInfo ? d.textInfo.anchor : 'start' })
 
       this.layout.transformText(allNodes, hasChildren)
       text.transition().duration(this.duration)
           .attr('x', (d) => { return d.textInfo.x })
           .attr('transform', (d) => { return 'rotate(' + d.textInfo.rotate + ')' })
           .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          // .style(' text-anchor', (d) => { return d.textInfo.anchor })
 
       allNodes.each(function (d) {
         d.x0 = d.x
@@ -277,12 +283,16 @@ export default {
       this.redraw()
     },
 
+    marginX () {
+      this.completeRedraw()
+    },
+
+    marginY () {
+      this.completeRedraw()
+    },
+
     layoutType () {
-      const g = this.internaldata.g.transition().duration(this.duration)
-      const size = this.getSize()
-      this.layout.transformSvg(g, this.margin, size)
-      this.layout.size(this.internaldata.tree, size, this.margin)
-      this.redraw()
+      this.completeRedraw()
     }
   }
 }
