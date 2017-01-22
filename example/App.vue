@@ -22,7 +22,7 @@
       <option>circular</option>
     </select>
 
-    <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree"></d3tree>
+    <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick"></d3tree>
   </div>
 </template>
 
@@ -44,6 +44,11 @@ export default {
   },
   components: {
     D3tree
+  },
+  methods: {
+    onClick (evt) {
+      console.log(evt)
+  }
   }
 }
 </script>
