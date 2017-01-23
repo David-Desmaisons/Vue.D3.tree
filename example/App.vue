@@ -2,10 +2,10 @@
   <div id="app">
 
     <label for="margin-x">Margin x {{Marginx}}px</label>
-    <input id="margin-x" type="range" min="0" max="100" v-model.number="Marginx">
+    <input id="margin-x" type="range" min="0" max="200" v-model.number="Marginx">
 
     <label for="margin-y">Margin y {{Marginy}}px</label>
-    <input id="margin-y" type="range" min="0" max="100" v-model.number="Marginy">
+    <input id="margin-y" type="range" min="0" max="200" v-model.number="Marginy">
 
     <label for="velocity">Transtion velocity {{duration}}ms</label>
     <input id="velocity" type="range" min="0" max="3000" v-model.number="duration">
