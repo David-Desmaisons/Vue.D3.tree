@@ -1,28 +1,56 @@
 <template>
-  <div id="app">
+  <div id="app" class="container-fluid">
+    <div class="col-md-4">
+      <div class="form-horizontal">
 
-    <label for="margin-x">Margin x {{Marginx}}px</label>
-    <input id="margin-x" type="range" min="0" max="200" v-model.number="Marginx">
+      <div class="form-group">
+        <label for="type" class="control-label col-sm-2">Tree</label>
+          <div  class="col-sm-10">
+            <select id="type" class="form-control" v-model="type">
+              <option>tree</option>
+              <option>cluster</option>
+            </select>
+          </div>
+      </div>
 
-    <label for="margin-y">Margin y {{Marginy}}px</label>
-    <input id="margin-y" type="range" min="0" max="200" v-model.number="Marginy">
+      <div class="form-group">
+        <label for="layout-type" class="control-label col-sm-2">Layout</label>
+          <div  class="col-sm-10">
+            <select id="layout-type" class="form-control col-sm-10" v-model="layoutType">
+              <option>euclidian</option>
+              <option>circular</option>
+            </select>       
+        </div>
+      </div> 
 
-    <label for="velocity">Transtion velocity {{duration}}ms</label>
-    <input id="velocity" type="range" min="0" max="3000" v-model.number="duration">
+      <div class="form-group">
+        <label for="margin-x" class="control-label col-sm-2">Margin-x {{Marginx}}px</label>
+        <div class="col-sm-10">
+          <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
+        </div> 
+      </div>        
 
-    <label for="type">Tree type</label>
-    <select id="type" v-model="type">
-      <option>tree</option>
-      <option>cluster</option>
-    </select>
+      <div class="form-group">
+        <label for="margin-y" class="control-label col-sm-2">Margin-y {{Marginy}}px</label>
+        <div class="col-sm-10">
+          <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
+        </div> 
+      </div>        
 
-    <label for="layout-type">Layout type</label>
-    <select id="layout-type" v-model="layoutType">
-      <option>euclidian</option>
-      <option>circular</option>
-    </select>
+      <div class="form-group">
+        <label for="velocity" class="control-label col-sm-2">Duration {{duration}}ms</label>
+        <div class="col-sm-10">
+          <input id="velocity" class="form-control" type="range" min="0" max="3000" v-model.number="duration">
+        </div> 
+      </div>       
 
+    </div>
+  </div>
+
+  <div class="col-md-8">
     <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick"></d3tree>
+  </div>
+
   </div>
 </template>
 
