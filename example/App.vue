@@ -1,11 +1,11 @@
 <template>
   <div id="app" class="container-fluid">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="form-horizontal">
 
       <div class="form-group">
-        <label for="type" class="control-label col-sm-2">Tree</label>
-          <div  class="col-sm-10">
+        <label for="type" class="control-label col-sm-3">Tree</label>
+          <div  class="col-sm-9">
             <select id="type" class="form-control" v-model="type">
               <option>tree</option>
               <option>cluster</option>
@@ -14,8 +14,8 @@
       </div>
 
       <div class="form-group">
-        <label for="layout-type" class="control-label col-sm-2">Layout</label>
-          <div  class="col-sm-10">
+        <label for="layout-type" class="control-label col-sm-3">Layout</label>
+          <div  class="col-sm-9">
             <select id="layout-type" class="form-control col-sm-10" v-model="layoutType">
               <option>euclidian</option>
               <option>circular</option>
@@ -24,30 +24,39 @@
       </div> 
 
       <div class="form-group">
-        <label for="margin-x" class="control-label col-sm-2">Margin-x {{Marginx}}px</label>
-        <div class="col-sm-10">
+        <label for="margin-x" class="control-label col-sm-3">Margin-x</label>
+        <div class="col-sm-8">
           <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
         </div> 
+          <div class="col-sm-1">
+            <p>{{Marginx}}px</p>       
+        </div> 
       </div>        
 
       <div class="form-group">
-        <label for="margin-y" class="control-label col-sm-2">Margin-y {{Marginy}}px</label>
-        <div class="col-sm-10">
+        <label for="margin-y" class="control-label col-sm-3">Margin-y</label>
+        <div class="col-sm-8">
           <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
+        </div>
+        <div class="col-sm-1">
+          <p>{{Marginy}}px</p>       
         </div> 
       </div>        
 
       <div class="form-group">
-        <label for="velocity" class="control-label col-sm-2">Duration {{duration}}ms</label>
-        <div class="col-sm-10">
+        <label for="velocity" class="control-label col-sm-3">Duration</label>
+        <div class="col-sm-8">
           <input id="velocity" class="form-control" type="range" min="0" max="3000" v-model.number="duration">
-        </div> 
+        </div>
+        <div class="col-sm-1">
+          <p>{{duration}}ms</p>       
+        </div>
       </div>       
 
     </div>
   </div>
 
-  <div class="col-md-8">
+  <div class="col-md-9">
     <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick"></d3tree>
   </div>
 
