@@ -1,58 +1,64 @@
 <template>
   <div id="app" class="container-fluid">
     <div class="col-md-3">
-      <div class="form-horizontal">
 
-      <div class="form-group">
-        <label for="type" class="control-label col-sm-3">type</label>
-          <div  class="col-sm-9">
-            <select id="type" class="form-control" v-model="type">
-              <option>tree</option>
-              <option>cluster</option>
-            </select>
-          </div>
-      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">Props</div>
 
-      <div class="form-group">
-        <label for="layout-type" class="control-label col-sm-3">layoutType</label>
-          <div  class="col-sm-9">
-            <select id="layout-type" class="form-control col-sm-10" v-model="layoutType">
-              <option>euclidian</option>
-              <option>circular</option>
-            </select>       
-        </div>
-      </div> 
+        <div class="panel-body">
+            <div class="form-horizontal">
 
-      <div class="form-group">
-        <label for="margin-x" class="control-label col-sm-3">marginx</label>
-        <div class="col-sm-8">
-          <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
+            <div class="form-group">
+              <label for="type" class="control-label col-sm-3">type</label>
+                <div  class="col-sm-9">
+                  <select id="type" class="form-control" v-model="type">
+                    <option>tree</option>
+                    <option>cluster</option>
+                  </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+              <label for="layout-type" class="control-label col-sm-3">layoutType</label>
+                <div  class="col-sm-9">
+                  <select id="layout-type" class="form-control" v-model="layoutType">
+                    <option>euclidian</option>
+                    <option>circular</option>
+                  </select>       
+              </div>
+            </div> 
+
+            <div class="form-group">
+              <label for="margin-x" class="control-label col-sm-3">marginx</label>
+              <div class="col-sm-7">
+                <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
+              </div> 
+                <div class="col-sm-2">
+                  <p>{{Marginx}}px</p>       
+              </div> 
+            </div>        
+
+            <div class="form-group">
+              <label for="margin-y" class="control-label col-sm-3">marginy</label>
+              <div class="col-sm-7">
+                <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
+              </div>
+              <div class="col-sm-2">
+                <p>{{Marginy}}px</p>       
+              </div> 
+            </div>        
+
+            <div class="form-group">
+              <label for="velocity" class="control-label col-sm-3">Duration</label>
+              <div class="col-sm-7">
+                <input id="velocity" class="form-control" type="range" min="0" max="3000" v-model.number="duration">
+              </div>
+              <div class="col-sm-2">
+                <p>{{duration}}ms</p>       
+              </div>
+            </div>   
         </div> 
-          <div class="col-sm-1">
-            <p>{{Marginx}}px</p>       
-        </div> 
-      </div>        
-
-      <div class="form-group">
-        <label for="margin-y" class="control-label col-sm-3">marginy</label>
-        <div class="col-sm-8">
-          <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
-        </div>
-        <div class="col-sm-1">
-          <p>{{Marginy}}px</p>       
-        </div> 
-      </div>        
-
-      <div class="form-group">
-        <label for="velocity" class="control-label col-sm-3">Duration</label>
-        <div class="col-sm-8">
-          <input id="velocity" class="form-control" type="range" min="0" max="3000" v-model.number="duration">
-        </div>
-        <div class="col-sm-1">
-          <p>{{duration}}ms</p>       
-        </div>
-      </div>       
-
+      </div>     
     </div>
   </div>
 
