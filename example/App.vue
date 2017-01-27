@@ -60,6 +60,18 @@
         </div> 
       </div>     
     </div>
+
+
+    <div class="panel panel-default log">
+        <div class="panel-heading">Events</div>
+
+        <div class="panel-body">
+          <div v-for="event in events">
+            Name: {{event.eventName}} Data:{{event.data}}
+          </div>
+        </div>
+    </div>
+
   </div>
 
   <div class="col-md-9">
@@ -77,7 +89,8 @@ Object.assign(data, {
   layoutType: 'euclidian',
   duration: 750,
   Marginx: 30,
-  Marginy: 30
+  Marginy: 30,
+  events: []
 })
 
 export default {
@@ -90,13 +103,16 @@ export default {
   },
   methods: {
     onClick (evt) {
-      console.log('onClick', evt)
+      this.onEvent('onClick', evt)
     },
     onExpand (evt) {
-      console.log('onExpand', evt)
+      this.onEvent('onExpand', evt)
     },
     onRetract (evt) {
-      console.log('onRetract', evt)
+      this.onEvent('onRetract', evt)
+    },
+    onEvent (eventName, data) {
+      this.events.push({eventName, data: JSON.stringify(data.data)})
     }
   }
 }
@@ -116,4 +132,12 @@ export default {
   height: 600px;
   width: 100%;
 }
+
+.log  {
+  height: 500px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  overflow: scroll;
+}
+
 </style>
