@@ -63,7 +63,7 @@
   </div>
 
   <div class="col-md-9">
-    <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick"></d3tree>
+    <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
   </div>
@@ -90,7 +90,13 @@ export default {
   },
   methods: {
     onClick (evt) {
-      console.log(evt)
+      console.log('onClick', evt)
+    },
+    onExpand (evt) {
+      console.log('onExpand', evt)
+    },
+    onRetract (evt) {
+      console.log('onRetract', evt)
     }
   }
 }

@@ -221,9 +221,11 @@ export default {
       if (d.children) {
         d._children = d.children
         d.children = null
+        this.$emit('retract', {element: d, data: d.data})
       } else {
         d.children = d._children
         d._children = null
+        this.$emit('expand', {element: d, data: d.data})
       }
       this.updateGraph(d)
     },
