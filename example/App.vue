@@ -67,7 +67,7 @@
 
         <div class="panel-body">
           <div v-for="event in events">
-            Name: {{event.eventName}} Data:{{event.data}}
+            <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
         </div>
     </div>
@@ -112,7 +112,7 @@ export default {
       this.onEvent('onRetract', evt)
     },
     onEvent (eventName, data) {
-      this.events.push({eventName, data: JSON.stringify(data.data)})
+      this.events.push({eventName, data: data.data})
     }
   }
 }
@@ -138,6 +138,7 @@ export default {
   overflow-x: scroll;
   overflow-y: scroll;
   overflow: scroll;
+  text-align: left;
 }
 
 </style>

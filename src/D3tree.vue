@@ -110,6 +110,8 @@ export default {
     if (this.data) {
       this.onData(this.data)
     }
+
+    window.onfocus = () => { this.completeRedraw() }
   },
 
   methods: {
