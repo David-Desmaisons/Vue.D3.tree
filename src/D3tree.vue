@@ -47,6 +47,10 @@ const props = {
   marginY: {
     type: Number,
     default: 20
+  },
+  nodeText: {
+    type: String,
+    required: true
   }
 }
 
@@ -185,7 +189,7 @@ export default {
 
       const text = allNodes.append('text')
         .attr('dy', '.35em')
-        .text(d => { return d.data.text })
+        .text(d => { return d.data[this.nodeText] })
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
           d3.event.stopPropagation()

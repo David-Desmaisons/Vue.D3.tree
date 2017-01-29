@@ -62,10 +62,10 @@
     </div>
 
 
-    <div class="panel panel-default log">
+    <div class="panel panel-default">
         <div class="panel-heading">Events</div>
 
-        <div class="panel-body">
+        <div class="panel-body log">
           <div v-for="event in events">
             <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
@@ -75,7 +75,7 @@
   </div>
 
   <div class="col-md-9">
-    <d3tree :data="Graph.tree" :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
+    <d3tree :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
   </div>
@@ -90,6 +90,7 @@ Object.assign(data, {
   duration: 750,
   Marginx: 30,
   Marginy: 30,
+  nodeText: 'text',
   events: []
 })
 
@@ -113,6 +114,7 @@ export default {
     },
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
+      console.log({eventName, data: data})
     }
   }
 }
@@ -135,9 +137,9 @@ export default {
 
 .log  {
   height: 500px;
-  overflow-x: scroll;
-  overflow-y: scroll;
-  overflow: scroll;
+  overflow-x: auto;
+  overflow-y: auto;
+  overflow: auto;
   text-align: left;
 }
 
