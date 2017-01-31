@@ -1,6 +1,6 @@
 {
   "name": "vued3tree",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Vue.js project",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
@@ -10,6 +10,17 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs"
   },
+   "main": "dist/vueD3Tree.js",
+   "files": [
+    "dist/vueD3Tree.js"
+  ],
+  "keywords": [
+    "vue",
+    "vuejs",
+    "tree",
+    "D3.js",
+    "web-components"
+  ],
   "dependencies": {
     "d3": "^4.4.0",
     "d3-hierarchy": "^1.0.3",
