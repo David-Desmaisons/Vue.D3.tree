@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
 
-Generic vue component to display tree based on [D3.js](https://d3js.org/) layout.
+Vue component to display tree based on [D3.js](https://d3js.org/) layout.
 
 ![demo](./documentation/treedemo.gif)
 
