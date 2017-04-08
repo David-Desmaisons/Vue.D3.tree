@@ -2,7 +2,7 @@
 
 Generic vue component to display tree based on [D3.js](https://d3js.org/) layout.
 
-![demo](../documentation/treedemo.gif)
+![demo](./documentation/treedemo.gif)
 
 ## Usage
 
