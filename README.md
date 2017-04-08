@@ -26,12 +26,12 @@ export default {
       return {
           tree: {
             name: "father",
-            chidldren:[{ 
+            children:[{ 
                 name: "son1",
                 chidldren:[ {name: "grandson"}, {name: "grandson2"}]
             },{
                 name: "son2",
-                chidldren:[ {name: "grandson3"}, {name: "grandson4"}]
+                children:[ {name: "grandson3"}, {name: "grandson4"}]
             }]
        }
     }     
