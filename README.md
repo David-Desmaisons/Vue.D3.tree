@@ -1,6 +1,11 @@
 # Vue.D3.tree
+[![GitHub open issues](https://img.shields.io/github/issues/David-Desmaisons/Vue.D3.tree.svg?maxAge=2592000)](https://github.com/David-Desmaisons/Vue.D3.tree/issues)
+[![Npm version](https://img.shields.io/npm/v/vued3tree.svg?maxAge=2592000)](https://www.npmjs.com/package/vued3tree)
+[![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
+[![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
-Generic vue component to display tree based on [D3.js](https://d3js.org/) layout.
+
+Vue component to display tree based on [D3.js](https://d3js.org/) layout.
 
 ![demo](./documentation/treedemo.gif)
 
@@ -21,12 +26,12 @@ export default {
       return {
           tree: {
             name: "father",
-            chidldren:[{ 
+            children:[{ 
                 name: "son1",
                 chidldren:[ {name: "grandson"}, {name: "grandson2"}]
             },{
                 name: "son2",
-                chidldren:[ {name: "grandson3"}, {name: "grandson4"}]
+                children:[ {name: "grandson3"}, {name: "grandson4"}]
             }]
        }
     }     
