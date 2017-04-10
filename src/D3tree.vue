@@ -73,6 +73,14 @@ function hasChildren (d) {
   return d.children || d._children
 }
 
+function onAllChilddren (d, callback) {
+  if (callback(d) === false) {
+    return
+  }
+  var directChildren = hasChildren(d)
+  directChildren && directChildren.forEach(child => onAllChilddren(child, callback))
+}
+
 function removeTextAndGraph (selection) {
   ['circle', 'text'].forEach(select => {
     selection.selectAll(select).remove()
@@ -223,17 +231,58 @@ export default {
       exitingNodes.select('circle').attr('r', 1e-6)
     },
 
+    colapse (d, update = true) {
+      if (!d.children) {
+        return
+      }
+
+      d._children = d.children
+      d.children = null
+      this.$emit('retract', {element: d, data: d.data})
+      update && this.updateGraph(d)
+    },
+
+    expand (d, update = true) {
+      if (d.children) {
+        return
+      }
+
+      d.children = d._children
+      d._children = null
+      this.$emit('expand', {element: d, data: d.data})
+      update && this.updateGraph(d)
+    },
+
+    expandAll (d, update = true) {
+      onAllChilddren(d, child => this.expand(child, false))
+      update && this.updateGraph(d)
+    },
+
+    colapseAll (d, update = true) {
+      onAllChilddren(d, child => this.colapse(child, false))
+      update && this.updateGraph(d)
+    },
+
     onNodeClick (d) {
       if (d.children) {
-        d._children = d.children
-        d.children = null
-        this.$emit('retract', {element: d, data: d.data})
+        this.colapse(d)
       } else {
-        d.children = d._children
-        d._children = null
-        this.$emit('expand', {element: d, data: d.data})
+        this.expand(d)
       }
-      this.updateGraph(d)
+    },
+
+    showOnlyChildren (d) {
+      const root = this.internaldata.root
+      const path = d.ancestors()
+      console.log(path)
+      const updater = node => {
+        if (node === d) {
+          this.expandAll(d, false)
+          return false
+        }
+      }
+      onAllChilddren(root, updater)
+      this.updateGraph(root)
     },
 
     onData (data) {

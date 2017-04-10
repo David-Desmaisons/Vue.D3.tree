@@ -56,7 +56,18 @@
               <div class="col-sm-2">
                 <p>{{duration}}ms</p>       
               </div>
-            </div>   
+            </div>  
+
+            <div class="form-group">
+              <p v-if="currentNode">Current Node: {{currentNode.data.text}}</p>
+              <p v-else>No Node selected.</p>
+            </div>  
+
+            <button type="button" class="btn btn-primary" @click="expandAll">Expand All from current</button>
+
+            <button type="button" class="btn btn-secondary" @click="colapseAll">Colapse All from current</button>
+ 
+ 
         </div> 
       </div>     
     </div>
@@ -75,7 +86,7 @@
   </div>
 
   <div class="col-md-9">
-    <d3tree :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
+    <d3tree ref="tree" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
   </div>
@@ -91,6 +102,7 @@ Object.assign(data, {
   Marginx: 30,
   Marginy: 30,
   nodeText: 'text',
+  currentNode: null,
   events: []
 })
 
@@ -103,7 +115,18 @@ export default {
     D3tree
   },
   methods: {
+    expandAll () {
+      if (this.currentNode) {
+        this.$refs['tree'].expandAll(this.currentNode)
+      }
+    },
+    colapseAll () {
+      if (this.currentNode) {
+        this.$refs['tree'].colapseAll(this.currentNode)
+      }
+    },
     onClick (evt) {
+      this.currentNode = evt.element
       this.onEvent('onClick', evt)
     },
     onExpand (evt) {
