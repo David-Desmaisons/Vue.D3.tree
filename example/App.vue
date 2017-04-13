@@ -65,8 +65,9 @@
 
             <button type="button" class="btn btn-primary" @click="expandAll">Expand All from current</button>
 
-            <button type="button" class="btn btn-secondary" @click="colapseAll">Colapse All from current</button>
- 
+            <button type="button" class="btn btn-secondary" @click="collapseAll">Collapse All from current</button>
+
+            <button type="button" class="btn btn-success" @click="showOnlyChildren">Show Only Children from current</button>
  
         </div> 
       </div>     
@@ -120,9 +121,14 @@ export default {
         this.$refs['tree'].expandAll(this.currentNode)
       }
     },
-    colapseAll () {
+    collapseAll () {
       if (this.currentNode) {
-        this.$refs['tree'].colapseAll(this.currentNode)
+        this.$refs['tree'].collapseAll(this.currentNode)
+      }
+    },
+    showOnlyChildren () {
+      if (this.currentNode) {
+        this.$refs['tree'].showOnlyChildren(this.currentNode)
       }
     },
     onClick (evt) {

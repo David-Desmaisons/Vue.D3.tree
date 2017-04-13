@@ -10,6 +10,12 @@ Object.assign(d3, d3Hierarchy)
 import euclidian from './euclidian-layout'
 import circular from './circular-layout'
 
+function mapMany (arr, mapper) {
+  return arr.reduce(function (prev, curr) {
+    return prev.concat(mapper(curr))
+  }, [])
+}
+
 const layout = {
   euclidian,
   circular
@@ -235,7 +241,7 @@ export default {
       exitingNodes.select('circle').attr('r', 1e-6)
     },
 
-    colapse (d, update = true) {
+    collapse (d, update = true) {
       if (!d.children) {
         return
       }
@@ -262,14 +268,14 @@ export default {
       update && this.updateGraph(d)
     },
 
-    colapseAll (d, update = true) {
-      onAllChilddren(d, child => this.colapse(child, false))
+    collapseAll (d, update = true) {
+      onAllChilddren(d, child => this.collapse(child, false))
       update && this.updateGraph(d)
     },
 
     onNodeClick (d) {
       if (d.children) {
-        this.colapse(d)
+        this.collapse(d)
       } else {
         this.expand(d)
       }
@@ -277,16 +283,17 @@ export default {
 
     showOnlyChildren (d) {
       const root = this.internaldata.root
-      const path = d.ancestors()
-      console.log(path)
+      const path = d.ancestors().reverse()
+      const shouldBeRetracted = mapMany(path, p => p.children).filter(node => node !== null && (path.indexOf(node) === -1))
       const updater = node => {
-        if (node === d) {
-          this.expandAll(d, false)
+        if (shouldBeRetracted.indexOf(node) !== -1) {
+          this.collapse(node, false)
           return false
         }
+        return (node !== d)
       }
       onAllChilddren(root, updater)
-      this.updateGraph(root)
+      this.updateGraph(d)
     },
 
     onData (data) {
