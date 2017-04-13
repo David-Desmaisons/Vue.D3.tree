@@ -157,9 +157,13 @@ export default {
     },
 
     updateGraph (source) {
-      const origin = {
-        x: source.x0,
-        y: source.y0
+      let originBuilder = source
+      if (typeof source === 'object') {
+        const origin = {
+          x: source.x0,
+          y: source.y0
+        }
+        originBuilder = d => origin
       }
 
       const root = this.internaldata.root
@@ -168,7 +172,7 @@ export default {
 
       const updateLinks = links.enter().append('path')
                     .attr('class', 'linktree')
-                    .attr('d', d => { return drawLink(origin, origin, this.layout) })
+                    .attr('d', d => { return drawLink(originBuilder(d), originBuilder(d), this.layout) })
 
       const updateAndNewLinks = links.merge(updateLinks)
       updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, this.layout) })
@@ -179,7 +183,7 @@ export default {
 
       const newNodes = node.enter().append('g')
                 .attr('class', 'nodetree')
-                .attr('transform', d => { return translate(origin, this.layout) })
+                .attr('transform', d => { return translate(originBuilder(d), this.layout) })
 
       const allNodes = newNodes.merge(node)
       allNodes.classed('node--internal', d => { return hasChildren(d) })
