@@ -79,12 +79,25 @@ function hasChildren (d) {
   return d.children || d._children
 }
 
-function onAllChilddren (d, callback) {
-  if (callback(d) === false) {
+function getChildren (d) {
+  return d.children ? {children: d.children, visible: true} : (d._children ? {children: d._children, visible: false} : null)
+}
+
+function onAllChilddren (d, callback, fatherVisible = undefined) {
+  if (callback(d, fatherVisible) === false) {
     return
   }
-  var directChildren = hasChildren(d)
-  directChildren && directChildren.forEach(child => onAllChilddren(child, callback))
+  var directChildren = getChildren(d)
+  directChildren && directChildren.children.forEach(child => onAllChilddren(child, callback, directChildren.visible))
+}
+
+function findInParents (node, nodes) {
+  if (nodes.indexOf(node) !== -1) {
+    return node
+  }
+
+  const parent = node.parent
+  return (parent === null) ? node : findInParents(parent, nodes)
 }
 
 function removeTextAndGraph (selection) {
@@ -164,12 +177,11 @@ export default {
 
     updateGraph (source) {
       let originBuilder = source
+      let forExit = source
       if (typeof source === 'object') {
-        const origin = {
-          x: source.x0,
-          y: source.y0
-        }
+        const origin = {x: source.x0, y: source.y0}
         originBuilder = d => origin
+        forExit = d => ({x: source.x, y: source.y})
       }
 
       const root = this.internaldata.root
@@ -183,7 +195,7 @@ export default {
       const updateAndNewLinks = links.merge(updateLinks)
       updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, this.layout) })
 
-      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(source, source, this.layout) }).remove()
+      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(forExit(d), forExit(d), this.layout) }).remove()
 
       const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
 
@@ -236,41 +248,9 @@ export default {
 
       const exitingNodes = node.exit()
       exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => { return translate(source, this.layout) })
+                  .attr('transform', d => { return translate(forExit(d), this.layout) })
                   .attr('opacity', 0).remove()
       exitingNodes.select('circle').attr('r', 1e-6)
-    },
-
-    collapse (d, update = true) {
-      if (!d.children) {
-        return
-      }
-
-      d._children = d.children
-      d.children = null
-      this.$emit('retract', {element: d, data: d.data})
-      update && this.updateGraph(d)
-    },
-
-    expand (d, update = true) {
-      if (d.children) {
-        return
-      }
-
-      d.children = d._children
-      d._children = null
-      this.$emit('expand', {element: d, data: d.data})
-      update && this.updateGraph(d)
-    },
-
-    expandAll (d, update = true) {
-      onAllChilddren(d, child => this.expand(child, false))
-      update && this.updateGraph(d)
-    },
-
-    collapseAll (d, update = true) {
-      onAllChilddren(d, child => this.collapse(child, false))
-      update && this.updateGraph(d)
     },
 
     onNodeClick (d) {
@@ -279,21 +259,6 @@ export default {
       } else {
         this.expand(d)
       }
-    },
-
-    showOnlyChildren (d) {
-      const root = this.internaldata.root
-      const path = d.ancestors().reverse()
-      const shouldBeRetracted = mapMany(path, p => p.children).filter(node => node !== null && (path.indexOf(node) === -1))
-      const updater = node => {
-        if (shouldBeRetracted.indexOf(node) !== -1) {
-          this.collapse(node, false)
-          return false
-        }
-        return (node !== d)
-      }
-      onAllChilddren(root, updater)
-      this.updateGraph(d)
     },
 
     onData (data) {
@@ -324,6 +289,71 @@ export default {
       if (root) {
         this.updateGraph(root)
       }
+    },
+
+    getNodeOriginComputer (originalVisibleNodes) {
+      return node => {
+        const parentVisible = findInParents(node, originalVisibleNodes)
+        return {x: parentVisible.x0, y: parentVisible.y0}
+      }
+    },
+
+    // API
+
+    collapse (d, update = true) {
+      if (!d.children) {
+        return
+      }
+
+      d._children = d.children
+      d.children = null
+      this.$emit('retract', {element: d, data: d.data})
+      update && this.updateGraph(d)
+    },
+
+    expand (d, update = true) {
+      if (d.children) {
+        return false
+      }
+
+      d.children = d._children
+      d._children = null
+      this.$emit('expand', {element: d, data: d.data})
+      update && this.updateGraph(d)
+      return true
+    },
+
+    expandAll (d, update = true) {
+      const lastVisible = d.leaves()
+      onAllChilddren(d, child => { this.expand(child, false) })
+      update && this.updateGraph(this.getNodeOriginComputer(lastVisible))
+    },
+
+    collapseAll (d, update = true) {
+      onAllChilddren(d, child => this.collapse(child, false))
+      update && this.updateGraph(d)
+    },
+
+    showOnlyChildren (d) {
+      const root = this.internaldata.root
+      const path = d.ancestors().reverse()
+      const shouldBeRetracted = mapMany(path, p => p.children).filter(node => node !== null && (path.indexOf(node) === -1))
+      const mapped = {}
+      shouldBeRetracted.filter(node => node.children)
+                      .forEach(rectractedNode => rectractedNode.each(c => { mapped[c.id] = rectractedNode }))
+      const origin = node => {
+        const reference = mapped[node.id]
+        return {x: reference.x, y: reference.y}
+      }
+      const updater = node => {
+        if (shouldBeRetracted.indexOf(node) !== -1) {
+          this.collapse(node, false)
+          return false
+        }
+        return (node !== d)
+      }
+      onAllChilddren(root, updater)
+      this.updateGraph(origin)
     }
   },
 
