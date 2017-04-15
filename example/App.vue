@@ -68,6 +68,8 @@
             <button type="button" class="btn btn-secondary" @click="collapseAll">Collapse All from current</button>
 
             <button type="button" class="btn btn-success" @click="showOnlyChildren">Show Only Children from current</button>
+
+            <button type="button" class="btn btn-warning" @click="show">Show current</button>
  
         </div> 
       </div>     
@@ -129,6 +131,11 @@ export default {
     showOnlyChildren () {
       if (this.currentNode) {
         this.$refs['tree'].showOnlyChildren(this.currentNode)
+      }
+    },
+    show () {
+      if (this.currentNode) {
+        this.$refs['tree'].show(this.currentNode)
       }
     },
     onClick (evt) {

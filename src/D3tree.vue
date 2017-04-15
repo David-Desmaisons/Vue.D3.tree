@@ -302,13 +302,14 @@ export default {
 
     collapse (d, update = true) {
       if (!d.children) {
-        return
+        return false
       }
 
       d._children = d.children
       d.children = null
       this.$emit('retract', {element: d, data: d.data})
       update && this.updateGraph(d)
+      return true
     },
 
     expand (d, update = true) {
@@ -332,6 +333,13 @@ export default {
     collapseAll (d, update = true) {
       onAllChilddren(d, child => this.collapse(child, false))
       update && this.updateGraph(d)
+    },
+
+    show (d, update = true) {
+      const path = d.ancestors().reverse()
+      const root = path.find(node => node.children === null) || d
+      path.forEach(node => this.expand(node, false))
+      update && this.updateGraph(root)
     },
 
     showOnlyChildren (d) {
