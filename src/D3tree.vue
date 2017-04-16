@@ -186,31 +186,31 @@ export default {
 
       const root = this.internaldata.root
       const links = this.internaldata.g.selectAll('.linktree')
-         .data(this.internaldata.tree(root).descendants().slice(1), d => { return d.id })
+         .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
       const updateLinks = links.enter().append('path')
                     .attr('class', 'linktree')
-                    .attr('d', d => { return drawLink(originBuilder(d), originBuilder(d), this.layout) })
+                    .attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
 
       const updateAndNewLinks = links.merge(updateLinks)
-      updateAndNewLinks.transition().duration(this.duration).attr('d', d => { return drawLink(d, d.parent, this.layout) })
+      updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout))
 
-      links.exit().transition().duration(this.duration).attr('d', d => { return drawLink(forExit(d), forExit(d), this.layout) }).remove()
+      links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove()
 
       const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
 
       const newNodes = node.enter().append('g')
                 .attr('class', 'nodetree')
-                .attr('transform', d => { return translate(originBuilder(d), this.layout) })
+                .attr('transform', d => translate(originBuilder(d), this.layout))
 
       const allNodes = newNodes.merge(node)
-      allNodes.classed('node--internal', d => { return hasChildren(d) })
-        .classed('node--leaf', d => { return !hasChildren(d) })
-        .classed('selected', d => { return d === currentSelected })
+      allNodes.classed('node--internal', d => hasChildren(d))
+        .classed('node--leaf', d => !hasChildren(d))
+        .classed('selected', d => d === currentSelected)
         .on('click', this.onNodeClick)
 
       allNodes.transition().duration(this.duration)
-        .attr('transform', d => { return translate(d, this.layout) })
+        .attr('transform', d => translate(d, this.layout))
         .attr('opacity', 1)
 
       removeTextAndGraph(node)
@@ -227,9 +227,9 @@ export default {
           this.$emit('clicked', {element: d, data: d.data})
         })
 
-      text.attr('x', (d) => { return d.textInfo ? d.textInfo.x : 0 })
+      text.attr('x', d => { return d.textInfo ? d.textInfo.x : 0 })
           .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
-          .attr('transform', (d) => { return 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')' })
+          .attr('transform', d => 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')')
 
       const transformer = this.layout.transformText
       allNodes.each((d) => {
@@ -237,9 +237,9 @@ export default {
       })
 
       text.transition().duration(this.duration)
-          .attr('x', (d) => { return d.textInfo.x })
+          .attr('x', d => d.textInfo.x)
           .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          .attr('transform', (d) => { return 'rotate(' + d.textInfo.rotate + ')' })
+          .attr('transform', d => `rotate(${d.textInfo.rotate})`)
 
       allNodes.each((d) => {
         d.x0 = d.x
@@ -248,7 +248,7 @@ export default {
 
       const exitingNodes = node.exit()
       exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => { return translate(forExit(d), this.layout) })
+                  .attr('transform', d => translate(forExit(d), this.layout))
                   .attr('opacity', 0).remove()
       exitingNodes.select('circle').attr('r', 1e-6)
     },
