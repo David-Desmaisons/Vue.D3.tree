@@ -11,8 +11,12 @@ export default {
     return [radius * Math.cos(angle), radius * Math.sin(angle)]
   },
 
-  transformSvg (svg, {x, y}, {width, height}) {
+  transformSvg (svg, nargin, {width, height}) {
     return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
+  },
+
+  updateTransform (transform, nargin, {width, height}) {
+    return transform.translate(width / 2, height / 2)
   },
 
   transformText (d, children) {

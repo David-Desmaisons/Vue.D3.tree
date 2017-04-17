@@ -10,8 +10,8 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs"
   },
-   "main": "dist/vueD3Tree.js",
-   "files": [
+  "main": "dist/vueD3Tree.js",
+  "files": [
     "dist/vueD3Tree.js"
   ],
   "keywords": [

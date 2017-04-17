@@ -4,11 +4,12 @@
 </template>
 <script>
 import resize from 'vue-resize-directive'
+import euclidian from './euclidian-layout'
+import circular from './circular-layout'
+
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
 Object.assign(d3, d3Hierarchy)
-import euclidian from './euclidian-layout'
-import circular from './circular-layout'
 
 function mapMany (arr, mapper) {
   return arr.reduce(function (prev, curr) {
@@ -57,6 +58,10 @@ const props = {
   nodeText: {
     type: String,
     required: true
+  },
+  zoomable: {
+    type: Boolean,
+    default: false
   }
 }
 
@@ -124,19 +129,36 @@ export default {
 
   directives,
 
+  data () {
+    return {
+      currentTransform: null
+    }
+  },
+
   mounted () {
     const size = this.getSize()
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
-    const g = this.layout.transformSvg(svg.append('g'), this.margin, size)
+    let g = null
+    let zoom = null
+
+    if (this.zoomable) {
+      g = svg.append('g')
+      zoom = d3.zoom().scaleExtent([1, 8]).on('zoom', this.zoomed(g))
+      svg.call(zoom)
+      g.call(zoom.transform, d3.zoomIdentity)
+    } else {
+      g = this.layout.transformSvg(svg.append('g'), this.margin, size)
+    }
+
     const tree = this.tree
     this.internaldata = {
       svg,
       g,
-      tree
+      tree,
+      zoom
     }
-    this.sizeSvg()
 
     if (this.data) {
       this.onData(this.data)
@@ -146,10 +168,6 @@ export default {
   },
 
   methods: {
-    sizeSvg () {
-      this.internaldata.g = this.layout.transformSvg(this.internaldata.g, this.margin, this.getSize())
-    },
-
     getSize () {
       var width = this.$el.clientWidth
       var height = this.$el.clientHeight
@@ -163,14 +181,13 @@ export default {
               .attr('height', size.height)
 
       this.layout.size(this.internaldata.tree, size, this.margin)
-      this.layout.transformSvg(this.internaldata.g.transition().duration(this.duration), this.margin, size)
+      this.applyZoom(size)
       this.redraw()
     },
 
-    completeRedraw () {
-      const g = this.internaldata.g.transition().duration(this.duration)
+    completeRedraw (noTransition = true) {
       const size = this.getSize()
-      this.layout.transformSvg(g, this.margin, size)
+      this.applyTransitionZoom(size)
       this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
@@ -295,6 +312,39 @@ export default {
       return node => {
         const parentVisible = findInParents(node, originalVisibleNodes)
         return {x: parentVisible.x0, y: parentVisible.y0}
+      }
+    },
+
+    applyZoom (size) {
+      const {g, zoom} = this.internaldata
+      if (this.zoomable) {
+        g.call(zoom.transform, this.currentTransform)
+      } else {
+        size = size || this.getSize()
+        this.internaldata.g = this.layout.transformSvg(g, this.margin, size)
+      }
+    },
+
+    applyTransitionZoom (size) {
+      const {g, zoom} = this.internaldata
+      const transitiong = g.transition().duration(this.duration)
+      console.log(zoom)
+      if (this.zoomable) {
+        transitiong.call(zoom.transform, this.currentTransform)
+      }
+      // else {
+      this.layout.transformSvg(transitiong, this.margin, size)
+     // }
+    },
+
+    zoomed (g) {
+      return () => {
+        const transform = d3.event.transform
+        const size = this.getSize()
+        const transformToApply = this.layout.updateTransform(transform, this.margin, size)
+        this.currentTransform = transform
+        this.$emit('zoom', {transform})
+        g.attr('transform', transformToApply)
       }
     },
 

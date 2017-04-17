@@ -11,6 +11,10 @@ export default {
     return svg.attr('transform', 'translate(' + margin.x + ',' + margin.y + ')')
   },
 
+  updateTransform (transform, {x, y}) {
+    return transform.translate(x, y)
+  },
+
   transformText (text, children) {
     return {
       x: !children ? 6 : -6,
