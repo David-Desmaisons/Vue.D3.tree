@@ -330,11 +330,10 @@ export default {
       const transitiong = g.transition().duration(this.duration)
       console.log(zoom)
       if (this.zoomable) {
-        transitiong.call(zoom.transform, this.currentTransform)
+        this.layout.transformSvg(transitiong, this.margin, size).on('end', () => this.internaldata.g.call(zoom.transform, d3.zoomIdentity))
+      } else {
+        this.layout.transformSvg(transitiong, this.margin, size)
       }
-      // else {
-      this.layout.transformSvg(transitiong, this.margin, size)
-     // }
     },
 
     zoomed (g) {

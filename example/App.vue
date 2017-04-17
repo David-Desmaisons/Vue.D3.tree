@@ -88,7 +88,7 @@
 
   </div>
 
-  <div class="col-md-9">
+  <div class="col-md-9 panel panel-default">
     <d3tree ref="tree" :zoomable="true" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
@@ -163,7 +163,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 
 .tree {
