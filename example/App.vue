@@ -70,6 +70,8 @@
             <button type="button" class="btn btn-success" @click="showOnlyChildren">Show Only Children from current</button>
 
             <button type="button" class="btn btn-warning" @click="show">Show current</button>
+
+            <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom">Reset Zoom</button>
  
         </div> 
       </div>     
@@ -89,7 +91,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <d3tree ref="tree" :zoomable="true" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
+    <d3tree ref="tree" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
   </div>
@@ -106,6 +108,7 @@ Object.assign(data, {
   Marginy: 30,
   nodeText: 'text',
   currentNode: null,
+  zoomable: true,
   events: []
 })
 
@@ -151,6 +154,9 @@ export default {
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
       console.log({eventName, data: data})
+    },
+    resetZoom () {
+      this.$refs['tree'].resetZoom()
     }
   }
 }

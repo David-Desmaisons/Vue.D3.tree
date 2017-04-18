@@ -131,7 +131,8 @@ export default {
 
   data () {
     return {
-      currentTransform: null
+      currentTransform: null,
+      currentRealTransorm: null
     }
   },
 
@@ -146,7 +147,7 @@ export default {
     if (this.zoomable) {
       g = svg.append('g')
       zoom = d3.zoom().scaleExtent([1, 8]).on('zoom', this.zoomed(g))
-      svg.call(zoom)
+      svg.call(zoom).on('wheel', () => d3.event.preventDefault())
       g.call(zoom.transform, d3.zoomIdentity)
     } else {
       g = this.layout.transformSvg(svg.append('g'), this.margin, size)
@@ -160,11 +161,7 @@ export default {
       zoom
     }
 
-    if (this.data) {
-      this.onData(this.data)
-    }
-
-    window.onfocus = () => { this.completeRedraw() }
+    this.data && this.onData(this.data)
   },
 
   methods: {
@@ -321,16 +318,20 @@ export default {
         g.call(zoom.transform, this.currentTransform)
       } else {
         size = size || this.getSize()
-        this.internaldata.g = this.layout.transformSvg(g, this.margin, size)
+        this.layout.transformSvg(g, this.margin, size)
       }
     },
 
     applyTransitionZoom (size) {
-      const {g, zoom} = this.internaldata
+      const {g, svg, zoom} = this.internaldata
       const transitiong = g.transition().duration(this.duration)
       console.log(zoom)
       if (this.zoomable) {
-        this.layout.transformSvg(transitiong, this.margin, size).on('end', () => this.internaldata.g.call(zoom.transform, d3.zoomIdentity))
+        const realTransform = this.currentRealTransorm
+        const transform = this.currentTransform
+        const nextRealTransform = this.layout.updateTransform(this.currentTransform, this.margin, size)
+        const current = d3.zoomIdentity.translate(realTransform.x - nextRealTransform.x, realTransform.y - nextRealTransform.y).scale(transform.k)
+        svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
       } else {
         this.layout.transformSvg(transitiong, this.margin, size)
       }
@@ -342,6 +343,7 @@ export default {
         const size = this.getSize()
         const transformToApply = this.layout.updateTransform(transform, this.margin, size)
         this.currentTransform = transform
+        this.currentRealTransorm = transformToApply
         this.$emit('zoom', {transform})
         g.attr('transform', transformToApply)
       }
@@ -411,6 +413,14 @@ export default {
       }
       onAllChilddren(root, updater)
       this.updateGraph(origin)
+    },
+
+    resetZoom () {
+      if (!this.zoomable) {
+        return
+      }
+      const {svg, zoom} = this.internaldata
+      svg.transition().duration(this.duration).call(zoom.transform, () => d3.zoomIdentity)
     }
   },
 
