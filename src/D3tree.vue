@@ -131,8 +131,7 @@ export default {
 
   data () {
     return {
-      currentTransform: null,
-      currentRealTransorm: null
+      currentTransform: null
     }
   },
 
@@ -182,9 +181,9 @@ export default {
       this.redraw()
     },
 
-    completeRedraw (oldMargin) {
+    completeRedraw ({margin = null, layout = null}) {
       const size = this.getSize()
-      this.applyTransition(size, oldMargin)
+      this.applyTransition(size, {margin, layout})
       this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
@@ -322,17 +321,20 @@ export default {
       }
     },
 
-    applyTransition (size, oldMargin) {
+    applyTransition (size, {margin, layout}) {
       const {g, svg, zoom} = this.internaldata
-      const transitiong = g.transition().duration(this.duration)
       if (this.zoomable) {
-        const realTransform = this.currentRealTransorm
         const transform = this.currentTransform
+        const oldMargin = margin || this.margin
+        const oldLayout = layout || this.layout
+
+        const nowTransform = oldLayout.updateTransform(transform, oldMargin, size)
         const nextRealTransform = this.layout.updateTransform(transform, this.margin, size)
-        const current = d3.zoomIdentity.translate(realTransform.x - nextRealTransform.x, realTransform.y - nextRealTransform.y).scale(transform.k)
-        // const newComputed = this.layout.updateTransform(current, this.margin, size)
+        const current = d3.zoomIdentity.translate(transform.x + nowTransform.x - nextRealTransform.x, transform.y + nowTransform.y - nextRealTransform.y).scale(transform.k)
+
         svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
       } else {
+        const transitiong = g.transition().duration(this.duration)
         this.layout.transformSvg(transitiong, this.margin, size)
       }
     },
@@ -343,15 +345,12 @@ export default {
         const size = this.getSize()
         const transformToApply = this.layout.updateTransform(transform, this.margin, size)
         this.currentTransform = transform
-        this.currentRealTransorm = transformToApply
         this.$emit('zoom', {transform})
-        console.log(transformToApply)
         g.attr('transform', transformToApply)
       }
     },
 
     // API
-
     collapse (d, update = true) {
       if (!d.children) {
         return false
@@ -456,15 +455,15 @@ export default {
     },
 
     marginX (newMarginX, oldMarginX) {
-      this.completeRedraw({x: oldMarginX, y: this.marginY})
+      this.completeRedraw({margin: {x: oldMarginX, y: this.marginY}})
     },
 
     marginY (newMarginY, oldMarginY) {
-      this.completeRedraw({x: this.marginX, y: oldMarginY})
+      this.completeRedraw({margin: {x: this.marginX, y: oldMarginY}})
     },
 
-    layoutType () {
-      this.completeRedraw()
+    layout (newLayout, oldLayout) {
+      this.completeRedraw({layout: oldLayout})
     }
   }
 }
