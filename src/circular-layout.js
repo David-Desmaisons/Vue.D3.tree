@@ -11,11 +11,11 @@ export default {
     return [radius * Math.cos(angle), radius * Math.sin(angle)]
   },
 
-  transformSvg (svg, nargin, {width, height}) {
+  transformSvg (svg, margin, {width, height}) {
     return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
   },
 
-  updateTransform (transform, nargin, {width, height}) {
+  updateTransform (transform, margin, {width, height}) {
     return transform.translate(width / 2, height / 2)
   },
 

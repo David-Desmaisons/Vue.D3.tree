@@ -182,9 +182,9 @@ export default {
       this.redraw()
     },
 
-    completeRedraw (noTransition = true) {
+    completeRedraw (oldMargin) {
       const size = this.getSize()
-      this.applyTransitionZoom(size)
+      this.applyTransition(size, oldMargin)
       this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
@@ -322,15 +322,15 @@ export default {
       }
     },
 
-    applyTransitionZoom (size) {
+    applyTransition (size, oldMargin) {
       const {g, svg, zoom} = this.internaldata
       const transitiong = g.transition().duration(this.duration)
-      console.log(zoom)
       if (this.zoomable) {
         const realTransform = this.currentRealTransorm
         const transform = this.currentTransform
-        const nextRealTransform = this.layout.updateTransform(this.currentTransform, this.margin, size)
+        const nextRealTransform = this.layout.updateTransform(transform, this.margin, size)
         const current = d3.zoomIdentity.translate(realTransform.x - nextRealTransform.x, realTransform.y - nextRealTransform.y).scale(transform.k)
+        // const newComputed = this.layout.updateTransform(current, this.margin, size)
         svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
       } else {
         this.layout.transformSvg(transitiong, this.margin, size)
@@ -345,6 +345,7 @@ export default {
         this.currentTransform = transform
         this.currentRealTransorm = transformToApply
         this.$emit('zoom', {transform})
+        console.log(transformToApply)
         g.attr('transform', transformToApply)
       }
     },
@@ -454,12 +455,12 @@ export default {
       this.redraw()
     },
 
-    marginX () {
-      this.completeRedraw()
+    marginX (newMarginX, oldMarginX) {
+      this.completeRedraw({x: oldMarginX, y: this.marginY})
     },
 
-    marginY () {
-      this.completeRedraw()
+    marginY (newMarginY, oldMarginY) {
+      this.completeRedraw({x: this.marginX, y: oldMarginY})
     },
 
     layoutType () {
