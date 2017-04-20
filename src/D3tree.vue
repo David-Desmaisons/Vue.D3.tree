@@ -4,7 +4,7 @@
 </template>
 <script>
 import resize from 'vue-resize-directive'
-import euclidian from './euclidian-layout'
+import euclidean from './euclidean-layout'
 import circular from './circular-layout'
 
 import * as d3 from 'd3'
@@ -18,14 +18,14 @@ function mapMany (arr, mapper) {
 }
 
 const layout = {
-  euclidian,
+  euclidean,
   circular
 }
 
 var i = 0
 var currentSelected = null
 const types = ['tree', 'cluster']
-const layouts = ['circular', 'euclidian']
+const layouts = ['circular', 'euclidean']
 
 const props = {
   data: Object,
@@ -42,7 +42,7 @@ const props = {
   },
   layoutType: {
     type: String,
-    default: 'euclidian',
+    default: 'euclidean',
     validator (value) {
       return layouts.indexOf(value) !== -1
     }

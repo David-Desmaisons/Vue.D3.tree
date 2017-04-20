@@ -22,7 +22,7 @@
               <label for="layout-type" class="control-label col-sm-3">layoutType</label>
                 <div  class="col-sm-9">
                   <select id="layout-type" class="form-control" v-model="layoutType">
-                    <option>euclidian</option>
+                    <option>euclidean</option>
                     <option>circular</option>
                   </select>       
               </div>
@@ -102,7 +102,7 @@ import D3tree from '../src/D3tree'
 import data from '../data/data'
 Object.assign(data, {
   type: 'tree',
-  layoutType: 'euclidian',
+  layoutType: 'euclidean',
   duration: 750,
   Marginx: 30,
   Marginy: 30,
