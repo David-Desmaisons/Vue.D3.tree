@@ -210,7 +210,7 @@ export default {
 
       links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove()
 
-      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => { return d.id })
+      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
 
       const newNodes = node.enter().append('g')
                 .attr('class', 'nodetree')
@@ -232,7 +232,7 @@ export default {
 
       const text = allNodes.append('text')
         .attr('dy', '.35em')
-        .text(d => { return d.data[this.nodeText] })
+        .text(d => d.data[this.nodeText])
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
           d3.event.stopPropagation()
@@ -248,6 +248,10 @@ export default {
       allNodes.each((d) => {
         d.textInfo = transformer(d, hasChildren(d))
       })
+
+      const max = Math.max(...text.nodes().map(node => node.getComputedTextLength()))
+      const max2 = Math.max(...root.descendants().map(d => d.data[this.nodeText].length))
+      console.log(max, max2)
 
       text.transition().duration(this.duration)
           .attr('x', d => d.textInfo.x)
