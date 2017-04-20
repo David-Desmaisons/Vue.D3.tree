@@ -201,22 +201,20 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
-      const updateLinks = links.enter().append('path')
-                    .attr('class', 'linktree')
-                    .attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+      const updateLinks = links.enter().append('path').attr('class', 'linktree')
+      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
+      const newNodes = node.enter().append('g').attr('class', 'nodetree')
+      const allNodes = newNodes.merge(node)
+
+      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
 
       const updateAndNewLinks = links.merge(updateLinks)
       updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout))
 
       links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove()
 
-      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
+      newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
 
-      const newNodes = node.enter().append('g')
-                .attr('class', 'nodetree')
-                .attr('transform', d => translate(originBuilder(d), this.layout))
-
-      const allNodes = newNodes.merge(node)
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
         .classed('selected', d => d === currentSelected)
