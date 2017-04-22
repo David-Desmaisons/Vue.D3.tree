@@ -335,13 +335,13 @@ export default {
     },
 
     updateIfNeeded (d, update) {
-      return update ? this.updateGraph(d).then(() => true) : Promise.solve(true)
+      return update ? this.updateGraph(d).then(() => true) : Promise.resolve(true)
     },
 
     // API
     collapse (d, update = true) {
       if (!d.children) {
-        return Promise.solve(false)
+        return Promise.resolve(false)
       }
 
       d._children = d.children
@@ -352,7 +352,7 @@ export default {
 
     expand (d, update = true) {
       if (!d._children) {
-        return Promise.solve(false)
+        return Promise.resolve(false)
       }
 
       d.children = d._children
@@ -403,7 +403,7 @@ export default {
 
     resetZoom () {
       if (!this.zoomable) {
-        return Promise.solve(false)
+        return Promise.resolve(false)
       }
       const {svg, zoom} = this.internaldata
       const transitionPromise = toPromise(svg.transition().duration(this.duration).call(zoom.transform, () => d3.zoomIdentity))
