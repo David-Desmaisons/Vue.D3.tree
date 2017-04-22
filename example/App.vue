@@ -63,15 +63,25 @@
               <p v-else>No Node selected.</p>
             </div>  
 
-            <button type="button" class="btn btn-primary" @click="expandAll">Expand All from current</button>
+            <button type="button" :disabled="!currentNode" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
+            <i class="fa fa-expand" aria-hidden="true"></i>          
+            </button>
 
-            <button type="button" class="btn btn-secondary" @click="collapseAll">Collapse All from current</button>
+            <button type="button" :disabled="!currentNode" class="btn btn-secondary" @click="collapseAll" data-toggle="tooltip" data-placement="top" title="Collapse All from current">
+            <i class="fa fa-compress" aria-hidden="true"></i>            
+            </button>
 
-            <button type="button" class="btn btn-success" @click="showOnlyChildren">Show Only Children from current</button>
+            <button type="button" :disabled="!currentNode" class="btn btn-success" @click="showOnlyChildren" data-toggle="tooltip" data-placement="top" title="Show Only Children from current">
+            <i class="fa fa-search-plus" aria-hidden="true"></i>       
+            </button>
 
-            <button type="button" class="btn btn-warning" @click="show">Show current</button>
+            <button type="button" :disabled="!currentNode" class="btn btn-warning" @click="show" data-toggle="tooltip" data-placement="top" title="Show current">
+            <i class="fa fa-binoculars" aria-hidden="true"></i>           
+            </button>
 
-            <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom">Reset Zoom</button>
+            <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom" data-toggle="tooltip" data-placement="top" title="Reset Zoom">
+            <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
+            </button>
  
         </div> 
       </div>     
