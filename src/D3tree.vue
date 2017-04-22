@@ -376,7 +376,7 @@ export default {
       const path = d.ancestors().reverse()
       const root = path.find(node => node.children === null) || d
       path.forEach(node => this.expand(node, false))
-      return this.updateIfNeeded(d, root)
+      return this.updateIfNeeded(root, update)
     },
 
     showOnlyChildren (d) {
