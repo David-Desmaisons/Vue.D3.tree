@@ -59,8 +59,9 @@
             </div>  
 
             <div class="form-group">
-              <p v-if="currentNode">Current Node: {{currentNode.data.text}}</p>
-              <p v-else>No Node selected.</p>
+              <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
+              <span v-else>No Node selected.</span>
+               <i v-if="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
             </div>  
 
             <button type="button" :disabled="!currentNode" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
@@ -82,7 +83,7 @@
             <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom" data-toggle="tooltip" data-placement="top" title="Reset Zoom">
             <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
             </button>
- 
+
         </div> 
       </div>     
     </div>
@@ -119,6 +120,7 @@ Object.assign(data, {
   nodeText: 'text',
   currentNode: null,
   zoomable: true,
+  isLoading: false,
   events: []
 })
 
@@ -131,25 +133,24 @@ export default {
     D3tree
   },
   methods: {
-    expandAll () {
+    do (action) {
       if (this.currentNode) {
-        this.$refs['tree'].expandAll(this.currentNode)
+        this.isLoading = true
+        this.$refs['tree'][action](this.currentNode).then(() => { this.isLoading = false })
       }
+    },
+
+    expandAll () {
+      this.do('expandAll')
     },
     collapseAll () {
-      if (this.currentNode) {
-        this.$refs['tree'].collapseAll(this.currentNode)
-      }
+      this.do('collapseAll')
     },
     showOnlyChildren () {
-      if (this.currentNode) {
-        this.$refs['tree'].showOnlyChildren(this.currentNode)
-      }
+      this.do('showOnlyChildren')
     },
     show () {
-      if (this.currentNode) {
-        this.$refs['tree'].show(this.currentNode)
-      }
+      this.do('show')
     },
     onClick (evt) {
       this.currentNode = evt.element
@@ -166,7 +167,8 @@ export default {
       console.log({eventName, data: data})
     },
     resetZoom () {
-      this.$refs['tree'].resetZoom()
+      this.isLoading = true
+      this.$refs['tree'].resetZoom().then(() => { this.isLoading = false })
     }
   }
 }
