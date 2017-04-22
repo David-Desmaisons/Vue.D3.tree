@@ -6,6 +6,7 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
+import {compareString, anchorTodx, toPromise, findInParents} from './d3-utils'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
@@ -69,10 +70,6 @@ const directives = {
   resize
 }
 
-function compareString (a, b) {
-  return (a < b) ? -1 : (a > b) ? 1 : 0
-}
-
 function drawLink (source, target, {transformNode}) {
   return 'M' + transformNode(source.x, source.y) +
          'C' + transformNode(source.x, (source.y + target.y) / 2) +
@@ -96,15 +93,6 @@ function onAllChilddren (d, callback, fatherVisible = undefined) {
   directChildren && directChildren.children.forEach(child => onAllChilddren(child, callback, directChildren.visible))
 }
 
-function findInParents (node, nodes) {
-  if (nodes.indexOf(node) !== -1) {
-    return node
-  }
-
-  const parent = node.parent
-  return (parent === null) ? node : findInParents(parent, nodes)
-}
-
 function removeTextAndGraph (selection) {
   ['circle', 'text'].forEach(select => {
     selection.selectAll(select).remove()
@@ -115,15 +103,6 @@ function translate (vector, {transformNode}) {
   return 'translate(' + transformNode(vector.x, vector.y) + ')'
 }
 
-function anchorTodx (d, el) {
-  if (d === 'middle') {
-    return -el.getBBox().width / 2
-  } else if (d === 'end') {
-    return -el.getBBox().width
-  }
-  return 0
-}
-
 export default {
   props,
 
@@ -131,7 +110,8 @@ export default {
 
   data () {
     return {
-      currentTransform: null
+      currentTransform: null,
+      maxTextLenght: 0
     }
   },
 
@@ -175,16 +155,15 @@ export default {
       this.internaldata.svg
               .attr('width', size.width)
               .attr('height', size.height)
-
-      this.layout.size(this.internaldata.tree, size, this.margin)
+      this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyZoom(size)
       this.redraw()
     },
 
     completeRedraw ({margin = null, layout = null}) {
       const size = this.getSize()
+      this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyTransition(size, {margin, layout})
-      this.layout.size(this.internaldata.tree, size, this.margin)
       this.redraw()
     },
 
@@ -206,27 +185,7 @@ export default {
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
       const allNodes = newNodes.merge(node)
 
-      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
-
-      const updateAndNewLinks = links.merge(updateLinks)
-      updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout))
-
-      links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove()
-
-      newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
-
-      allNodes.classed('node--internal', d => hasChildren(d))
-        .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d === currentSelected)
-        .on('click', this.onNodeClick)
-
-      allNodes.transition().duration(this.duration)
-        .attr('transform', d => translate(d, this.layout))
-        .attr('opacity', 1)
-
       removeTextAndGraph(node)
-
-      allNodes.append('circle')
 
       const text = allNodes.append('text')
         .attr('dy', '.35em')
@@ -238,6 +197,29 @@ export default {
           this.$emit('clicked', {element: d, data: d.data})
         })
 
+      // const max = Math.max(...text.nodes().map(node => node.getComputedTextLength()))
+      this.layout.size(this.internaldata.tree, this.getSize(), this.margin, this.maxTextLenght)
+
+      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+
+      const updateAndNewLinks = links.merge(updateLinks)
+      const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
+
+      const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
+
+      newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
+
+      allNodes.classed('node--internal', d => hasChildren(d))
+        .classed('node--leaf', d => !hasChildren(d))
+        .classed('selected', d => d === currentSelected)
+        .on('click', this.onNodeClick)
+
+      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
+        .attr('transform', d => translate(d, this.layout))
+        .attr('opacity', 1))
+
+      allNodes.append('circle')
+
       text.attr('x', d => { return d.textInfo ? d.textInfo.x : 0 })
           .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
           .attr('transform', d => 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')')
@@ -247,14 +229,10 @@ export default {
         d.textInfo = transformer(d, hasChildren(d))
       })
 
-      const max = Math.max(...text.nodes().map(node => node.getComputedTextLength()))
-      const max2 = Math.max(...root.descendants().map(d => d.data[this.nodeText].length))
-      console.log(max, max2)
-
-      text.transition().duration(this.duration)
+      const textTransition = toPromise(text.transition().duration(this.duration)
           .attr('x', d => d.textInfo.x)
           .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          .attr('transform', d => `rotate(${d.textInfo.rotate})`)
+          .attr('transform', d => `rotate(${d.textInfo.rotate})`))
 
       allNodes.each((d) => {
         d.x0 = d.x
@@ -262,10 +240,13 @@ export default {
       })
 
       const exitingNodes = node.exit()
-      exitingNodes.transition().duration(this.duration)
+      const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
                   .attr('transform', d => translate(forExit(d), this.layout))
-                  .attr('opacity', 0).remove()
+                  .attr('opacity', 0).remove())
+
       exitingNodes.select('circle').attr('r', 1e-6)
+
+      return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
     },
 
     onNodeClick (d) {
@@ -302,8 +283,9 @@ export default {
     redraw () {
       const root = this.internaldata.root
       if (root) {
-        this.updateGraph(root)
+        return this.updateGraph(root)
       }
+      return Promise.resolve('no graph')
     },
 
     getNodeOriginComputer (originalVisibleNodes) {
@@ -352,47 +334,49 @@ export default {
       }
     },
 
+    updateIfNeeded (d, update) {
+      return update ? this.updateGraph(d).then(() => true) : Promise.solve(true)
+    },
+
     // API
     collapse (d, update = true) {
       if (!d.children) {
-        return false
+        return Promise.solve(false)
       }
 
       d._children = d.children
       d.children = null
       this.$emit('retract', {element: d, data: d.data})
-      update && this.updateGraph(d)
-      return true
+      return this.updateIfNeeded(d, update)
     },
 
     expand (d, update = true) {
-      if (d.children) {
-        return false
+      if (!d._children) {
+        return Promise.solve(false)
       }
 
       d.children = d._children
       d._children = null
       this.$emit('expand', {element: d, data: d.data})
-      update && this.updateGraph(d)
-      return true
+      return this.updateIfNeeded(d, update)
     },
 
     expandAll (d, update = true) {
       const lastVisible = d.leaves()
       onAllChilddren(d, child => { this.expand(child, false) })
-      update && this.updateGraph(this.getNodeOriginComputer(lastVisible))
+      return this.updateIfNeeded(this.getNodeOriginComputer(lastVisible), update)
     },
 
     collapseAll (d, update = true) {
       onAllChilddren(d, child => this.collapse(child, false))
-      update && this.updateGraph(d)
+      return this.updateIfNeeded(d, update)
     },
 
     show (d, update = true) {
       const path = d.ancestors().reverse()
       const root = path.find(node => node.children === null) || d
       path.forEach(node => this.expand(node, false))
-      update && this.updateGraph(root)
+      return this.updateIfNeeded(d, root)
     },
 
     showOnlyChildren (d) {
@@ -414,15 +398,16 @@ export default {
         return (node !== d)
       }
       onAllChilddren(root, updater)
-      this.updateGraph(origin)
+      return this.updateGraph(origin).then(() => true)
     },
 
     resetZoom () {
       if (!this.zoomable) {
-        return
+        return Promise.solve(false)
       }
       const {svg, zoom} = this.internaldata
-      svg.transition().duration(this.duration).call(zoom.transform, () => d3.zoomIdentity)
+      const transitionPromise = toPromise(svg.transition().duration(this.duration).call(zoom.transform, () => d3.zoomIdentity))
+      return transitionPromise.then(() => true)
     }
   },
 
@@ -430,7 +415,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = this.type === 'cluster' ? d3.cluster() : d3.tree()
-      this.layout.size(tree, size, this.margin)
+      this.layout.size(tree, size, this.margin, this.maxTextLenght)
       return tree
     },
 
