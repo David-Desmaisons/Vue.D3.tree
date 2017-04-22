@@ -1,18 +1,18 @@
 export default {
-  size (tree, size, margin, max = 0) {
-    tree.size([size.height - (margin.y * 2), size.width - (margin.x * 2) - (2 * max)])
+  size (tree, size, margin, maxTextLength = 0) {
+    tree.size([size.height - (margin.y * 2), size.width - (margin.x * 2) - (2 * maxTextLength)])
   },
 
   transformNode (x, y) {
     return y + ',' + x
   },
 
-  transformSvg (svg, margin) {
-    return svg.attr('transform', 'translate(' + margin.x + ',' + margin.y + ')')
+  transformSvg (svg, margin, size, maxTextLength) {
+    return svg.attr('transform', 'translate(' + margin.x + maxTextLength + ',' + margin.y + ')')
   },
 
-  updateTransform (transform, {x, y}) {
-    return transform.translate(x, y)
+  updateTransform (transform, {x, y}, size, maxTextLength) {
+    return transform.translate(x + maxTextLength, y)
   },
 
   transformText (text, children) {

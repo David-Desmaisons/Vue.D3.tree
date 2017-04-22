@@ -129,7 +129,7 @@ export default {
       svg.call(zoom).on('wheel', () => d3.event.preventDefault())
       svg.call(zoom.transform, d3.zoomIdentity)
     } else {
-      g = this.layout.transformSvg(svg.append('g'), this.margin, size)
+      g = this.transformSvg(svg.append('g'), size)
     }
 
     const tree = this.tree
@@ -167,6 +167,16 @@ export default {
       this.redraw()
     },
 
+    transformSvg (g, size) {
+      size = size || this.getSize()
+      return this.layout.transformSvg(g, this.margin, size, this.maxTextLenght)
+    },
+
+    updateTransform (g, size) {
+      size = size || this.getSize()
+      return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
+    },
+
     updateGraph (source) {
       let originBuilder = source
       let forExit = source
@@ -196,9 +206,6 @@ export default {
           this.redraw()
           this.$emit('clicked', {element: d, data: d.data})
         })
-
-      // const max = Math.max(...text.nodes().map(node => node.getComputedTextLength()))
-      this.layout.size(this.internaldata.tree, this.getSize(), this.margin, this.maxTextLenght)
 
       updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
 
@@ -243,10 +250,17 @@ export default {
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
                   .attr('transform', d => translate(forExit(d), this.layout))
                   .attr('opacity', 0).remove())
-
       exitingNodes.select('circle').attr('r', 1e-6)
 
-      return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
+      const max = Math.max(...text.nodes().map(node => node.getComputedTextLength())) + 6
+      if (max <= this.maxTextLenght) {
+        return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
+      }
+
+      this.maxTextLenght = max
+      this.internaldata.svg.call(this.internaldata.zoom.transform, this.currentTransform)
+      this.layout.size(this.internaldata.tree, this.getSize(), this.margin, this.maxTextLenght)
+      return this.updateGraph(source)
     },
 
     onNodeClick (d) {
@@ -300,8 +314,7 @@ export default {
       if (this.zoomable) {
         g.call(zoom.transform, this.currentTransform)
       } else {
-        size = size || this.getSize()
-        this.layout.transformSvg(g, this.margin, size)
+        this.transformSvg(g, size)
       }
     },
 
@@ -312,14 +325,14 @@ export default {
         const oldMargin = margin || this.margin
         const oldLayout = layout || this.layout
 
-        const nowTransform = oldLayout.updateTransform(transform, oldMargin, size)
-        const nextRealTransform = this.layout.updateTransform(transform, this.margin, size)
+        const nowTransform = oldLayout.updateTransform(transform, oldMargin, size, this.maxTextLenght)
+        const nextRealTransform = this.updateTransform(transform, size)
         const current = d3.zoomIdentity.translate(transform.x + nowTransform.x - nextRealTransform.x, transform.y + nowTransform.y - nextRealTransform.y).scale(transform.k)
 
         svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
       } else {
         const transitiong = g.transition().duration(this.duration)
-        this.layout.transformSvg(transitiong, this.margin, size)
+        this.transformSvg(transitiong, size)
       }
     },
 
@@ -327,7 +340,7 @@ export default {
       return () => {
         const transform = d3.event.transform
         const size = this.getSize()
-        const transformToApply = this.layout.updateTransform(transform, this.margin, size)
+        const transformToApply = this.updateTransform(transform, size)
         this.currentTransform = transform
         this.$emit('zoom', {transform})
         g.attr('transform', transformToApply)
