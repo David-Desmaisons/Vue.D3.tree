@@ -111,7 +111,10 @@ export default {
   data () {
     return {
       currentTransform: null,
-      maxTextLenght: 0
+      maxTextLenght: {
+        first: 0,
+        last: 0
+      }
     }
   },
 
@@ -253,13 +256,14 @@ export default {
       exitingNodes.select('circle').attr('r', 1e-6)
 
       const leaves = root.leaves()
-      const extremeNodes = [text.node(), ...text.filter(d => leaves.indexOf(d) !== -1).nodes()]
-      const max = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
-      if (max <= this.maxTextLenght) {
+      const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
+      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
+      const first = text.node().getComputedTextLength() + 6
+      if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
         return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
       }
 
-      this.maxTextLenght = max
+      this.maxTextLenght = {first, last}
       this.internaldata.svg.call(this.internaldata.zoom.transform, this.currentTransform)
       this.layout.size(this.internaldata.tree, this.getSize(), this.margin, this.maxTextLenght)
       return this.updateGraph(source)
