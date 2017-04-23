@@ -67,7 +67,11 @@ Sent when the node is clicked and the node children are expanded
 
 Sent when the node is clicked and the node children are retracted
 
-For all events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+For all these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+
+* `zoom`
+
+Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms)
 
 
 ### Build Setup
