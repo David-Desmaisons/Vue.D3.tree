@@ -252,7 +252,9 @@ export default {
                   .attr('opacity', 0).remove())
       exitingNodes.select('circle').attr('r', 1e-6)
 
-      const max = Math.max(...text.nodes().map(node => node.getComputedTextLength())) + 6
+      const leaves = root.leaves()
+      const extremeNodes = [text.node(), ...text.filter(d => leaves.indexOf(d) !== -1).nodes()]
+      const max = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
       if (max <= this.maxTextLenght) {
         return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
       }
