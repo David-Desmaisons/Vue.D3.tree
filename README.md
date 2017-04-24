@@ -74,6 +74,20 @@ For all these events, the argument passed is `{element, data}` where `element` r
 Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms)
 
 
+## methods
+
+| Name      | Argument | return             | Description |
+| ---       | ---      | ---                | ---         |
+| expand      | `D3.js node`      | a promise which resolve when animation is over                | Expand the given node.|
+| expandAll       | `D3.js node`      | a promise which resolve when animation is over                | Expand the given node and all its children.|
+| collapse      | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node.|
+| collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
+| resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
+| show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
+| showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
+
+
+
 ### Build Setup
 
 ``` bash

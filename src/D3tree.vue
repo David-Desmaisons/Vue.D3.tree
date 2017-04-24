@@ -398,7 +398,7 @@ export default {
       return this.updateIfNeeded(root, update)
     },
 
-    showOnlyChildren (d) {
+    showOnly (d) {
       const root = this.internaldata.root
       const path = d.ancestors().reverse()
       const shouldBeRetracted = mapMany(path, p => p.children ? p.children : []).filter(node => node && (path.indexOf(node) === -1))

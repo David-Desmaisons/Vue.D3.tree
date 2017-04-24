@@ -72,7 +72,7 @@
             <i class="fa fa-compress" aria-hidden="true"></i>            
             </button>
 
-            <button type="button" :disabled="!currentNode" class="btn btn-success" @click="showOnlyChildren" data-toggle="tooltip" data-placement="top" title="Show Only Children from current">
+            <button type="button" :disabled="!currentNode" class="btn btn-success" @click="showOnly" data-toggle="tooltip" data-placement="top" title="Show Only from current">
             <i class="fa fa-search-plus" aria-hidden="true"></i>       
             </button>
 
@@ -146,8 +146,8 @@ export default {
     collapseAll () {
       this.do('collapseAll')
     },
-    showOnlyChildren () {
-      this.do('showOnlyChildren')
+    showOnly () {
+      this.do('showOnly')
     },
     show () {
       this.do('show')
