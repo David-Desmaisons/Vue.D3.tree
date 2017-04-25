@@ -1,6 +1,7 @@
 export default {
   size (tree, {width, height}, {x, y}, {last}) {
     const ray = Math.min(width - x, height - y) / 2 - last
+    console.log('ray', ray)
     tree.size([360, ray])
         .separation((a, b) => { return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1) })
   },

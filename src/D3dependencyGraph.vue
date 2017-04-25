@@ -1,0 +1,240 @@
+<template>
+  <div class="viewport treeclass" v-resize="resize">
+  </div>
+</template>
+<script>
+import resize from 'vue-resize-directive'
+import layout from './circular-layout'
+import {compareString, anchorTodx, translate, removeTextAndGraph, toPromise} from './d3-utils'
+
+import * as d3 from 'd3'
+import * as d3Hierarchy from 'd3-hierarchy'
+Object.assign(d3, d3Hierarchy)
+
+var i = 0
+
+const props = {
+  data: Object,
+  link: Object,
+  marginX: {
+    type: Number,
+    default: 0
+  },
+  marginY: {
+    type: Number,
+    default: 0
+  },
+  nodeText: {
+    type: String,
+    required: true
+  },
+  duration: {
+    type: Number,
+    default: 500
+  }
+}
+
+const directives = {
+  resize
+}
+
+export default {
+  props,
+
+  directives,
+
+  data () {
+    return {
+      currentTransform: null,
+      layout,
+      maxTextLenght: {
+        first: 0,
+        last: 0
+      }
+    }
+  },
+
+  mounted () {
+    const size = this.getSize()
+    const svg = d3.select(this.$el).append('svg')
+          .attr('width', size.width)
+          .attr('height', size.height)
+    const g = this.transformSvg(svg.append('g'), size)
+
+    const tree = this.tree
+    this.internaldata = {
+      svg,
+      g,
+      tree
+    }
+
+    this.data && this.onData(this.data)
+  },
+
+  methods: {
+    getSize () {
+      var width = this.$el.clientWidth
+      var height = this.$el.clientHeight
+      return { width, height }
+    },
+
+    resize () {
+      const size = this.getSize()
+      const {g, svg, tree} = this.internaldata
+      svg.attr('width', size.width)
+        .attr('height', size.height)
+      this.transformSvg(g, size)
+      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      this.redraw()
+    },
+
+    completeRedraw ({margin = null}) {
+      const size = this.getSize()
+      this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
+      this.applyTransition(size, {margin})
+      this.redraw()
+    },
+
+    transformSvg (g, size) {
+      size = size || this.getSize()
+      return this.layout.transformSvg(g, this.margin, size, this.maxTextLenght)
+    },
+
+    updateTransform (g, size) {
+      size = size || this.getSize()
+      return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
+    },
+
+    updateGraph () {
+      console.log('here')
+      const {root, g, tree} = this.internaldata
+
+      tree(root)
+      const node = g.selectAll('.nodetree').data(root.leaves(), d => d.id)
+      const newNodes = node.enter().append('g').attr('class', 'nodetree')
+      const allNodes = newNodes.merge(node)
+
+      removeTextAndGraph(node)
+
+      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
+        .attr('transform', d => translate(d, this.layout))
+        .attr('opacity', 1))
+
+      const {transformText} = this.layout
+      allNodes.each((d) => {
+        d.textInfo = transformText(d, false)
+      })
+      const text = allNodes.append('text')
+        .attr('dy', '.35em')
+        .text(d => d.data[this.nodeText])
+        .attr('x', d => d.textInfo.x)
+        .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+        .attr('transform', d => `rotate(${d.textInfo.rotate})`)
+
+      const last = Math.max(...text.nodes().map(node => node.getComputedTextLength())) + 6
+      if (last <= this.maxTextLenght.last) {
+        return allNodesPromise
+      }
+
+      this.instantClean()
+      const size = this.getSize()
+      this.maxTextLenght = {first: 0, last}
+      this.transformSvg(g, size)
+      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      return this.updateGraph()
+    },
+
+    onData (data) {
+      this.clean()
+      if (!data) {
+        this.internaldata.root = null
+        return
+      }
+      const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
+      this.internaldata.root = root
+      root.each(d => { d.id = i++ })
+      const size = this.getSize()
+      root.x = size.height / 2
+      root.y = 0
+      root.x0 = root.x
+      root.y0 = root.y
+      this.redraw()
+    },
+
+    clean () {
+      ['.linktree', '.nodetree', 'text', 'circle'].forEach(selector => {
+        this.internaldata.g.selectAll(selector).transition().duration(this.duration).attr('opacity', 0).remove()
+      })
+    },
+
+    instantClean () {
+      ['.linktree', '.nodetree', 'text', 'circle'].forEach(selector => {
+        this.internaldata.g.selectAll(selector).remove()
+      })
+    },
+
+    redraw () {
+      const root = this.internaldata.root
+      if (root) {
+        return this.updateGraph(root)
+      }
+      return Promise.resolve('no graph')
+    },
+
+    applyTransition (size, {margin}) {
+      const {g} = this.internaldata
+      const transitiong = g.transition().duration(this.duration250)
+      this.transformSvg(transitiong, size)
+    }
+  },
+
+  computed: {
+    tree () {
+      const size = this.getSize()
+      const tree = d3.cluster()
+      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      return tree
+    },
+
+    margin () {
+      return {x: this.marginX, y: this.marginY}
+    }
+  },
+
+  watch: {
+    data (current, old) {
+      this.onData(current)
+    },
+
+    marginX (newMarginX, oldMarginX) {
+      this.completeRedraw({margin: {x: oldMarginX, y: this.marginY}})
+    },
+
+    marginY (newMarginY, oldMarginY) {
+      this.completeRedraw({margin: {x: this.marginX, y: oldMarginY}})
+    }
+  }
+}
+</script>
+
+<style>
+.treeclass .nodetree text {
+  font: 10px sans-serif;
+  cursor: pointer;
+}
+
+.treeclass .nodetree.selected text {
+  font-weight: bold;
+}
+
+.treeclass .node--internal text {
+  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+}
+
+.treeclass .linktree {
+  fill: none;
+  stroke: #555;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
+}
+</style>

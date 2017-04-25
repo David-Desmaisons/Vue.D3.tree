@@ -6,17 +6,11 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
-import {compareString, anchorTodx, toPromise, findInParents} from './d3-utils'
+import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, removeTextAndGraph, translate} from './d3-utils'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
 Object.assign(d3, d3Hierarchy)
-
-function mapMany (arr, mapper) {
-  return arr.reduce(function (prev, curr) {
-    return prev.concat(mapper(curr))
-  }, [])
-}
 
 const layout = {
   euclidean,
@@ -70,13 +64,6 @@ const directives = {
   resize
 }
 
-function drawLink (source, target, {transformNode}) {
-  return 'M' + transformNode(source.x, source.y) +
-         'C' + transformNode(source.x, (source.y + target.y) / 2) +
-         ' ' + transformNode(target.x, (source.y + target.y) / 2) +
-         ' ' + transformNode(target.x, target.y)
-}
-
 function hasChildren (d) {
   return d.children || d._children
 }
@@ -91,16 +78,6 @@ function onAllChilddren (d, callback, fatherVisible = undefined) {
   }
   var directChildren = getChildren(d)
   directChildren && directChildren.children.forEach(child => onAllChilddren(child, callback, directChildren.visible))
-}
-
-function removeTextAndGraph (selection) {
-  ['circle', 'text'].forEach(select => {
-    selection.selectAll(select).remove()
-  })
-}
-
-function translate (vector, {transformNode}) {
-  return 'translate(' + transformNode(vector.x, vector.y) + ')'
 }
 
 export default {
@@ -234,9 +211,9 @@ export default {
           .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
           .attr('transform', d => 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')')
 
-      const transformer = this.layout.transformText
+      const {transformText} = this.layout
       allNodes.each((d) => {
-        d.textInfo = transformer(d, hasChildren(d))
+        d.textInfo = transformText(d, hasChildren(d))
       })
 
       const textTransition = toPromise(text.transition().duration(this.duration)
@@ -264,8 +241,14 @@ export default {
       }
 
       this.maxTextLenght = {first, last}
-      this.internaldata.svg.call(this.internaldata.zoom.transform, this.currentTransform)
-      this.layout.size(this.internaldata.tree, this.getSize(), this.margin, this.maxTextLenght)
+      const size = this.getSize()
+      if (this.zoomable) {
+        this.internaldata.svg.call(this.internaldata.zoom.transform, this.currentTransform)
+      } else {
+        const {g} = this.internaldata
+        this.transformSvg(g, size)
+      }
+      this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       return this.updateGraph(source)
     },
 

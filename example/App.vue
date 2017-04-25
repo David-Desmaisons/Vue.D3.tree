@@ -105,11 +105,16 @@
     <d3tree ref="tree" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
 
+   <div class="col-md-9 panel panel-default">
+    <d3dependency-graph class="tree" ref="graph" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
+  </div>
+
   </div>
 </template>
 
 <script>
 import D3tree from '../src/D3tree'
+import D3dependencyGraph from '../src/D3dependencyGraph'
 import data from '../data/data'
 Object.assign(data, {
   type: 'tree',
@@ -130,7 +135,8 @@ export default {
     return data
   },
   components: {
-    D3tree
+    D3tree,
+    D3dependencyGraph
   },
   methods: {
     do (action) {

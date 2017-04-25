@@ -1,7 +1,3 @@
-function compareString (a, b) {
-  return (a < b) ? -1 : (a > b) ? 1 : 0
-}
-
 function anchorTodx (d, el) {
   if (d === 'middle') {
     return -el.getBBox().width / 2
@@ -11,6 +7,17 @@ function anchorTodx (d, el) {
   return 0
 }
 
+function drawLink (source, target, {transformNode}) {
+  return 'M' + transformNode(source.x, source.y) +
+         'C' + transformNode(source.x, (source.y + target.y) / 2) +
+         ' ' + transformNode(target.x, (source.y + target.y) / 2) +
+         ' ' + transformNode(target.x, target.y)
+}
+
+function compareString (a, b) {
+  return (a < b) ? -1 : (a > b) ? 1 : 0
+}
+
 function findInParents (node, nodes) {
   if (nodes.indexOf(node) !== -1) {
     return node
@@ -18,6 +25,18 @@ function findInParents (node, nodes) {
 
   const parent = node.parent
   return (parent === null) ? node : findInParents(parent, nodes)
+}
+
+function mapMany (arr, mapper) {
+  return arr.reduce(function (prev, curr) {
+    return prev.concat(mapper(curr))
+  }, [])
+}
+
+function removeTextAndGraph (selection) {
+  ['circle', 'text'].forEach(select => {
+    selection.selectAll(select).remove()
+  })
 }
 
 function toPromise (transition) {
@@ -42,10 +61,18 @@ function toPromise (transition) {
   })
 }
 
+function translate (vector, {transformNode}) {
+  return 'translate(' + transformNode(vector.x, vector.y) + ')'
+}
+
 export {
-    compareString,
     anchorTodx,
+    compareString,
+    drawLink,
+    findInParents,
+    mapMany,
+    removeTextAndGraph,
     toPromise,
-    findInParents
+    translate
 }
 
