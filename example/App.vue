@@ -106,7 +106,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="tree" ref="graph" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" :data="forDependency.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
   </div>
 
   </div>
@@ -116,6 +116,10 @@
 import D3tree from '../src/D3tree'
 import D3dependencyGraph from '../src/D3dependencyGraph'
 import data from '../data/data'
+import rawVm from '../data/DiscogsClientvm'
+import CircularJson from 'circular-json'
+const vm = CircularJson.parse(rawVm)
+
 Object.assign(data, {
   type: 'tree',
   layoutType: 'euclidean',
@@ -126,7 +130,11 @@ Object.assign(data, {
   currentNode: null,
   zoomable: true,
   isLoading: false,
-  events: []
+  events: [],
+  forDependency: {
+    tree: vm.Graph.tree,
+    links: vm.Graph.links
+  }
 })
 
 export default {
@@ -194,6 +202,11 @@ export default {
 
 .tree {
   height: 600px;
+  width: 100%;
+}
+
+.graph-root {
+  height: 800px;
   width: 100%;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="viewport treeclass" v-resize="resize">
+  <div class="viewport graph" v-resize="resize">
   </div>
 </template>
 <script>
@@ -155,7 +155,12 @@ export default {
       }
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
-      root.each(d => { d.id = this.identifier(d.data) })
+      const map = this.internaldata.map = {}
+      root.each(d => {
+        const id = this.identifier(d.data)
+        d.id = id
+        map[id] = d
+      })
       const size = this.getSize()
       root.x = size.height / 2
       root.y = 0
@@ -186,7 +191,7 @@ export default {
 
     applyTransition (size, {margin}) {
       const {g} = this.internaldata
-      const transitiong = g.transition().duration(this.duration250)
+      const transitiong = g.transition().duration(this.duration)
       this.transformSvg(transitiong, size)
     }
   },
@@ -221,12 +226,11 @@ export default {
 </script>
 
 <style>
-.treeclass .nodetree text {
+.graph .nodetree text {
   font: 10px sans-serif;
-  cursor: pointer;
 }
 
-.treeclass .nodetree.selected text {
+.graph .nodetree.selected text {
   font-weight: bold;
 }
 </style>
