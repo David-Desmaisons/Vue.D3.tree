@@ -15,7 +15,7 @@ var i = 0
 
 const props = {
   data: Object,
-  link: Object,
+  links: Array,
   marginX: {
     type: Number,
     default: 0
@@ -72,7 +72,12 @@ export default {
       tree
     }
 
-    this.data && this.onData(this.data)
+    if (!this.data) {
+      return
+    }
+
+    this.onData(this.data)
+    this.links && this.onLinks(this.links)
   },
 
   methods: {
@@ -169,14 +174,36 @@ export default {
       this.redraw()
     },
 
+    onLinks (links) {
+      if (!this.data) {
+        return
+      }
+
+      const {map, g} = this.internaldata
+      const line = d3.radialLine()
+              .radius(d => d.y)
+              .angle(d => d.x / 180 * Math.PI)
+              .curve(d3.curveBundle.beta(0.95))
+
+      const processedLinks = links.map(link => ({source: map[link.source], target: map[link.target]}))
+      console.log(processedLinks)
+
+      const edges = g.selectAll('.link').data(processedLinks)
+
+      edges.enter().append('path').attr('class', 'link')
+            .merge(edges).attr('d', d => line(d.source.path(d.target)))
+
+      edges.exit().remove()
+    },
+
     clean () {
-      ['.nodetree', 'text'].forEach(selector => {
+      ['.nodetree', 'text', '.link'].forEach(selector => {
         this.internaldata.g.selectAll(selector).transition().duration(this.duration).attr('opacity', 0).remove()
       })
     },
 
     instantClean () {
-      ['.nodetree', 'text'].forEach(selector => {
+      ['.nodetree', 'text', '.link'].forEach(selector => {
         this.internaldata.g.selectAll(selector).remove()
       })
     },
@@ -214,6 +241,10 @@ export default {
       this.onData(current)
     },
 
+    links (current, old) {
+      this.onLinks(current)
+    },
+
     marginX (newMarginX, oldMarginX) {
       this.completeRedraw({margin: {x: oldMarginX, y: this.marginY}})
     },
@@ -232,5 +263,12 @@ export default {
 
 .graph .nodetree.selected text {
   font-weight: bold;
+}
+
+.graph .link {
+  fill: none;
+  stroke: #555;
+  stroke-opacity: 0.4;
+  stroke-width: 1.5px;
 }
 </style>

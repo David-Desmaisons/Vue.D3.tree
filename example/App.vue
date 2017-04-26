@@ -106,7 +106,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" :data="forDependency.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
   </div>
 
   </div>
