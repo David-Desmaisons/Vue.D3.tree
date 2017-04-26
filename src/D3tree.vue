@@ -54,6 +54,10 @@ const props = {
     type: String,
     required: true
   },
+  identifier: {
+    type: Function,
+    default: () => i++
+  },
   zoomable: {
     type: Boolean,
     default: false
@@ -268,7 +272,7 @@ export default {
       }
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
-      root.each(d => { d.id = i++ })
+      root.each(d => { d.id = this.identifier(d.data) })
       const size = this.getSize()
       root.x = size.height / 2
       root.y = 0

@@ -28,6 +28,10 @@ const props = {
     type: String,
     required: true
   },
+  identifier: {
+    type: Function,
+    default: () => i++
+  },
   duration: {
     type: Number,
     default: 500
@@ -106,7 +110,6 @@ export default {
     },
 
     updateGraph () {
-      console.log('here')
       const {root, g, tree} = this.internaldata
 
       tree(root)
@@ -152,7 +155,7 @@ export default {
       }
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
-      root.each(d => { d.id = i++ })
+      root.each(d => { d.id = this.identifier(d.data) })
       const size = this.getSize()
       root.x = size.height / 2
       root.y = 0
@@ -162,13 +165,13 @@ export default {
     },
 
     clean () {
-      ['.linktree', '.nodetree', 'text', 'circle'].forEach(selector => {
+      ['.nodetree', 'text'].forEach(selector => {
         this.internaldata.g.selectAll(selector).transition().duration(this.duration).attr('opacity', 0).remove()
       })
     },
 
     instantClean () {
-      ['.linktree', '.nodetree', 'text', 'circle'].forEach(selector => {
+      ['.nodetree', 'text'].forEach(selector => {
         this.internaldata.g.selectAll(selector).remove()
       })
     },
@@ -225,16 +228,5 @@ export default {
 
 .treeclass .nodetree.selected text {
   font-weight: bold;
-}
-
-.treeclass .node--internal text {
-  text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
-}
-
-.treeclass .linktree {
-  fill: none;
-  stroke: #555;
-  stroke-opacity: 0.4;
-  stroke-width: 1.5px;
 }
 </style>
