@@ -114,7 +114,7 @@ export default {
       return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
     },
 
-    updateGraph () {
+    updateNodes () {
       const {root, g, tree} = this.internaldata
 
       tree(root)
@@ -149,7 +149,19 @@ export default {
       this.maxTextLenght = {first: 0, last}
       this.transformSvg(g, size)
       this.layout.size(tree, size, this.margin, this.maxTextLenght)
-      return this.updateGraph()
+      return this.updateNodes()
+    },
+
+    updateLinks () {
+      const {g, links} = this.internaldata
+      const edges = g.selectAll('.link').data(links)
+      const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
+
+      edges.enter().append('path').attr('class', 'link')
+            .merge(edges).attr('d', d => line(d.source.path(d.target)))
+
+      edges.exit().remove()
+      return Promise.resolve('success')
     },
 
     onData (data) {
@@ -171,7 +183,7 @@ export default {
       root.y = 0
       root.x0 = root.x
       root.y0 = root.y
-      this.redraw()
+      this.updateNodes()
     },
 
     onLinks (links) {
@@ -179,18 +191,9 @@ export default {
         return
       }
 
-      const {map, g} = this.internaldata
-      const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
-
-      const processedLinks = links.map(link => ({source: map[link.source], target: map[link.target]}))
-      console.log(processedLinks)
-
-      const edges = g.selectAll('.link').data(processedLinks)
-
-      edges.enter().append('path').attr('class', 'link')
-            .merge(edges).attr('d', d => line(d.source.path(d.target)))
-
-      edges.exit().remove()
+      const {map} = this.internaldata
+      this.internaldata.links = links.map(link => ({source: map[link.source], target: map[link.target]}))
+      this.updateLinks()
     },
 
     clean () {
@@ -206,11 +209,8 @@ export default {
     },
 
     redraw () {
-      const root = this.internaldata.root
-      if (root) {
-        return this.updateGraph(root)
-      }
-      return Promise.resolve('no graph')
+      const {root} = this.internaldata
+      return root ? Promise.all([this.updateNodes(), this.updateLinks()]) : Promise.resolve('no graph')
     },
 
     applyTransition (size, {margin}) {
