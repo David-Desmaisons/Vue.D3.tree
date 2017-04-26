@@ -120,13 +120,11 @@ export default {
       tree(root)
       const node = g.selectAll('.nodetree').data(root.leaves(), d => d.id)
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
-      const allNodes = newNodes.merge(node)
+      const allNodes = newNodes.merge(node).attr('transform', d => translate(d, this.layout))
 
       removeTextAndGraph(node)
 
-      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
-        .attr('transform', d => translate(d, this.layout))
-        .attr('opacity', 1))
+      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration).attr('opacity', 1))
 
       const {transformText} = this.layout
       allNodes.each((d) => {
@@ -157,11 +155,13 @@ export default {
       const edges = g.selectAll('.link').data(links)
       const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
-      edges.enter().append('path').attr('class', 'link')
-            .merge(edges).attr('d', d => line(d.source.path(d.target)))
+      const newEdges = edges.enter().append('path').attr('class', 'link')
+
+      const promise = toPromise(edges.merge(newEdges).transition().duration(this.duration)
+                                    .attr('opacity', 1).attr('d', d => line(d.source.path(d.target))))
 
       edges.exit().remove()
-      return Promise.resolve('success')
+      return promise
     },
 
     onData (data) {
