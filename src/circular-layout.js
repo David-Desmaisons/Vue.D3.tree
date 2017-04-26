@@ -19,6 +19,12 @@ export default {
     return transform.translate(width / 2, height / 2)
   },
 
+  getLine (d3) {
+    return d3.radialLine()
+              .radius(d => d.y)
+              .angle(d => d.x / 180 * Math.PI)
+  },
+
   transformText (d, children) {
     return {
       x: d.x < 180 === !children ? 6 : -6,

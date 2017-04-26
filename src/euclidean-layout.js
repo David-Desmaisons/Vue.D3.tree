@@ -15,6 +15,12 @@ export default {
     return transform.translate(x + first, y)
   },
 
+  getLine (d3) {
+    return d3.line()
+            .x(d => d.data.x)
+            .y(d => d.data.y)
+  },
+
   transformText (text, children) {
     return {
       x: !children ? 6 : -6,

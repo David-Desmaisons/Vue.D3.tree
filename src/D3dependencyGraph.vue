@@ -180,10 +180,7 @@ export default {
       }
 
       const {map, g} = this.internaldata
-      const line = d3.radialLine()
-              .radius(d => d.y)
-              .angle(d => d.x / 180 * Math.PI)
-              .curve(d3.curveBundle.beta(0.95))
+      const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const processedLinks = links.map(link => ({source: map[link.source], target: map[link.target]}))
       console.log(processedLinks)
