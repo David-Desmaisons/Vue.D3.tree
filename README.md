@@ -12,15 +12,15 @@ Vue component to display tree based on [D3.js](https://d3js.org/) layout.
 ## Usage
 
 ```html
-<tree :data="tree" :node-text="name" layoutType="circular">
-</tree>
+<d3tree :data="tree" :node-text="name" layoutType="circular">
+</d3tree>
 ```
 ```javascript
-import tree from 'vued3tree'
+import {D3tree} from 'vued3tree'
 
 export default {
   components: {
-    tree
+    D3tree
   },
   data() {
       return {
