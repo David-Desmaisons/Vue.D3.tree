@@ -46,7 +46,7 @@ var webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
     path: config.build.assetsRoot,
-    filename: 'vueD3Tree.js',
+    filename: 'index.js',
     library: 'vueD3Tree',
     libraryTarget: "umd"
   },
