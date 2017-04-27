@@ -120,7 +120,9 @@ export default {
       tree(root)
       const node = g.selectAll('.nodetree').data(root.leaves(), d => d.id)
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
-      const allNodes = newNodes.merge(node).attr('transform', d => translate(d, this.layout))
+      newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted)
+
+      const allNodes = this.internaldata.nodes = newNodes.merge(node).attr('transform', d => translate(d, this.layout))
 
       removeTextAndGraph(node)
 
@@ -157,17 +159,56 @@ export default {
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
 
-      const promise = toPromise(edges.merge(newEdges).transition().duration(this.duration)
+      const allEdges = this.internaldata.edges = edges.merge(newEdges)
+      const promise = toPromise(allEdges.transition().duration(this.duration)
                                     .attr('opacity', 1).attr('d', d => line(d.source.path(d.target))))
 
       edges.exit().remove()
       return promise
     },
 
+    mouseOvered (d) {
+      const {edges, nodes} = this.internaldata
+      if (edges === null) {
+        return
+      }
+      nodes.each(function (n) { n.target = n.source = false })
+
+      edges.classed('link--target', function (l) {
+        if (l.target === d) {
+          l.source.source = true
+          return true
+        }
+      })
+      .classed('link--source', function (l) {
+        if (l.source === d) {
+          l.target.target = true
+          return true
+        }
+      })
+      .filter(function (l) { return l.target === d || l.source === d })
+      .raise()
+
+      nodes.classed('node--target', function (n) { return n.target })
+          .classed('node--source', function (n) { return n.source })
+    },
+
+    mouseOuted (d) {
+      const {edges, nodes} = this.internaldata
+      if (edges === null) {
+        return
+      }
+      edges.classed('link--target', false)
+          .classed('link--source', false)
+
+      nodes.classed('node--target', false)
+          .classed('node--source', false)
+    },
+
     onData (data) {
       this.clean()
       if (!data) {
-        this.internaldata.root = null
+        this.internaldata.root = this.internaldata.nodes = null
         return
       }
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
@@ -189,6 +230,10 @@ export default {
     onLinks (links) {
       if (!this.data) {
         return
+      }
+
+      if (!links) {
+        this.internaldata.links = this.internaldata.edges = null
       }
 
       const {map} = this.internaldata
@@ -264,8 +309,36 @@ export default {
 
 .graph .link {
   fill: none;
-  stroke: #555;
-  stroke-opacity: 0.4;
+  stroke: blue;
+  stroke-opacity: 0.3;
   stroke-width: 1.5px;
+}
+
+.graph .nodetree.node--source text{
+  fill: #2ca02c;
+  font-weight: bold;
+}
+
+.graph .nodetree.node--target text{
+  fill: #d62728;
+  font-weight: bold;
+}
+
+
+.graph .nodetree:hover text{
+  font-weight: bold;
+}
+
+.graph .link--source,
+.graph .link--target {
+  stroke-opacity: 1;
+}
+
+.graph .link--source {
+  stroke: #d62728;
+}
+
+.graph .link--target {
+  stroke: #2ca02c;
 }
 </style>
