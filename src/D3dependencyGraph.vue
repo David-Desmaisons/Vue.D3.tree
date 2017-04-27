@@ -11,8 +11,6 @@ import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
 Object.assign(d3, d3Hierarchy)
 
-var i = 0
-
 const props = {
   data: Object,
   links: Array,
@@ -30,7 +28,7 @@ const props = {
   },
   identifier: {
     type: Function,
-    default: () => i++
+    required: true
   },
   duration: {
     type: Number,
