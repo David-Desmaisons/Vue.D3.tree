@@ -113,8 +113,7 @@
 </template>
 
 <script>
-import D3tree from '../src/D3tree'
-import D3dependencyGraph from '../src/D3dependencyGraph'
+import {D3tree, D3dependencyGraph} from '../src/'
 import data from '../data/data'
 import rawVm from '../data/DiscogsClientvm'
 import CircularJson from 'circular-json'

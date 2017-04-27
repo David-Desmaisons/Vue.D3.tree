@@ -12,7 +12,7 @@ var env = process.env.NODE_ENV === 'testing'
 
 var webpackConfig = merge(baseWebpackConfig, {
   entry: {
-    "vueD3Tree": './src/D3tree.vue'
+    "index": './src/index.js'
   },
   externals: {
     "vue": {
