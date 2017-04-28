@@ -170,7 +170,7 @@ export default {
 
     mouseOvered (d) {
       const {edges, nodes} = this.internaldata
-      if (edges === null) {
+      if (!edges) {
         return
       }
       nodes.each(function (n) { n.target = n.source = false })
@@ -196,7 +196,7 @@ export default {
 
     mouseOuted (d) {
       const {edges, nodes} = this.internaldata
-      if (edges === null) {
+      if (!edges) {
         return
       }
       edges.classed('link--target', false)
