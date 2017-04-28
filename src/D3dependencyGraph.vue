@@ -152,6 +152,9 @@ export default {
 
     updateLinks () {
       const {g, links} = this.internaldata
+      if (!links) {
+        return
+      }
       const edges = g.selectAll('.link').data(links)
       const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
