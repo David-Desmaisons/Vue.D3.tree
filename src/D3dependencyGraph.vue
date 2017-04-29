@@ -316,6 +316,7 @@ export default {
 <style>
 .graph .nodetree text {
   font: 10px sans-serif;
+  transition: all 0.5s;
 }
 
 .graph .nodetree.selected text {
@@ -327,6 +328,7 @@ export default {
   stroke: blue;
   stroke-opacity: 0.3;
   stroke-width: 1.5px;
+  transition: stroke 0.5s, opacity 0.5s;
 }
 
 .graph .nodetree.node--source text{
