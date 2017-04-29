@@ -1,6 +1,27 @@
+function getRay ({width, height}, {x, y}, {xExtreme = null, yExtreme = null}) {
+  const firstRay = computeRay((width - x) / 2, xExtreme, Math.cos)
+  const secondRay = computeRay((height - y) / 2, yExtreme, Math.sin)
+  return Math.min(firstRay, secondRay)
+}
+
+function computeRay (space, extreme, trig) {
+  if (!extreme) {
+    return space
+  }
+  const available = space - extreme.value
+  const angle = (extreme.x - 90) / 180 * Math.PI
+  return Math.abs(available / trig(angle))
+}
+
 export default {
   size (tree, {width, height}, {x, y}, {last}) {
     const ray = Math.min(width - x, height - y) / 2 - last
+    tree.size([360, ray])
+        .separation((a, b) => { return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1) })
+  },
+
+  optimizeSize (tree, size, margin, extreme) {
+    const ray = getRay(size, margin, extreme || {})
     tree.size([360, ray])
         .separation((a, b) => { return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1) })
   },

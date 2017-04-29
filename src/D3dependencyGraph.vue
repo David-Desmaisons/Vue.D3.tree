@@ -47,12 +47,8 @@ export default {
 
   data () {
     return {
-      currentTransform: null,
       layout,
-      maxTextLenght: {
-        first: 0,
-        last: 0
-      }
+      textContraint: null
     }
   },
 
@@ -91,25 +87,25 @@ export default {
       svg.attr('width', size.width)
         .attr('height', size.height)
       this.transformSvg(g, size)
-      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
     },
 
     completeRedraw ({margin = null}) {
       const size = this.getSize()
-      this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
+      this.layout.optimizeSize(this.internaldata.tree, size, this.margin, this.textContraint)
       this.applyTransition(size, {margin})
       this.redraw()
     },
 
     transformSvg (g, size) {
       size = size || this.getSize()
-      return this.layout.transformSvg(g, this.margin, size, this.maxTextLenght)
+      return this.layout.transformSvg(g, this.margin, size)
     },
 
     updateTransform (g, size) {
       size = size || this.getSize()
-      return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
+      return this.layout.updateTransform(g, this.margin, size)
     },
 
     updateNodes () {
@@ -126,7 +122,7 @@ export default {
 
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration).attr('opacity', 1))
 
-      const {transformText} = this.layout
+      const {transformText, transformNode} = this.layout
       allNodes.each((d) => {
         d.textInfo = transformText(d, false)
       })
@@ -137,16 +133,29 @@ export default {
         .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
         .attr('transform', d => `rotate(${d.textInfo.rotate})`)
 
-      const last = Math.max(...text.nodes().map(node => node.getComputedTextLength())) + 6
-      if (last <= this.maxTextLenght.last) {
+      const tentative = []
+      text.each(function (d) { tentative.push({ node: this, data: d, pos: transformNode(d.x, this.getComputedTextLength() + 6) }) })
+
+      const getMaxNode = (position) => {
+        const mapped1 = tentative.map(el => ({ node: el.node, data: el.data, value: Math.abs(el.pos[position]) }))
+        const max = Math.max(...mapped1.map(el => el.value))
+        return mapped1.find(el => el.value === max)
+      }
+      const maxNode = getMaxNode(0)
+      const maxNode2 = getMaxNode(1)
+      const size = this.getSize()
+
+      const textContraint = { xExtreme: { value: maxNode.value, x: maxNode.data.x }, yExtreme: { value: maxNode2.value, x: maxNode2.data.x } }
+
+      if ((this.textContraint) && (this.textContraint.xExtreme.value === textContraint.xExtreme.value) &&
+            (this.textContraint.yExtreme.value === textContraint.yExtreme.value)) {
         return allNodesPromise
       }
 
       this.instantClean()
-      const size = this.getSize()
-      this.maxTextLenght = {first: 0, last}
+      this.textContraint = textContraint
       this.transformSvg(g, size)
-      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
       return this.updateNodes()
     },
 
@@ -270,7 +279,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = d3.cluster()
-      this.layout.size(tree, size, this.margin, this.maxTextLenght)
+      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
       return tree
     },
 
