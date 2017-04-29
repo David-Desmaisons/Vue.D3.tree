@@ -196,11 +196,15 @@ export default {
           return true
         }
       })
+      .classed('link--ignored', function (l) {
+        return (l.source !== d) && ((l.target !== d))
+      })
       .filter(function (l) { return l.target === d || l.source === d })
       .raise()
 
-      nodes.classed('node--target', function (n) { return n.target })
-          .classed('node--source', function (n) { return n.source })
+      nodes.classed('node--target', n => n.target)
+          .classed('node--source', n => n.source)
+          .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
     },
 
     mouseOuted (d) {
@@ -210,9 +214,11 @@ export default {
       }
       edges.classed('link--target', false)
           .classed('link--source', false)
+          .classed('link--ignored', false)
 
       nodes.classed('node--target', false)
           .classed('node--source', false)
+          .classed('node--ignored', false)
     },
 
     onData (data) {
@@ -334,14 +340,21 @@ export default {
   font-weight: bold;
 }
 
-
 .graph .nodetree:hover text{
   font-weight: bold;
+}
+
+.graph .nodetree.node--ignored text{
+  opacity: 0.4;
 }
 
 .graph .link--source,
 .graph .link--target {
   stroke-opacity: 1;
+}
+
+.graph .link--ignored {
+  stroke-opacity: 0.1;
 }
 
 .graph .link--source {
