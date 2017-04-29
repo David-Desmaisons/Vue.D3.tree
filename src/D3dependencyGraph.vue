@@ -137,23 +137,22 @@ export default {
       text.each(function (d) { tentative.push({ node: this, data: d, pos: transformNode(d.x, this.getComputedTextLength() + 6) }) })
 
       const getMaxNode = (position) => {
-        const mapped1 = tentative.map(el => ({ node: el.node, data: el.data, value: Math.abs(el.pos[position]) }))
+        const mapped1 = tentative.map(el => ({ node: el.node, x: el.data.x, value: Math.abs(el.pos[position]) }))
         const max = Math.max(...mapped1.map(el => el.value))
         return mapped1.find(el => el.value === max)
       }
-      const maxNode = getMaxNode(0)
-      const maxNode2 = getMaxNode(1)
-      const size = this.getSize()
+      const xExtreme = getMaxNode(0)
+      const yExtreme = getMaxNode(1)
+      const textContraint = {xExtreme, yExtreme}
 
-      const textContraint = { xExtreme: { value: maxNode.value, x: maxNode.data.x }, yExtreme: { value: maxNode2.value, x: maxNode2.data.x } }
-
-      if ((this.textContraint) && (this.textContraint.xExtreme.value === textContraint.xExtreme.value) &&
-            (this.textContraint.yExtreme.value === textContraint.yExtreme.value)) {
+      if ((this.textContraint) && (this.textContraint.xExtreme.value === xExtreme.value) &&
+            (this.textContraint.yExtreme.value === yExtreme.value)) {
         return allNodesPromise
       }
 
       this.instantClean()
       this.textContraint = textContraint
+      const size = this.getSize()
       this.transformSvg(g, size)
       this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
       return this.updateNodes()
