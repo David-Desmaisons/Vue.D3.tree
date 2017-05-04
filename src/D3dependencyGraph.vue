@@ -27,8 +27,11 @@ const props = {
     required: true
   },
   identifier: {
-    type: Function,
-    required: true
+    required: true,
+    validator (value) {
+      const valueType = typeof value
+      return (valueType === 'string') || (valueType === 'function')
+    }
   },
   duration: {
     type: Number,
@@ -232,7 +235,9 @@ export default {
       this.internaldata.root = root
       const map = this.internaldata.map = {}
       root.each(d => {
-        const id = this.identifier(d.data)
+        const identifier = this.identifier
+        const idGetter = typeof identifier === 'string' ? data => data[identifier] : identifier
+        const id = idGetter(d.data)
         d.id = id
         map[id] = d
       })
