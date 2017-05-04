@@ -204,6 +204,7 @@ export default {
       nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
+          .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
     mouseOuted (d) {
@@ -218,6 +219,7 @@ export default {
       nodes.classed('node--target', false)
           .classed('node--source', false)
           .classed('node--ignored', false)
+          .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
     onData (data) {
@@ -316,7 +318,7 @@ export default {
 <style>
 .graph .nodetree text {
   font: 10px sans-serif;
-  transition: all 0.5s;
+  transition: opacity 0.5s, fill 0.5s;
 }
 
 .graph .nodetree.selected text {
@@ -332,13 +334,13 @@ export default {
 }
 
 .graph .nodetree.node--source text{
-  fill: #2ca02c;
   font-weight: bold;
+  fill: #2ca02c;
 }
 
 .graph .nodetree.node--target text{
-  fill: #d62728;
   font-weight: bold;
+  fill: #d62728;
 }
 
 .graph .nodetree:hover text{
