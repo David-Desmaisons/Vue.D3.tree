@@ -208,6 +208,8 @@ export default {
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+
+      this.$emit('hover', {element: d, data: d.data})
     },
 
     mouseOuted (d) {
@@ -321,39 +323,12 @@ export default {
 </script>
 
 <style>
-.graph .nodetree text {
-  font: 10px sans-serif;
-  transition: opacity 0.5s, fill 0.5s;
-}
-
-.graph .nodetree.selected text {
-  font-weight: bold;
-}
-
 .graph .link {
   fill: none;
   stroke: blue;
   stroke-opacity: 0.3;
   stroke-width: 1.5px;
-  transition: stroke 0.5s, opacity 0.5s;
-}
-
-.graph .nodetree.node--source text{
-  font-weight: bold;
-  fill: #2ca02c;
-}
-
-.graph .nodetree.node--target text{
-  font-weight: bold;
-  fill: #d62728;
-}
-
-.graph .nodetree:hover text{
-  font-weight: bold;
-}
-
-.graph .nodetree.node--ignored text{
-  opacity: 0.4;
+  transition: stroke 0.5s, stroke-opacity 0.5s;
 }
 
 .graph .link--source,
@@ -371,5 +346,29 @@ export default {
 
 .graph .link--target {
   stroke: #2ca02c;
+}
+
+.graph .nodetree text {
+  font: 10px sans-serif;
+  transition: opacity 0.5s, fill 0.5s;
+}
+
+.graph .nodetree:hover text{
+  font-weight: bold;
+  transition: stroke 0.;
+}
+
+.graph .nodetree.node--source text{
+  font-weight: bold;
+  fill: #2ca02c;
+}
+
+.graph .nodetree.node--target text{
+  font-weight: bold;
+  fill: #d62728;
+}
+
+.graph .nodetree.node--ignored text{
+  opacity: 0.4;
 }
 </style>
