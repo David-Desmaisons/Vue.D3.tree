@@ -50,7 +50,6 @@ export default {
 
   data () {
     return {
-      layout,
       textContraint: null
     }
   },
@@ -90,25 +89,25 @@ export default {
       svg.attr('width', size.width)
         .attr('height', size.height)
       this.transformSvg(g, size)
-      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
+      layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
     },
 
     completeRedraw ({margin = null}) {
       const size = this.getSize()
-      this.layout.optimizeSize(this.internaldata.tree, size, this.margin, this.textContraint)
+      layout.optimizeSize(this.internaldata.tree, size, this.margin, this.textContraint)
       this.applyTransition(size, {margin})
       this.redraw()
     },
 
     transformSvg (g, size) {
       size = size || this.getSize()
-      return this.layout.transformSvg(g, this.margin, size)
+      return layout.transformSvg(g, this.margin, size)
     },
 
     updateTransform (g, size) {
       size = size || this.getSize()
-      return this.layout.updateTransform(g, this.margin, size)
+      return layout.updateTransform(g, this.margin, size)
     },
 
     updateNodes () {
@@ -119,13 +118,13 @@ export default {
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
       newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted)
 
-      const allNodes = this.internaldata.nodes = newNodes.merge(node).attr('transform', d => translate(d, this.layout))
+      const allNodes = this.internaldata.nodes = newNodes.merge(node).attr('transform', d => translate(d, layout))
 
       removeTextAndGraph(node)
 
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration).attr('opacity', 1))
 
-      const {transformText, transformNode} = this.layout
+      const {transformText, transformNode} = layout
       allNodes.each((d) => {
         d.textInfo = transformText(d, false)
       })
@@ -157,7 +156,7 @@ export default {
       this.textContraint = textContraint
       const size = this.getSize()
       this.transformSvg(g, size)
-      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
+      layout.optimizeSize(tree, size, this.margin, this.textContraint)
       return this.updateNodes()
     },
 
@@ -167,7 +166,7 @@ export default {
         return
       }
       const edges = g.selectAll('.link').data(links)
-      const line = this.layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
+      const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
 
@@ -304,7 +303,7 @@ export default {
     tree () {
       const size = this.getSize()
       const tree = d3.cluster()
-      this.layout.optimizeSize(tree, size, this.margin, this.textContraint)
+      layout.optimizeSize(tree, size, this.margin, this.textContraint)
       return tree
     },
 
