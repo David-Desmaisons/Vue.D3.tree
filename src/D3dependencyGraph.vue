@@ -180,6 +180,19 @@ export default {
     },
 
     mouseOvered (d) {
+      this.showDependencies(d)
+      this.$emit('hover', {element: d, data: d.data})
+    },
+
+    mouseOuted (d) {
+      this.reset()
+    },
+
+    showDependencies (d) {
+      if (!d) {
+        this.reset()
+        return
+      }
       const {edges, nodes} = this.internaldata
       if (!edges) {
         return
@@ -208,11 +221,9 @@ export default {
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-
-      this.$emit('hover', {element: d, data: d.data})
     },
 
-    mouseOuted (d) {
+    reset () {
       const {edges, nodes} = this.internaldata
       if (!edges) {
         return
