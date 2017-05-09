@@ -50,7 +50,8 @@ export default {
 
   data () {
     return {
-      textContraint: null
+      textContraint: null,
+      currentNode: null
     }
   },
 
@@ -179,19 +180,15 @@ export default {
     },
 
     mouseOvered (d) {
-      this.showDependencies(d)
+      this.currentNode = d
       this.$emit('hover', {element: d, data: d.data})
     },
 
     mouseOuted (d) {
-      this.reset()
+      this.currentNode = null
     },
 
     showDependencies (d) {
-      if (!d) {
-        this.reset()
-        return
-      }
       const {edges, nodes} = this.internaldata
       if (!edges) {
         return
@@ -327,6 +324,15 @@ export default {
 
     marginY (newMarginY, oldMarginY) {
       this.completeRedraw({margin: {x: this.marginX, y: oldMarginY}})
+    },
+
+    currentNode (newCurrent, oldCurrent) {
+      if (oldCurrent) {
+        this.reset()
+      }
+      if (newCurrent) {
+        this.showDependencies(newCurrent)
+      }
     }
   }
 }
