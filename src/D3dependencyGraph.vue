@@ -180,7 +180,6 @@ export default {
     },
 
     mouseOvered (d) {
-      this.internaldata.nodes.filter(data => data === d).select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
       this.$emit('mouseNodeOver', {element: d, data: d.data})
     },
 
@@ -216,6 +215,7 @@ export default {
       nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
+          .classed('node--selected', n => n === d)
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
@@ -231,6 +231,7 @@ export default {
       nodes.classed('node--target', false)
           .classed('node--source', false)
           .classed('node--ignored', false)
+          .classed('node--selected', false)
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
@@ -366,9 +367,8 @@ export default {
   transition: opacity 0.5s, fill 0.5s;
 }
 
-.graph .nodetree:hover text{
+.graph .nodetree.node--selected text{
   font-weight: bold;
-  transition: stroke 0.;
 }
 
 .graph .nodetree.node--source text{
