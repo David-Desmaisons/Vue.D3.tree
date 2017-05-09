@@ -327,12 +327,8 @@ export default {
     },
 
     currentNode (newCurrent, oldCurrent) {
-      if (oldCurrent) {
-        this.reset()
-      }
-      if (newCurrent) {
-        this.showDependencies(newCurrent)
-      }
+      oldCurrent && this.reset()
+      newCurrent && this.showDependencies(newCurrent)
       this.$emit('currentNodeChanged', {new: newCurrent, old: oldCurrent})
     }
   }
