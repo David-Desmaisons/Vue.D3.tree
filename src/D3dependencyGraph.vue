@@ -333,6 +333,7 @@ export default {
       if (newCurrent) {
         this.showDependencies(newCurrent)
       }
+      this.$emit('currentNodeChanged', {new: newCurrent, old: oldCurrent})
     }
   }
 }
