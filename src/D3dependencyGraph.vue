@@ -180,12 +180,12 @@ export default {
     },
 
     mouseOvered (d) {
-      this.currentNode = d
-      this.$emit('hover', {element: d, data: d.data})
+      this.internaldata.nodes.filter(data => data === d).select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+      this.$emit('mouseNodeOver', {element: d, data: d.data})
     },
 
     mouseOuted (d) {
-      this.currentNode = null
+      this.$emit('mouseNodeOut', {element: d, data: d.data})
     },
 
     showDependencies (d) {

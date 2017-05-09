@@ -106,7 +106,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" :identifier="'id'" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" identifier="id" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText" margin-x="0" margin-y="0"></d3dependency-graph>
   </div>
 
   </div>
@@ -144,6 +144,16 @@ export default {
   components: {
     D3tree,
     D3dependencyGraph
+  },
+  computed: {
+    selectedGraphNode: {
+      get () {
+        return this.$refs['graph'].currentNode
+      },
+      set (value) {
+        this.$refs['graph'].currentNode = value
+      }
+    }
   },
   methods: {
     do (action) {
