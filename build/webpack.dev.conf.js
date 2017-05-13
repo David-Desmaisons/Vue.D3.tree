@@ -8,10 +8,15 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 // add hot-reload related code to entry chunks
 module.exports = merge(baseWebpackConfig, {
   entry: {
-    app: ['./build/dev-client'].concat('./example/main.js')
+    app1: ['./build/dev-client'].concat('./example/tree/main.js'),
+    app2: ['./build/dev-client'].concat('./example/links/main.js')
   },
   module: {
     loaders: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
+  },
+   output: {
+    path: __dirname,
+    filename: "apps/[name]/build/bundle.js"
   },
   // eval-source-map is faster for development
   devtool: '#eval-source-map',
@@ -25,8 +30,15 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.NoErrorsPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
-      filename: './example/index.html',
-      template: './example/index.html',
+      filename: './example/tree/index.html',
+      template: './example/tree/index.html',
+      chunks: ['app1'],
+      inject: true
+    }),
+    new HtmlWebpackPlugin({
+      filename: './example/links/index.html',
+      template: './example/links/index.html',
+      chunks: ['app2'],
       inject: true
     })
   ]

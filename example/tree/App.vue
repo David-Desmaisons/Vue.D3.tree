@@ -104,18 +104,14 @@
   <div class="col-md-9 panel panel-default">
     <d3tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
   </div>
- 
-   <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText" margin-x="15" margin-y="15"></d3dependency-graph>
-  </div>
-
+  
   </div>
 </template>
 
 <script>
-import {D3tree, D3dependencyGraph} from '../src/'
-import data from '../data/data'
-import rawVm from '../data/DiscogsClientvm'
+import {D3tree, D3dependencyGraph} from '../../src/'
+import data from '../../data/data'
+import rawVm from '../../data/DiscogsClientvm'
 import CircularJson from 'circular-json'
 const vm = CircularJson.parse(rawVm)
 
