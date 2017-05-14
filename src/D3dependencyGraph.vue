@@ -170,6 +170,7 @@ export default {
       const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
+                            .attr('d', d => line(d.source.path(d.target).map(p => ({x: p.x, y: 0.1}))))
 
       const allEdges = this.internaldata.edges = edges.merge(newEdges)
       const promise = toPromise(allEdges.transition().duration(this.duration).attr('d', d => line(d.source.path(d.target))))

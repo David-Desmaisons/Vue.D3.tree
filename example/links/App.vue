@@ -85,7 +85,7 @@ import CircularJson from 'circular-json'
 const vm = CircularJson.parse(rawVm)
 
 Object.assign(data, {
-  duration: 3000,
+  duration: 750,
   marginX: 30,
   marginY: 30,
   nodeText: 'text',
