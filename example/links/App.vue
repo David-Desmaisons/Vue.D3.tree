@@ -71,7 +71,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
   </div>
 
   </div>
