@@ -120,7 +120,6 @@ export default {
       newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted)
 
       const allNodes = this.internaldata.nodes = newNodes.merge(node)
-      // allNodes.attr('transform', d => translate(d, layout))
 
       removeTextAndGraph(node)
 
@@ -136,8 +135,6 @@ export default {
         .attr('x', d => d.textInfo.x)
         .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
         .attr('transform', d => `rotate(${d.textInfo.rotate})`)
-
-      // allNodes.attr('transform', d => translate(d, layout))
 
       const tentative = []
       text.each(function (d) { tentative.push({ node: this, data: d, pos: transformNode(d.x, this.getComputedTextLength() + 6) }) })
