@@ -166,14 +166,13 @@ export default {
       if (!links) {
         return
       }
-      const edges = g.selectAll('.link').data(links)
+      const edges = g.selectAll('.link').data(links, l => l.source.id + '-' + l.target.id)
       const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
 
       const allEdges = this.internaldata.edges = edges.merge(newEdges)
-      const promise = toPromise(allEdges.transition().duration(this.duration)
-                                    .attr('opacity', 1).attr('d', d => line(d.source.path(d.target))))
+      const promise = toPromise(allEdges.transition().duration(this.duration).attr('d', d => line(d.source.path(d.target))))
 
       edges.exit().remove()
       return promise
