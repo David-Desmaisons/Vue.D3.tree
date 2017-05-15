@@ -11,7 +11,7 @@
             <div class="form-group">
               <label for="margin-x" class="control-label col-sm-3">marginx</label>
               <div class="col-sm-7">
-                <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="marginX">
+                <input id="margin-x" class="form-control" type="range" min="-50" max="200" v-model.number="marginX">
               </div> 
                 <div class="col-sm-2">
                   <p>{{marginX}}px</p>       
@@ -21,7 +21,7 @@
             <div class="form-group">
               <label for="margin-y" class="control-label col-sm-3">marginy</label>
               <div class="col-sm-7">
-                <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="marginY">
+                <input id="margin-y" class="form-control" type="range" min="-50" max="200" v-model.number="marginY">
               </div>
               <div class="col-sm-2">
                 <p>{{marginY}}px</p>       
@@ -81,7 +81,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="forDependency.tree" :links="forDependency.links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
   </div>
 
   </div>
@@ -89,7 +89,8 @@
 
 <script>
 import {D3dependencyGraph} from '../../src/'
-import rawVm from '../../data/DiscogsClientvm'
+// import rawVm from '../../data/DiscogsClientvm'
+import rawVm from '../../data/nhibernatevm'
 import CircularJson from 'circular-json'
 const vm = CircularJson.parse(rawVm)
 
@@ -99,10 +100,8 @@ const data = {
   marginY: 30,
   currentNode: null,
   events: [],
-  forDependency: {
-    tree: vm.Graph.tree,
-    links: vm.Graph.links
-  }
+  tree: vm.Graph.tree,
+  links: vm.Graph.links
 }
 
 export default {
