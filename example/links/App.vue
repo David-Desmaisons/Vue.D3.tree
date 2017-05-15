@@ -68,10 +68,20 @@
       </div>     
     </div>
 
+    <div class="panel panel-default">
+        <div class="panel-heading">Events</div>
+
+        <div class="panel-body log">
+          <div v-for="event in events">
+            <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
+          </div>
+        </div>
+    </div>
+
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="forDependency.tree" :links="forDependency.links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
   </div>
 
   </div>
@@ -102,6 +112,20 @@ export default {
   },
   components: {
     D3dependencyGraph
+  },
+  methods: {
+    onEvent (eventName, data) {
+      this.events.push({eventName, data: data.data})
+      console.log({eventName, data: data})
+    },
+    mouseNodeOver (event) {
+      this.selectedGraphNode = event.element
+      this.onEvent('mouseNodeOver', event)
+    },
+    mouseNodeOut (event) {
+      this.selectedGraphNode = null
+      this.onEvent('mouseNodeOut', event)
+    }
   },
   computed: {
     selectedGraphNode: {
