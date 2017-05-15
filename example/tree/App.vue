@@ -109,11 +109,8 @@
 </template>
 
 <script>
-import {D3tree, D3dependencyGraph} from '../../src/'
+import {D3tree} from '../../src/'
 import data from '../../data/data'
-import rawVm from '../../data/DiscogsClientvm'
-import CircularJson from 'circular-json'
-const vm = CircularJson.parse(rawVm)
 
 Object.assign(data, {
   type: 'tree',
@@ -125,11 +122,7 @@ Object.assign(data, {
   currentNode: null,
   zoomable: true,
   isLoading: false,
-  events: [],
-  forDependency: {
-    tree: vm.Graph.tree,
-    links: vm.Graph.links
-  }
+  events: []
 })
 
 export default {
@@ -138,18 +131,7 @@ export default {
     return data
   },
   components: {
-    D3tree,
-    D3dependencyGraph
-  },
-  computed: {
-    selectedGraphNode: {
-      get () {
-        return this.$refs['graph'].currentNode
-      },
-      set (value) {
-        this.$refs['graph'].currentNode = value
-      }
-    }
+    D3tree
   },
   methods: {
     do (action) {

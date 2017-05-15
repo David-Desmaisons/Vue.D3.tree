@@ -41,7 +41,7 @@
             <div class="form-group">
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
               <span v-else>No Node selected.</span>
-               <i v-if="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+               <i v-if="false" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
             </div>  
 
             <button type="button" :disabled="!currentNode" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="">
@@ -71,7 +71,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" :node-text="nodeText" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="selectedGraphNode=$event.element" @mouseNodeOut="selectedGraphNode=null" :data="forDependency.tree" :links="forDependency.links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
   </div>
 
   </div>
@@ -79,24 +79,21 @@
 
 <script>
 import {D3dependencyGraph} from '../../src/'
-import data from '../../data/data'
 import rawVm from '../../data/DiscogsClientvm'
 import CircularJson from 'circular-json'
 const vm = CircularJson.parse(rawVm)
 
-Object.assign(data, {
+const data = {
   duration: 750,
   marginX: 30,
   marginY: 30,
-  nodeText: 'text',
   currentNode: null,
-  isLoading: false,
   events: [],
   forDependency: {
     tree: vm.Graph.tree,
     links: vm.Graph.links
   }
-})
+}
 
 export default {
   name: 'app',
@@ -114,17 +111,6 @@ export default {
       set (value) {
         this.$refs['graph'].currentNode = value
       }
-    }
-  },
-  methods: {
-    do (action) {
-      if (this.currentNode) {
-        this.isLoading = true
-        this.$refs['tree'][action](this.currentNode).then(() => { this.isLoading = false })
-      }
-    },
-    getId (node) {
-      return node.id
     }
   }
 }
