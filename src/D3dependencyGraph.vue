@@ -215,11 +215,12 @@ export default {
       nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
-          .classed('node--selected', n => n === d)
+          .filter(n => n === d)
+          .classed('node--selected', true)
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
-    reset () {
+    reset (d) {
       const {edges, nodes} = this.internaldata
       if (!edges) {
         return
@@ -232,6 +233,7 @@ export default {
           .classed('node--source', false)
           .classed('node--ignored', false)
           .classed('node--selected', false)
+          .filter(n => n === d)
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
@@ -328,7 +330,7 @@ export default {
     },
 
     currentNode (newCurrent, oldCurrent) {
-      oldCurrent && this.reset()
+      oldCurrent && this.reset(oldCurrent)
       newCurrent && this.showDependencies(newCurrent)
       this.$emit('currentNodeChanged', {new: newCurrent, old: oldCurrent})
     }
