@@ -209,13 +209,13 @@ export default {
       .classed('link--ignored', function (l) {
         return (l.source !== d) && ((l.target !== d))
       })
-      .filter(function (l) { return l.target === d || l.source === d })
+      .filter(l => l.target === d || l.source === d)
       .raise()
 
       nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
-          .filter(n => n === d)
+          .filter(n => ((n.target) || (n.source) || (n === d)))
           .classed('node--selected', true)
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
@@ -233,7 +233,7 @@ export default {
           .classed('node--source', false)
           .classed('node--ignored', false)
           .classed('node--selected', false)
-          .filter(n => n === d)
+          .filter(n => ((n.target) || (n.source) || (n === d)))
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 

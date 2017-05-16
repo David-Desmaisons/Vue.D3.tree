@@ -115,7 +115,6 @@ export default {
   methods: {
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
-      console.log({eventName, data: data})
     },
     mouseNodeOver (event) {
       this.selectedGraphNode = event.element
