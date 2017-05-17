@@ -117,12 +117,12 @@ export default {
       this.events.push({eventName, data: data.data})
     },
     mouseNodeOver (event) {
-      this.selectedGraphNode = event.element
       this.onEvent('mouseNodeOver', event)
+      this.selectedGraphNode = event.element
     },
     mouseNodeOut (event) {
-      this.selectedGraphNode = null
       this.onEvent('mouseNodeOut', event)
+      this.selectedGraphNode = null
     }
   },
   computed: {

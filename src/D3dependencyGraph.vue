@@ -192,7 +192,9 @@ export default {
       if (!edges) {
         return
       }
-      nodes.each(function (n) { n.target = n.source = false })
+      nodes.each(n => { n.target = n.source = false })
+
+      this.$el.style.cssText = 'display: none;'
 
       edges.classed('link--target', function (l) {
         if (l.target === d) {
@@ -212,12 +214,14 @@ export default {
       .filter(l => l.target === d || l.source === d)
       .raise()
 
-      nodes.classed('node--target', n => n.target)
+      const nodesSelected = nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
           .filter(n => ((n.target) || (n.source) || (n === d)))
           .classed('node--selected', true)
-          .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+
+      this.$el.style.cssText = 'display: block;'
+      nodesSelected.select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
     reset (d) {
@@ -225,6 +229,8 @@ export default {
       if (!edges) {
         return
       }
+      this.$el.style.cssText = 'display: none;'
+
       edges.classed('link--target', false)
           .classed('link--source', false)
           .classed('link--ignored', false)
@@ -233,7 +239,9 @@ export default {
           .classed('node--source', false)
           .classed('node--ignored', false)
           .classed('node--selected', false)
-          .filter(n => ((n.target) || (n.source) || (n === d)))
+
+      this.$el.style.cssText = 'display: block;'
+      nodes.filter(n => ((n.target) || (n.source) || (n === d)))
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
@@ -384,6 +392,6 @@ export default {
 }
 
 .graph .nodetree.node--ignored text{
-  opacity: 0.4;
+  opacity: 0.1;
 }
 </style>
