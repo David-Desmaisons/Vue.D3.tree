@@ -350,7 +350,7 @@ export default {
 .graph .link {
   fill: none;
   stroke: blue;
-  stroke-opacity: 0.3;
+  stroke-opacity: 0.2;
   stroke-width: 1.5px;
   transition: stroke 0.5s, stroke-opacity 0.5s;
 }
@@ -361,7 +361,7 @@ export default {
 }
 
 .graph .link--ignored {
-  stroke-opacity: 0.1;
+  stroke-opacity: 0.01;
 }
 
 .graph .link--source {
