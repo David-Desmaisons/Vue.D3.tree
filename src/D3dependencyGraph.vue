@@ -355,20 +355,20 @@ export default {
   transition: stroke 0.5s, stroke-opacity 0.5s;
 }
 
-.graph .link--source,
-.graph .link--target {
+.graph .link.link--source,
+.graph .link.link--target {
   stroke-opacity: 1;
 }
 
-.graph .link--ignored {
+.graph .link.link--ignored {
   stroke-opacity: 0.01;
 }
 
-.graph .link--source {
+.graph .link.link--source {
   stroke: #d62728;
 }
 
-.graph .link--target {
+.graph .link.link--target {
   stroke: #2ca02c;
 }
 
