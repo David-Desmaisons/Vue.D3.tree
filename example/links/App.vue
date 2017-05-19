@@ -68,15 +68,7 @@
       </div>     
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Events</div>
-
-        <div class="panel-body log">
-          <div v-for="event in events">
-            <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
-          </div>
-        </div>
-    </div>
+    <event-logger :events="events"/>
 
   </div>
  
@@ -89,9 +81,10 @@
 
 <script>
 import {D3dependencyGraph} from '../../src/'
-// import rawVm from '../../data/DiscogsClientvm'
-import rawVm from '../../data/nhibernatevm'
+import rawVm from '../../data/DiscogsClientvm'
+// import rawVm from '../../data/nhibernatevm'
 import CircularJson from 'circular-json'
+import EventLogger from './EventLogger'
 const vm = CircularJson.parse(rawVm)
 
 const data = {
@@ -110,7 +103,8 @@ export default {
     return data
   },
   components: {
-    D3dependencyGraph
+    D3dependencyGraph,
+    EventLogger
   },
   methods: {
     onEvent (eventName, data) {

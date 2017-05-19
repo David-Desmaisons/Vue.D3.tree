@@ -5,7 +5,7 @@
 <script>
 import resize from 'vue-resize-directive'
 import layout from './circular-layout'
-import {compareString, anchorTodx, translate, removeTextAndGraph, toPromise} from './d3-utils'
+import {compareString, anchorTodx, translate, removeTextAndGraph, roundPath, toPromise} from './d3-utils'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
@@ -170,10 +170,10 @@ export default {
       const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
-                            .attr('d', d => line(d.source.path(d.target).map(p => ({x: p.x, y: 0.1}))))
+                            .attr('d', d => roundPath(line(d.source.path(d.target).map(p => ({x: p.x, y: 0.1})))))
 
       const allEdges = this.internaldata.edges = edges.merge(newEdges)
-      const promise = toPromise(allEdges.transition().duration(this.duration).attr('d', d => line(d.source.path(d.target))))
+      const promise = toPromise(allEdges.transition().duration(this.duration).attr('d', d => roundPath(line(d.source.path(d.target)))))
 
       edges.exit().remove()
       return promise
@@ -194,7 +194,7 @@ export default {
       }
       nodes.each(n => { n.target = n.source = false })
 
-      this.$el.style.cssText = 'display: none;'
+      const rootElement = d3.selectAll([this.$el]).style('display', 'none')
 
       edges.classed('link--target', function (l) {
         if (l.target === d) {
@@ -218,9 +218,9 @@ export default {
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
           .filter(n => ((n.target) || (n.source) || (n === d)))
-          .classed('node--selected', true)
+          .classed('node--selected', n => n === d)
 
-      this.$el.style.cssText = 'display: block;'
+      rootElement.style('display', 'block')
       nodesSelected.select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },
 
@@ -229,7 +229,7 @@ export default {
       if (!edges) {
         return
       }
-      this.$el.style.cssText = 'display: none;'
+      const rootElement = d3.selectAll([this.$el]).style('display', 'none')
 
       edges.classed('link--target', false)
           .classed('link--source', false)
@@ -240,7 +240,7 @@ export default {
           .classed('node--ignored', false)
           .classed('node--selected', false)
 
-      this.$el.style.cssText = 'display: block;'
+      rootElement.style('display', 'block')
       nodes.filter(n => ((n.target) || (n.source) || (n === d)))
           .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
     },

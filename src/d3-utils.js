@@ -39,6 +39,10 @@ function removeTextAndGraph (selection) {
   })
 }
 
+function roundPath (pathString, precision = 0) {
+  return pathString.replace(/\d+\.\d+/g, s => parseFloat(s).toFixed(precision))
+}
+
 function toPromise (transition) {
   let count = 0
   let interrupted = false
@@ -72,6 +76,7 @@ export {
     findInParents,
     mapMany,
     removeTextAndGraph,
+    roundPath,
     toPromise,
     translate
 }

@@ -29,7 +29,7 @@ export default {
   transformNode (x, y) {
     const angle = (x - 90) / 180 * Math.PI
     const radius = y
-    return [radius * Math.cos(angle), radius * Math.sin(angle)]
+    return [~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle))]
   },
 
   transformSvg (svg, margin, {width, height}) {
