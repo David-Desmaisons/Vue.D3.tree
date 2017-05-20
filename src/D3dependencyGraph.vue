@@ -133,10 +133,12 @@ export default {
         .attr('dy', '.35em')
         .text(d => d.data[this.nodeText])
         .attr('x', d => d.textInfo.x)
-        .attr('dx', function (d) {
-          const standardDx = d.textInfo.standardDx = anchorTodx(d.textInfo.anchor, this)
-          return standardDx
+        .each(function (d) {
+          if (d.textInfo.standardDx == null) {
+            d.textInfo.standardDx = anchorTodx(d.textInfo.anchor, this)
+          }
         })
+        .attr('dx', d => d.textInfo.standardDx)
         .attr('transform', d => `rotate(${d.textInfo.rotate})`)
 
       const tentative = []
