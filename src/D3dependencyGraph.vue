@@ -133,7 +133,10 @@ export default {
         .attr('dy', '.35em')
         .text(d => d.data[this.nodeText])
         .attr('x', d => d.textInfo.x)
-        .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+        .attr('dx', function (d) {
+          const standardDx = d.textInfo.standardDx = anchorTodx(d.textInfo.anchor, this)
+          return standardDx
+        })
         .attr('transform', d => `rotate(${d.textInfo.rotate})`)
 
       const tentative = []
@@ -194,7 +197,7 @@ export default {
       }
       nodes.each(n => { n.target = n.source = false })
 
-      const rootElement = d3.selectAll([this.$el]).style('display', 'none')
+      const rootElement = d3.selectAll([this.$el]).style('display', 'none').classed('detailed', true)
 
       edges.classed('link--target', function (l) {
         if (l.target === d) {
@@ -208,20 +211,21 @@ export default {
           return true
         }
       })
-      .classed('link--ignored', function (l) {
-        return (l.source !== d) && ((l.target !== d))
-      })
       .filter(l => l.target === d || l.source === d)
       .raise()
 
       const nodesSelected = nodes.classed('node--target', n => n.target)
           .classed('node--source', n => n.source)
           .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
-          .filter(n => ((n.target) || (n.source) || (n === d)))
           .classed('node--selected', n => n === d)
+          .filter(n => ((n.target) || (n.source) || (n === d)))
 
       rootElement.style('display', 'block')
-      nodesSelected.select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+      nodesSelected.select('text').each(function (d) {
+        if (d.textInfo.zoomedDx == null) {
+          d.textInfo.zoomedDx = anchorTodx(d.textInfo.anchor, this)
+        }
+      }).attr('dx', d => d.textInfo.zoomedDx)
     },
 
     reset (d) {
@@ -229,20 +233,20 @@ export default {
       if (!edges) {
         return
       }
-      const rootElement = d3.selectAll([this.$el]).style('display', 'none')
+      const rootElement = d3.selectAll([this.$el]).style('display', 'none').classed('detailed', false)
 
       edges.classed('link--target', false)
           .classed('link--source', false)
-          .classed('link--ignored', false)
 
       nodes.classed('node--target', false)
           .classed('node--source', false)
           .classed('node--ignored', false)
           .classed('node--selected', false)
 
-      rootElement.style('display', 'block')
       nodes.filter(n => ((n.target) || (n.source) || (n === d)))
-          .select('text').attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
+          .select('text').attr('dx', d => d.textInfo.standardDx)
+
+      rootElement.style('display', 'block')
     },
 
     onData (data) {
@@ -355,12 +359,12 @@ export default {
   transition: stroke 0.5s, stroke-opacity 0.5s;
 }
 
-.graph .link.link--source,
-.graph .link.link--target {
+.graph.detailed .link.link--source,
+.graph.detailed .link.link--target {
   stroke-opacity: 1;
 }
 
-.graph .link.link--ignored {
+.graph.detailed .link {
   stroke-opacity: 0.01;
 }
 
