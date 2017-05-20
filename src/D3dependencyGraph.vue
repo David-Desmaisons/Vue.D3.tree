@@ -199,7 +199,8 @@ export default {
 
       const rootElement = d3.selectAll([this.$el]).style('display', 'none').classed('detailed', true)
 
-      edges.classed('link--target', function (l) {
+      edges.filter(l => l.target === d || l.source === d)
+      .classed('link--target', function (l) {
         if (l.target === d) {
           l.source.source = true
           return true
@@ -211,14 +212,12 @@ export default {
           return true
         }
       })
-      .filter(l => l.target === d || l.source === d)
       .raise()
 
-      const nodesSelected = nodes.classed('node--target', n => n.target)
-          .classed('node--source', n => n.source)
-          .classed('node--ignored', n => ((!n.target) && (!n.source) && (n !== d)))
-          .classed('node--selected', n => n === d)
-          .filter(n => ((n.target) || (n.source) || (n === d)))
+      const nodesSelected = nodes.filter(n => ((n.target) || (n.source) || (n === d)))
+        .classed('node--target', n => n.target)
+        .classed('node--source', n => n.source)
+        .classed('node--selected', n => n === d)
 
       rootElement.style('display', 'block')
       nodesSelected.select('text').each(function (d) {
@@ -240,7 +239,6 @@ export default {
 
       nodes.classed('node--target', false)
           .classed('node--source', false)
-          .classed('node--ignored', false)
           .classed('node--selected', false)
 
       nodes.filter(n => ((n.target) || (n.source) || (n === d)))
@@ -381,21 +379,22 @@ export default {
   transition: opacity 0.5s, fill 0.5s;
 }
 
-.graph .nodetree.node--selected text{
-  font-weight: bold;
-}
-
-.graph .nodetree.node--source text{
-  font-weight: bold;
+.graph.detailed .nodetree.node--source text{
   fill: #2ca02c;
 }
 
-.graph .nodetree.node--target text{
-  font-weight: bold;
+.graph.detailed .nodetree.node--target text{
   fill: #d62728;
 }
 
-.graph .nodetree.node--ignored text{
+.graph.detailed .nodetree.node--selected text,
+.graph.detailed .nodetree.node--source text,
+.graph.detailed .nodetree.node--target text{
+  font-weight: bold;
+  opacity: 1;
+}
+
+.graph.detailed .nodetree text{
   opacity: 0.1;
 }
 </style>
