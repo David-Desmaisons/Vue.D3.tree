@@ -69,6 +69,33 @@ function translate (vector, {transformNode}) {
   return 'translate(' + transformNode(vector.x, vector.y) + ')'
 }
 
+function updateText (width) {
+  const textString = this.textContent
+  const textLength = textString.length
+  if (this.getSubStringLength(0, textLength) <= width) {
+    return
+  }
+
+  for (var x = textLength - 3; x > 0; x -= 3) {
+    if (this.getSubStringLength(0, x) <= width) {
+      this.textContent = textString.substring(0, x) + '...'
+      return
+    }
+  }
+
+  this.textContent = '...'
+}
+
+function updateTexts (selection, maxLength) {
+  if (maxLength === -1) {
+    return
+  }
+
+  selection.each(function () {
+    updateText.call(this, maxLength)
+  })
+}
+
 export {
     anchorTodx,
     compareString,
@@ -78,6 +105,7 @@ export {
     removeTextAndGraph,
     roundPath,
     toPromise,
-    translate
+    translate,
+    updateTexts
 }
 

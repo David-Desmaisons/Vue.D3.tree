@@ -5,7 +5,7 @@
 <script>
 import resize from 'vue-resize-directive'
 import layout from './circular-layout'
-import {compareString, anchorTodx, translate, removeTextAndGraph, roundPath, toPromise} from './d3-utils'
+import {anchorTodx, compareString, removeTextAndGraph, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
@@ -21,6 +21,10 @@ const props = {
   marginY: {
     type: Number,
     default: 0
+  },
+  maxTextWidth: {
+    type: Number,
+    default: -1
   },
   nodeText: {
     type: String,
@@ -133,6 +137,7 @@ export default {
         .attr('dy', '.35em')
         .text(d => d.data[this.nodeText])
         .attr('x', d => d.textInfo.x)
+        .call(updateTexts, this.maxTextWidth)
         .each(function (d) {
           if (d.textInfo.standardDx == null) {
             d.textInfo.standardDx = anchorTodx(d.textInfo.anchor, this)

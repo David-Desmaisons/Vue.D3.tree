@@ -73,7 +73,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <d3dependency-graph class="graph-root" ref="graph" :maxTextWidth="50" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
   </div>
 
   </div>
