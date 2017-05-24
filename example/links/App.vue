@@ -81,8 +81,8 @@
 
 <script>
 import {D3dependencyGraph} from '../../src/'
-import rawVm from '../../data/DiscogsClientvm'
-// import rawVm from '../../data/nhibernatevm'
+// import rawVm from '../../data/DiscogsClientvm'
+import rawVm from '../../data/nhibernatevm'
 import CircularJson from 'circular-json'
 import EventLogger from './EventLogger'
 const vm = CircularJson.parse(rawVm)
@@ -107,16 +107,21 @@ export default {
     EventLogger
   },
   methods: {
+    changeCurrent (value) {
+      window.setTimeout(() => {
+        this.selectedGraphNode = value
+      })
+    },
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
     },
     mouseNodeOver (event) {
       this.onEvent('mouseNodeOver', event)
-      this.selectedGraphNode = event.element
+      this.changeCurrent(event.element)
     },
     mouseNodeOut (event) {
       this.onEvent('mouseNodeOut', event)
-      this.selectedGraphNode = null
+      this.changeCurrent(null)
     }
   },
   computed: {
@@ -151,13 +156,4 @@ export default {
   height: 800px;
   width: 100%;
 }
-
-.log  {
-  height: 500px;
-  overflow-x: auto;
-  overflow-y: auto;
-  overflow: auto;
-  text-align: left;
-}
-
 </style>

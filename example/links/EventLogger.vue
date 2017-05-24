@@ -21,4 +21,11 @@ export default {
 </script>
 
 <style>
+.log  {
+  height: 500px;
+  overflow-x: auto;
+  overflow-y: auto;
+  overflow: auto;
+  text-align: left;
+}
 </style>
