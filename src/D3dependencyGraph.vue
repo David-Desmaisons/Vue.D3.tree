@@ -267,9 +267,9 @@ export default {
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
       const map = this.internaldata.map = {}
+      const identifier = this.identifier
+      const idGetter = typeof identifier === 'string' ? data => data[identifier] : identifier
       root.each(d => {
-        const identifier = this.identifier
-        const idGetter = typeof identifier === 'string' ? data => data[identifier] : identifier
         const id = idGetter(d.data)
         d.id = id
         map[id] = d
