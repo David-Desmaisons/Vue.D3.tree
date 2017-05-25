@@ -1,5 +1,5 @@
 <template>
-  <div class="viewport graph" v-resize="resize">
+  <div :class="rootClass" v-resize="resize">
   </div>
 </template>
 <script>
@@ -17,6 +17,10 @@ const props = {
   marginX: {
     type: Number,
     default: 0
+  },
+  rootClass: {
+    type: String,
+    default: 'graph'
   },
   marginY: {
     type: Number,

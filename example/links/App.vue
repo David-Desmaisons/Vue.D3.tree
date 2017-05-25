@@ -11,7 +11,7 @@
             <div class="form-group">
               <label for="margin-x" class="control-label col-sm-3">marginx</label>
               <div class="col-sm-7">
-                <input id="margin-x" class="form-control" type="range" min="-50" max="200" v-model.number="marginX">
+                <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="marginX">
               </div> 
                 <div class="col-sm-2">
                   <p>{{marginX}}px</p>       
@@ -21,7 +21,7 @@
             <div class="form-group">
               <label for="margin-y" class="control-label col-sm-3">marginy</label>
               <div class="col-sm-7">
-                <input id="margin-y" class="form-control" type="range" min="-50" max="200" v-model.number="marginY">
+                <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="marginY">
               </div>
               <div class="col-sm-2">
                 <p>{{marginY}}px</p>       
