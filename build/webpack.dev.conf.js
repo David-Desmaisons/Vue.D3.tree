@@ -36,7 +36,7 @@ module.exports = merge(baseWebpackConfig, {
       inject: true
     }),
     new HtmlWebpackPlugin({
-      filename: './example/hierarchicalEdgeBundling/index.html',
+      filename: './example/heb/index.html',
       template: './example/hierarchicalEdgeBundling/index.html',
       chunks: ['app2'],
       inject: true
