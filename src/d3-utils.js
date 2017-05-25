@@ -7,11 +7,11 @@ function anchorTodx (d, el) {
   return 0
 }
 
-function drawLink (source, target, {transformNode}) {
+function drawLink (source, target, { transformNode }) {
   return 'M' + transformNode(source.x, source.y) +
-         'C' + transformNode(source.x, (source.y + target.y) / 2) +
-         ' ' + transformNode(target.x, (source.y + target.y) / 2) +
-         ' ' + transformNode(target.x, target.y)
+    'C' + transformNode(source.x, (source.y + target.y) / 2) +
+    ' ' + transformNode(target.x, (source.y + target.y) / 2) +
+    ' ' + transformNode(target.x, target.y)
 }
 
 function compareString (a, b) {
@@ -65,8 +65,21 @@ function toPromise (transition) {
   })
 }
 
-function translate (vector, {transformNode}) {
+function translate (vector, { transformNode }) {
   return 'translate(' + transformNode(vector.x, vector.y) + ')'
+}
+
+function binarySearch (arr, left, right, value) {
+  if (right < left) {
+    return right
+  }
+
+  const mid = Math.round(left + (right - left) / 2)
+  if (arr(mid) === value) {
+    return mid
+  }
+
+  return (arr(mid) > value) ? binarySearch(arr, left, mid - 1, value) : binarySearch(arr, mid + 1, right, value)
 }
 
 function updateText (width) {
@@ -76,14 +89,8 @@ function updateText (width) {
     return
   }
 
-  for (var x = textLength - 3; x > 0; x -= 3) {
-    if (this.getSubStringLength(0, x) <= width) {
-      this.textContent = textString.substring(0, x) + '...'
-      return
-    }
-  }
-
-  this.textContent = '...'
+  const index = binarySearch((pos) => this.getSubStringLength(0, pos), 0, textLength - 3, width)
+  this.textContent = textString.substring(0, index) + '...'
 }
 
 function updateTexts (selection, maxLength) {
@@ -97,15 +104,15 @@ function updateTexts (selection, maxLength) {
 }
 
 export {
-    anchorTodx,
-    compareString,
-    drawLink,
-    findInParents,
-    mapMany,
-    removeTextAndGraph,
-    roundPath,
-    toPromise,
-    translate,
-    updateTexts
+  anchorTodx,
+  compareString,
+  drawLink,
+  findInParents,
+  mapMany,
+  removeTextAndGraph,
+  roundPath,
+  toPromise,
+  translate,
+  updateTexts
 }
 
