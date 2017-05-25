@@ -41,28 +41,8 @@
             <div class="form-group">
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
               <span v-else>No Node selected.</span>
-               <i v-if="false" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
-            </div>  
-
-            <button type="button" :disabled="!currentNode" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="">
-            <i class="fa fa-expand" aria-hidden="true"></i>          
-            </button>
-
-            <button type="button" :disabled="!currentNode" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="">
-            <i class="fa fa-compress" aria-hidden="true"></i>            
-            </button>
-
-            <button type="button" :disabled="!currentNode" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="">
-            <i class="fa fa-search-plus" aria-hidden="true"></i>       
-            </button>
-
-            <button type="button" :disabled="!currentNode" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="">
-            <i class="fa fa-binoculars" aria-hidden="true"></i>           
-            </button>
-
-            <button type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="">
-            <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
-            </button>
+               <!-- <i v-if="loading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i> -->
+            </div>
 
         </div> 
       </div>     
@@ -91,8 +71,9 @@ const data = {
   duration: 750,
   marginX: 30,
   marginY: 30,
-  currentNode: null,
   events: [],
+  loading: false,
+  currentNode: null,
   tree: vm.Graph.tree,
   links: vm.Graph.links
 }
@@ -108,8 +89,10 @@ export default {
   },
   methods: {
     changeCurrent (value) {
+      this.loading = true
       window.setTimeout(() => {
-        this.selectedGraphNode = value
+        this.currentNode = value
+        this.loading = false
       })
     },
     onEvent (eventName, data) {
@@ -124,14 +107,9 @@ export default {
       this.changeCurrent(null)
     }
   },
-  computed: {
-    selectedGraphNode: {
-      get () {
-        return this.$refs['graph'].currentNode
-      },
-      set (value) {
-        this.$refs['graph'].currentNode = value
-      }
+  watch: {
+    currentNode (value) {
+      this.$refs['graph'].currentNode = value
     }
   }
 }

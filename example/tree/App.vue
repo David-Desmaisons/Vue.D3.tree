@@ -84,8 +84,8 @@
             <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
             </button>
 
-        </div> 
-      </div>     
+        </div>
+      </div>
     </div>
 
 
