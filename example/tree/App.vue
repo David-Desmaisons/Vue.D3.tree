@@ -102,14 +102,14 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <d3tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"></d3tree>
+    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"/>
   </div>
   
   </div>
 </template>
 
 <script>
-import {D3tree} from '../../src/'
+import {tree} from '../../src/'
 import data from '../../data/data'
 
 Object.assign(data, {
@@ -131,7 +131,7 @@ export default {
     return data
   },
   components: {
-    D3tree
+    tree
   },
   methods: {
     do (action) {

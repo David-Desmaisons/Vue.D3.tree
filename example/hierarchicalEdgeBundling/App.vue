@@ -73,14 +73,14 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <d3dependency-graph class="graph-root" ref="graph" :maxTextWidth="50" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"></d3dependency-graph>
+    <hierarchical-edge-bundling class="graph-root" ref="graph" :maxTextWidth="50" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"/>
   </div>
 
   </div>
 </template>
 
 <script>
-import {D3dependencyGraph} from '../../src/'
+import {hierarchicalEdgeBundling} from '../../src/'
 // import rawVm from '../../data/DiscogsClientvm'
 import rawVm from '../../data/nhibernatevm'
 import CircularJson from 'circular-json'
@@ -103,7 +103,7 @@ export default {
     return data
   },
   components: {
-    D3dependencyGraph,
+    hierarchicalEdgeBundling,
     EventLogger
   },
   methods: {

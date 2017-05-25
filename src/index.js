@@ -1,7 +1,7 @@
-import D3tree from '../src/D3tree'
-import D3dependencyGraph from '../src/D3dependencyGraph'
+import tree from '../src/Tree'
+import hierarchicalEdgeBundling from '../src/HierarchicalEdgeBundling'
 
 export {
-    D3tree,
-    D3dependencyGraph
+    tree,
+    hierarchicalEdgeBundling
 }

@@ -9,7 +9,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = merge(baseWebpackConfig, {
   entry: {
     app1: ['./build/dev-client'].concat('./example/tree/main.js'),
-    app2: ['./build/dev-client'].concat('./example/links/main.js')
+    app2: ['./build/dev-client'].concat('./example/hierarchicalEdgeBundling/main.js')
   },
   module: {
     loaders: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
@@ -36,8 +36,8 @@ module.exports = merge(baseWebpackConfig, {
       inject: true
     }),
     new HtmlWebpackPlugin({
-      filename: './example/links/index.html',
-      template: './example/links/index.html',
+      filename: './example/hierarchicalEdgeBundling/index.html',
+      template: './example/hierarchicalEdgeBundling/index.html',
       chunks: ['app2'],
       inject: true
     })
