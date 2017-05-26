@@ -180,7 +180,7 @@ export default {
       if (!links) {
         return
       }
-      const edges = g.selectAll('.link').data(links, l => l.source.id + '-' + l.target.id)
+      const edges = g.selectAll('.link').data(links, l => l.source._id + '-' + l.target._id)
       const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
@@ -271,7 +271,7 @@ export default {
       const idGetter = typeof identifier === 'string' ? data => data[identifier] : identifier
       root.each(d => {
         const id = idGetter(d.data)
-        d.id = id
+        d._id = id
         map[id] = d
       })
       const size = this.getSize()

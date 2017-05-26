@@ -5,9 +5,11 @@
 [![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
 
-Vue component to display tree based on [D3.js](https://d3js.org/) layout.
+Vue components to display graphics based on [D3.js](https://d3js.org/) layout.
 
 ![demo](./documentation/treedemo.gif)
+
+# Tree
 
 ## Usage
 
@@ -23,17 +25,17 @@ export default {
     tree
   },
   data() {
-      return {
-          tree: {
-            name: "father",
-            children:[{
-                name: "son1",
-                children:[ {name: "grandson"}, {name: "grandson2"}]
-            },{
-                name: "son2",
-                children:[ {name: "grandson3"}, {name: "grandson4"}]
-            }]
-       }
+    return {
+      tree: {
+        name: "father",
+        children:[{
+          name: "son1",
+          children:[ {name: "grandson"}, {name: "grandson2"}]
+        },{
+          name: "son2",
+          children:[ {name: "grandson3"}, {name: "grandson4"}]
+        }]
+      }
     }
   }
 }
@@ -87,6 +89,74 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 
 
+# Hierarchical Edge Bundling
+
+## Usage
+
+```html
+<hierarchical-edge-bundling identifier="id" :data="tree" :links="links" node-text="name"/>
+```
+```javascript
+import {hierarchicalEdgeBundling} from 'vued3tree'
+
+export default {
+  components: {
+    hierarchicalEdgeBundling
+  },
+  data() {
+    return {
+      tree: {
+        name: "father",
+        children:[{
+          name: "son1",
+          children:[ {name: "grandson", id: 1}, {name: "grandson2", id: 2}]
+        },{
+          name: "son2",
+          children:[ {name: "grandson3", id: 3}, {name: "grandson4", id: 4}]
+        }]
+      },
+      links: [
+        {source: 3, target: 1},
+        {source: 3, target: 4}
+      ]
+    }
+  }
+}
+  //...
+```
+
+## Properties
+
+| Name      | Required | Type/Value              | Default     | Description |
+| ---       | ---      | ---                     | ---         | ---         |
+| data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
+| links      | no    | `Array`                     | null        | Data representing links between the nodes, having `source` and `target` properties referencing node identifiers
+| identifier   | yes | `String` or `Function` | -|  name of the property of the node to be used as a identifier or function taking a node and returning its identifier|
+| nodeText   | yes | `String`  | -|  name of the property of the node to be used as a display name |
+| duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
+| marginX    | no | `Number`          | 20       | margin for X axis in pixel |
+| marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
+| maxTextWidth    | no | `Number`           | -1            | Max node text width (in pixel) to be displayed, if -1 text is not truncated.| 
+| nodeClass    | no | `String`           | 'graph'            | class to be applied to the root div. Useful when custom CSS rules have to be applied. | 
+
+
+## Events
+
+* `mouseNodeOver`
+
+Sent when the node name is hovered by mouse
+
+* `mouseNodeOut`
+
+Sent when mouse leaves the node name
+
+For all these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+
+## data
+
+* `currentNode`
+
+Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted.
 
 ### Build Setup
 
