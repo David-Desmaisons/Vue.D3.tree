@@ -116,8 +116,13 @@ export default {
         }]
       },
       links: [
-        {source: 3, target: 1},
-        {source: 3, target: 4}
+        {source: 3, target: 1, type: 1},
+        {source: 3, target: 4, type: 2}
+      ],
+      linkTypes: [
+        {id: 1, name: 'depends', symmetric: true},
+        {id: 2, name: 'implement', in: 'implements', out: 'is implemented by'},
+        {id: 3, name: 'uses', in: 'uses', out: 'is used by'},
       ]
     }
   }
