@@ -61,8 +61,9 @@
 
 <script>
 import {hierarchicalEdgeBundling} from '../../src/'
-import rawVm from '../../data/DiscogsClientvm'
-// import rawVm from '../../data/nhibernatevm'
+//  import rawVm from '../../data/DiscogsClientvm'
+//  import rawVm from '../../data/nhibernatevm'
+import rawVm from '../../data/vm'
 import CircularJson from 'circular-json'
 import EventLogger from './EventLogger'
 const vm = CircularJson.parse(rawVm)

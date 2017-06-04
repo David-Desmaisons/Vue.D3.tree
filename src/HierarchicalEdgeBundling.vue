@@ -180,7 +180,7 @@ export default {
       if (!links) {
         return
       }
-      const edges = g.selectAll('.link').data(links, l => l.source._id + '-' + l.target._id)
+      const edges = g.selectAll('.link').data(links, l => l.source._id + '-' + l.target._id + '-' + l.type)
       const line = layout.getLine(d3).curve(d3.curveBundle.beta(0.95))
 
       const newEdges = edges.enter().append('path').attr('class', 'link')
@@ -293,7 +293,7 @@ export default {
       }
 
       const {map} = this.internaldata
-      this.internaldata.links = links.map(link => ({source: map[link.source], target: map[link.target]}))
+      this.internaldata.links = links.map(link => ({source: map[link.source], target: map[link.target], type: link.type}))
       this.updateLinks()
     },
 
