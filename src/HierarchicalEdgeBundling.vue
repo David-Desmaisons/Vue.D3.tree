@@ -123,7 +123,7 @@ export default {
       const {root, g, tree} = this.internaldata
 
       tree(root)
-      const node = g.selectAll('.nodetree').data(root.leaves(), d => d.id)
+      const node = g.selectAll('.nodetree').data(root.leaves(), d => d._id)
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
       newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted)
 
@@ -266,6 +266,7 @@ export default {
       }
       const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
       this.internaldata.root = root
+      this.$emit('nodesComputed', root)
       const map = this.internaldata.map = {}
       const identifier = this.identifier
       const idGetter = typeof identifier === 'string' ? data => data[identifier] : identifier
