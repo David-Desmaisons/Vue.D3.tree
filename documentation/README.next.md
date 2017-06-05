@@ -157,6 +157,10 @@ Sent when mouse leaves the node name
 
 For all these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
 
+* `clickOutsideGraph`
+
+Sent when mouse is clicked outside any geometry or text of the hierarchical edge bundling
+
 * `nodesComputed`
 
 Sent when D3.js nodes are computed using `data` props. Called with [D3.js hierarchy node](https://github.com/d3/d3-hierarchy#hierarchy)
