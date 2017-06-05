@@ -83,6 +83,11 @@ export default {
 
     this.onData(this.data)
     this.links && this.onLinks(this.links)
+    document.addEventListener('click', this.handleClickOutside, true)
+  },
+
+  beforeDestroy () {
+    document.removeEventListener('click', this.handleClickOutside, true)
   },
 
   methods: {
@@ -100,6 +105,13 @@ export default {
       this.transformSvg(g, size)
       layout.optimizeSize(tree, size, this.margin, this.textContraint)
       this.redraw()
+    },
+
+    handleClickOutside (ev) {
+      const el = this.internaldata.svg.node()
+      if ((el === ev.target) || (!el.contains(ev.target))) {
+        this.$emit('clickOutsideGraph')
+      }
     },
 
     completeRedraw ({margin = null}) {
@@ -125,7 +137,7 @@ export default {
       tree(root)
       const node = g.selectAll('.nodetree').data(root.leaves(), d => d._id)
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
-      newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted)
+      newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted).on('click', this.nodeClick)
 
       const allNodes = this.internaldata.nodes = newNodes.merge(node)
 
@@ -194,11 +206,19 @@ export default {
     },
 
     mouseOvered (d) {
-      this.$emit('mouseNodeOver', {element: d, data: d.data})
+      this.emit('mouseNodeOver', d)
     },
 
     mouseOuted (d) {
-      this.$emit('mouseNodeOut', {element: d, data: d.data})
+      this.emit('mouseNodeOut', d)
+    },
+
+    nodeClick (d) {
+      this.emit('mouseNodeClick', d)
+    },
+
+    emit (name, d) {
+      this.$emit(name, {element: d, data: d.data})
     },
 
     showDependencies (d) {
