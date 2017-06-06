@@ -92,6 +92,8 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 
 # Hierarchical Edge Bundling
 
+![demo](./documentation/hebdemo.gif)
+
 ## Usage
 
 ```html
