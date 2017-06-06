@@ -59,7 +59,7 @@ export default {
   data () {
     return {
       textContraint: null,
-      currentNode: null
+      highlightedNode: null
     }
   },
 
@@ -83,11 +83,11 @@ export default {
 
     this.onData(this.data)
     this.links && this.onLinks(this.links)
-    document.addEventListener('click', this.handleClickOutside, true)
+    this.$el.addEventListener('click', this.handleClickOutside, true)
   },
 
   beforeDestroy () {
-    document.removeEventListener('click', this.handleClickOutside, true)
+    this.$el.removeEventListener('click', this.handleClickOutside, true)
   },
 
   methods: {
@@ -371,10 +371,10 @@ export default {
       this.completeRedraw({margin: {x: this.marginX, y: oldMarginY}})
     },
 
-    currentNode (newCurrent, oldCurrent) {
+    highlightedNode (newCurrent, oldCurrent) {
       oldCurrent && this.reset(oldCurrent)
       newCurrent && this.showDependencies(newCurrent)
-      this.$emit('currentNodeChanged', {new: newCurrent, old: oldCurrent})
+      this.$emit('highlightedNodeChanged', {new: newCurrent, old: oldCurrent})
     }
   }
 }

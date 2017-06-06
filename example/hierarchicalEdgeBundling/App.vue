@@ -39,7 +39,7 @@
             </div>  
 
             <div class="form-group">
-              <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
+              <span v-if="highlightedNode">Current Node: {{highlightedNode.data.text}}</span>
               <span v-else>No Node selected.</span>
                <!-- <i v-if="loading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i> -->
             </div>
@@ -74,7 +74,7 @@ const data = {
   marginY: 30,
   events: [],
   loading: false,
-  currentNode: null,
+  highlightedNode: null,
   tree: vm.Graph.tree,
   links: vm.Graph.links
 }
@@ -92,7 +92,7 @@ export default {
     changeCurrent (value) {
       this.loading = true
       window.setTimeout(() => {
-        this.currentNode = value
+        this.highlightedNode = value
         this.loading = false
       })
     },
@@ -109,8 +109,8 @@ export default {
     }
   },
   watch: {
-    currentNode (value) {
-      this.$refs['graph'].currentNode = value
+    highlightedNode (value) {
+      this.$refs['graph'].highlightedNode = value
     }
   }
 }

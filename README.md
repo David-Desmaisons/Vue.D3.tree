@@ -158,7 +158,7 @@ Sent when the node name is hovered by mouse
 
 Sent when mouse leaves the node name
 
-For all these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+For these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
 
 * `clickOutsideGraph`
 
@@ -168,11 +168,15 @@ Sent when mouse is clicked outside any geometry or text of the hierarchical edge
 
 Sent when D3.js nodes are computed using `data` props. Called with [D3.js hierarchy node](https://github.com/d3/d3-hierarchy#hierarchy)
 
+* `highlightedNodeChanged`
+
+Sent when highlighted node has changed.
+
 ## data
 
-* `currentNode`
+* `highlightedNode`
 
-Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted.
+Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
 
 ### Build Setup
 
