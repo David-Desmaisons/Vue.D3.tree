@@ -97,6 +97,7 @@ export default {
       })
     },
     onEvent (eventName, data) {
+      console.log(eventName, data)
       this.events.push({eventName, data: data.data})
     },
     mouseNodeOver (event) {

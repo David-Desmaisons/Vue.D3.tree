@@ -18,6 +18,17 @@ function compareString (a, b) {
   return (a < b) ? -1 : (a > b) ? 1 : 0
 }
 
+function compareNode (a, b, attribute) {
+  if (a.height < b.height) {
+    return 1
+  }
+  if (a.height > b.height) {
+    return -1
+  }
+  console.log(a, b)
+  return compareString(a.data[attribute], b.data[attribute])
+}
+
 function findInParents (node, nodes) {
   if (nodes.indexOf(node) !== -1) {
     return node
@@ -106,6 +117,7 @@ function updateTexts (selection, maxLength) {
 export {
   anchorTodx,
   compareString,
+  compareNode,
   drawLink,
   findInParents,
   mapMany,

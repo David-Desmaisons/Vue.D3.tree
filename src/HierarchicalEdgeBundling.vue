@@ -5,7 +5,7 @@
 <script>
 import resize from 'vue-resize-directive'
 import layout from './circular-layout'
-import {anchorTodx, compareString, removeTextAndGraph, roundPath, toPromise, translate, updateTexts} from './d3-utils'
+import {anchorTodx, compareNode, removeTextAndGraph, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
 import * as d3 from 'd3'
 import * as d3Hierarchy from 'd3-hierarchy'
@@ -284,7 +284,7 @@ export default {
         this.internaldata.root = this.internaldata.nodes = null
         return
       }
-      const root = d3.hierarchy(data).sort((a, b) => { return compareString(a.data.text, b.data.text) })
+      const root = d3.hierarchy(data).sort((a, b) => compareNode(a, b, this.nodeText))
       this.internaldata.root = root
       this.$emit('nodesComputed', root)
       const map = this.internaldata.map = {}
