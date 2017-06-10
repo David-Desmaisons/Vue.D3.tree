@@ -53,7 +53,7 @@
   </div>
  
    <div class="col-md-9 panel panel-default">
-    <hierarchical-edge-bundling class="graph-root" ref="graph" :maxTextWidth="100" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"/>
+    <hierarchical-edge-bundling class="graph-root" ref="graph" :maxTextWidth="50" identifier="id" :duration="duration" @mouseNodeOver="mouseNodeOver" @mouseNodeOut="mouseNodeOut" :data="tree" :links="links" node-text="text" :margin-x="marginX" :margin-y="marginY"/>
   </div>
 
   </div>
