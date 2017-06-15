@@ -52,6 +52,8 @@ const directives = {
 }
 
 export default {
+  name: 'HierarchicalEdgeBundling',
+
   props,
 
   directives,

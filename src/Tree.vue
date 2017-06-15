@@ -85,6 +85,8 @@ function onAllChilddren (d, callback, fatherVisible = undefined) {
 }
 
 export default {
+  name: 'D3Tree',
+  
   props,
 
   directives,
