@@ -25,7 +25,6 @@ function compareNode (a, b, attribute) {
   if (a.height > b.height) {
     return -1
   }
-  console.log(a, b)
   return compareString(a.data[attribute], b.data[attribute])
 }
 
