@@ -281,7 +281,6 @@ export default {
     },
 
     onData (data) {
-      this.clean()
       if (!data) {
         this.internaldata.root = this.internaldata.nodes = null
         return
@@ -317,12 +316,6 @@ export default {
       const {map} = this.internaldata
       this.internaldata.links = links.map(link => ({source: map[link.source], target: map[link.target], type: link.type}))
       this.updateLinks()
-    },
-
-    clean () {
-      ['.nodetree', 'text', '.link'].forEach(selector => {
-        this.internaldata.g.selectAll(selector).transition().duration(this.duration).attr('opacity', 0).remove()
-      })
     },
 
     instantClean () {
