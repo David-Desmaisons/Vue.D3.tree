@@ -7,10 +7,7 @@ import resize from 'vue-resize-directive'
 import layout from './circular-layout'
 import {anchorTodx, compareNode, removeTextAndGraph, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
-import * as d3selection from 'd3-selection'
-import * as d3Shape from 'd3-shape'
-import * as d3Hierarchy from 'd3-hierarchy'
-const d3 = Object.assign(d3selection, d3Hierarchy, d3Shape)
+import * as d3 from 'd3'
 
 const props = {
   data: Object,

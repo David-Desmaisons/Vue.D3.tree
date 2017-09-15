@@ -83,6 +83,9 @@ module.exports = {
   eslint: {
     formatter: require('eslint-friendly-formatter')
   },
+  externals:[{
+    xmlhttprequest: '{XMLHttpRequest:XMLHttpRequest}'
+  }],
   vue: {
     loaders: utils.cssLoaders({ sourceMap: useCssSourceMap }),
     postcss: [

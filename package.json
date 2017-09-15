@@ -1,6 +1,6 @@
 {
   "name": "vued3tree",
-  "version": "3.4.2",
+  "version": "3.4.3",
   "description": "A Vue.js project",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
@@ -22,11 +22,7 @@
     "web-components"
   ],
   "dependencies": {
-    "d3-drag": "^1.1.1",
-    "d3-hierarchy": "^1.0.3",
-    "d3-selection": "^1.1.0",
-    "d3-shape": "^1.2.0",
-    "d3-zoom": "^1.5.0",
+    "d3": "^4.10.2",
     "vue": "^2.1.0",
     "vue-resize-directive": "^1.0.0"
   },
