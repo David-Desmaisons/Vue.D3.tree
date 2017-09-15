@@ -22,8 +22,11 @@
     "web-components"
   ],
   "dependencies": {
-    "d3": "^4.4.0",
+    "d3-drag": "^1.1.1",
     "d3-hierarchy": "^1.0.3",
+    "d3-selection": "^1.1.0",
+    "d3-shape": "^1.2.0",
+    "d3-zoom": "^1.5.0",
     "vue": "^2.1.0",
     "vue-resize-directive": "^1.0.0"
   },

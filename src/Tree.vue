@@ -8,9 +8,11 @@ import euclidean from './euclidean-layout'
 import circular from './circular-layout'
 import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, removeTextAndGraph, translate} from './d3-utils'
 
-import * as d3 from 'd3'
+import * as d3selection from 'd3-selection'
+import * as d3zoom from 'd3-zoom'
 import * as d3Hierarchy from 'd3-hierarchy'
-Object.assign(d3, d3Hierarchy)
+import * as d3Drag from 'd3-drag'
+const d3 = Object.assign(d3selection, d3Hierarchy, d3zoom, d3Drag)
 
 const layout = {
   euclidean,
