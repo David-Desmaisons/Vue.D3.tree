@@ -9,7 +9,7 @@
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs",
-    "prepublish" : "npm run build"
+    "prepublishOnly" : "npm run build"
   },
   "main": "dist/index.js",
   "files": [
