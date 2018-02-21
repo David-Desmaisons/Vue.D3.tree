@@ -62,7 +62,7 @@ const props = {
   },
   radius: {
     type: Number,
-    default: 5
+    default: 3
   }
 }
 
@@ -463,6 +463,10 @@ export default {
 
     layout (newLayout, oldLayout) {
       this.completeRedraw({layout: oldLayout})
+    },
+
+    radius () {
+      this.completeRedraw({layout: this.layout})
     }
   }
 }

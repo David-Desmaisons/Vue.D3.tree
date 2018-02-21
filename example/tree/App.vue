@@ -46,6 +46,16 @@
               <div class="col-sm-2">
                 <p>{{Marginy}}px</p>       
               </div> 
+            </div>   
+
+             <div class="form-group">
+              <label for="margin-y" class="control-label col-sm-3">radius</label>
+              <div class="col-sm-7">
+                <input id="margin-y" class="form-control" type="range" min="1" max="10" v-model.number="radius">
+              </div>
+              <div class="col-sm-2">
+                <p>{{radius}}px</p>       
+              </div> 
             </div>        
 
             <div class="form-group">
@@ -93,7 +103,7 @@
         <div class="panel-heading">Events</div>
 
         <div class="panel-body log">
-          <div v-for="event in events">
+          <div v-for="(event,index) in events" :key="index">
             <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
         </div>
@@ -102,7 +112,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"/>
+    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"/>
   </div>
   
   </div>
@@ -118,6 +128,7 @@ Object.assign(data, {
   duration: 750,
   Marginx: 30,
   Marginy: 30,
+  radius: 5,
   nodeText: 'text',
   currentNode: null,
   zoomable: true,
