@@ -179,8 +179,6 @@ Sent when highlighted node has changed.
 
 Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
 
-vue-semantic-modal
-
 # Installation
 - Available through:
 ``` js
