@@ -79,7 +79,7 @@ For all these events, the argument passed is `{element, data}` where `element` r
 Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms)
 
 
-## methods
+## Methods
 
 | Name      | Argument | return             | Description |
 | ---       | ---      | ---                | ---         |
@@ -91,6 +91,14 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 
+## Gotchas
+
+This component is responsive and will adjust to resizing.
+In order for this to work properly, you must define for this component or its parent weither:
+  * a height or a max-height
+  * or a width or a max-width.
+  
+Failing to do so may result in a component whose size that will keep increasing.
 
 # Hierarchical Edge Bundling
 
@@ -174,11 +182,20 @@ Sent when D3.js nodes are computed using `data` props. Called with [D3.js hierar
 
 Sent when highlighted node has changed.
 
-## data
+## Data
 
 * `highlightedNode`
 
 Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
+
+## Gotchas
+
+This component is responsive and will adjust to resizing.
+In order for this to work properly, you must define for this component or its parent weither:
+  * a height or a max-height
+  * or a width or a max-width.
+  
+Failing to do so may result in a component whose size that will keep increasing.
 
 # Installation
 - Available through:
