@@ -16,7 +16,7 @@ Update documentationVue components to display graphics based on [D3.js](https://
 ## Usage
 
 ```html
-<tree :data="tree" :node-text="name" layoutType="circular">
+<tree :data="tree" node-text="name" layoutType="circular">
 </tree>
 ```
 ```javascript
