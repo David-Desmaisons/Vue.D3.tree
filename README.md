@@ -1,6 +1,7 @@
 # Vue.D3.tree
 [![GitHub open issues](https://img.shields.io/github/issues/David-Desmaisons/Vue.D3.tree.svg?maxAge=2592000)](https://github.com/David-Desmaisons/Vue.D3.tree/issues)
 [![Npm version](https://img.shields.io/npm/v/vued3tree.svg?maxAge=2592000)](https://www.npmjs.com/package/vued3tree)
+[![npm download](https://img.shields.io/npm/dt/vued3tree.svg?maxAge=2592000)](https://www.npmjs.com/package/vued3tree)
 [![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
 [![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
@@ -15,7 +16,7 @@ Update documentationVue components to display graphics based on [D3.js](https://
 ## Usage
 
 ```html
-<tree :data="tree" :node-text="name" layoutType="circular">
+<tree :data="tree" node-text="name" layoutType="circular">
 </tree>
 ```
 ```javascript
@@ -54,6 +55,7 @@ export default {
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
 | nodeText   | yes | `String`  | null|  name of the property of the node to be used as a display name |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
+| radius    | no | `Number`           | 3            | node circle radius in pixel |
 | zoomable   | no | `Boolean`  | true |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
 
 ## Events
@@ -77,7 +79,7 @@ For all these events, the argument passed is `{element, data}` where `element` r
 Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms)
 
 
-## methods
+## Methods
 
 | Name      | Argument | return             | Description |
 | ---       | ---      | ---                | ---         |
@@ -89,6 +91,14 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 
+## Gotchas
+
+This component is responsive and will adjust to resizing.
+In order for this to work properly, you must define for this component or its parent weither:
+  * a height or a max-height
+  * or a width or a max-width.
+  
+Failing to do so may result in a component whose size that will keep increasing.
 
 # Hierarchical Edge Bundling
 
@@ -172,13 +182,20 @@ Sent when D3.js nodes are computed using `data` props. Called with [D3.js hierar
 
 Sent when highlighted node has changed.
 
-## data
+## Data
 
 * `highlightedNode`
 
 Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
 
-vue-semantic-modal
+## Gotchas
+
+This component is responsive and will adjust to resizing.
+In order for this to work properly, you must define for this component or its parent weither:
+  * a height or a max-height
+  * or a width or a max-width.
+  
+Failing to do so may result in a component whose size that will keep increasing.
 
 # Installation
 - Available through:

@@ -31,7 +31,7 @@
             <div class="form-group">
               <label for="margin-x" class="control-label col-sm-3">marginx</label>
               <div class="col-sm-7">
-                <input id="margin-x" class="form-control" type="range" min="-200" max="200" v-model.number="Marginx">
+                <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
               </div> 
                 <div class="col-sm-2">
                   <p>{{Marginx}}px</p>       
@@ -41,10 +41,20 @@
             <div class="form-group">
               <label for="margin-y" class="control-label col-sm-3">marginy</label>
               <div class="col-sm-7">
-                <input id="margin-y" class="form-control" type="range" min="-200" max="200" v-model.number="Marginy">
+                <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
               </div>
               <div class="col-sm-2">
                 <p>{{Marginy}}px</p>       
+              </div> 
+            </div>   
+
+             <div class="form-group">
+              <label for="margin-y" class="control-label col-sm-3">radius</label>
+              <div class="col-sm-7">
+                <input id="margin-y" class="form-control" type="range" min="1" max="10" v-model.number="radius">
+              </div>
+              <div class="col-sm-2">
+                <p>{{radius}}px</p>       
               </div> 
             </div>        
 
@@ -56,12 +66,12 @@
               <div class="col-sm-2">
                 <p>{{duration}}ms</p>       
               </div>
-            </div>  
+            </div>
 
-             <div class="form-group">
+            <div class="form-group">
               <label for="zoomable" class="">Zoomable</label>
               <input id="zoomable" class="form-check-input" type="checkbox" v-model="zoomable">
-            </div>  
+            </div> 
 
             <div class="form-group">
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
@@ -98,7 +108,7 @@
         <div class="panel-heading">Events</div>
 
         <div class="panel-body log">
-          <div v-for="(event,idx) in events" :key="idx">
+          <div v-for="(event,index) in events" :key="index">
             <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
         </div>
@@ -107,7 +117,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"/>
+    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract"/>
   </div>
   
   </div>
@@ -123,6 +133,7 @@ Object.assign(data, {
   duration: 750,
   Marginx: 30,
   Marginy: 30,
+  radius: 3,
   nodeText: 'text',
   currentNode: null,
   zoomable: true,

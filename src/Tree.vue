@@ -59,6 +59,10 @@ const props = {
   zoomable: {
     type: Boolean,
     default: false
+  },
+  radius: {
+    type: Number,
+    default: 3
   }
 }
 
@@ -209,7 +213,9 @@ export default {
         .attr('transform', d => translate(d, this.layout))
         .attr('opacity', 1))
 
-      allNodes.append('circle')
+      allNodes
+        .append('circle')
+        .attr('r', this.radius)
 
       text.attr('x', d => { return d.textInfo ? d.textInfo.x : 0 })
           .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
@@ -459,6 +465,10 @@ export default {
       this.completeRedraw({layout: oldLayout})
     },
 
+    radius () {
+      this.completeRedraw({layout: this.layout})
+    },
+
     zoomable (newValue) {
       const { svg, g } = this.internaldata
       let { zoom } = this.internaldata
@@ -480,13 +490,11 @@ export default {
 <style>
 .treeclass .nodetree  circle {
   fill: #999;
-  r: 2.5;
 }
 
 .treeclass .node--internal circle {
   cursor: pointer;
   fill:  #555;
-  r: 3;
 }
 
 .treeclass .nodetree text {

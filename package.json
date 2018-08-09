@@ -1,6 +1,6 @@
 {
   "name": "vued3tree",
-  "version": "3.4.3",
+  "version": "3.5.0",
   "description": "A Vue.js project",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
@@ -8,7 +8,8 @@
     "build": "node build/build.js",
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
-    "lint": "eslint --ext .js,.vue src test/unit/specs"
+    "lint": "eslint --ext .js,.vue src test/unit/specs",
+    "prepublishOnly" : "npm run build"
   },
   "main": "dist/index.js",
   "files": [
