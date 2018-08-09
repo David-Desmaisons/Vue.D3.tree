@@ -441,8 +441,11 @@ export default {
   },
 
   watch: {
-    data (current, old) {
-      this.onData(current)
+    data: {
+      handler: function (current, old) {
+        this.onData(current)
+      },
+      deep: true
     },
 
     type () {
