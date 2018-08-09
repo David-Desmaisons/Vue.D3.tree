@@ -8,7 +8,7 @@ export default {
   },
 
   transformSvg (svg, margin, size, {first}) {
-    return svg.attr('transform', 'translate(' + margin.x + first + ',' + margin.y + ')')
+    return svg.attr('transform', 'translate(' + (margin.x + first) + ',' + margin.y + ')')
   },
 
   updateTransform (transform, {x, y}, size, {first}) {

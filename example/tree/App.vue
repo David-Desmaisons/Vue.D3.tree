@@ -58,6 +58,11 @@
               </div>
             </div>  
 
+             <div class="form-group">
+              <label for="zoomable" class="">Zoomable</label>
+              <input id="zoomable" class="form-check-input" type="checkbox" v-model="zoomable">
+            </div>  
+
             <div class="form-group">
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
               <span v-else>No Node selected.</span>
@@ -93,7 +98,7 @@
         <div class="panel-heading">Events</div>
 
         <div class="panel-body log">
-          <div v-for="event in events">
+          <div v-for="(event,idx) in events" :key="idx">
             <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
         </div>

@@ -457,6 +457,21 @@ export default {
 
     layout (newLayout, oldLayout) {
       this.completeRedraw({layout: oldLayout})
+    },
+
+    zoomable (newValue) {
+      const { svg, g } = this.internaldata
+      let { zoom } = this.internaldata
+      if (newValue) {
+        zoom = d3.zoom().scaleExtent([0.9, 8])
+        zoom.on('zoom', this.zoomed(g))
+        svg.call(zoom).on('wheel', () => d3.event.preventDefault())
+        svg.call(zoom.transform, this.currentTransform || d3.zoomIdentity)
+      } else {
+        zoom.on('zoom', null)
+        zoom = null
+      }
+      this.internaldata.zoom = zoom
     }
   }
 }
