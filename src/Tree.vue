@@ -6,7 +6,7 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
-import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, removeTextAndGraph, translate} from './d3-utils'
+import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
 
 import * as d3 from 'd3'
 
@@ -183,11 +183,11 @@ export default {
       const newNodes = node.enter().append('g').attr('class', 'nodetree')
       const allNodes = newNodes.merge(node)
 
-      removeTextAndGraph(node)
-
-      const text = allNodes.append('text')
+      newNodes.append('text')
         .attr('dy', '.35em')
-        .text(d => d.data[this.nodeText])
+        .attr('x', 0)
+        .attr('dx', 0)
+        .attr('transform', 'rotate(0)')
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
           d3.event.stopPropagation()
@@ -203,6 +203,8 @@ export default {
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
       newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
+        .append('circle')
+        .attr('r', this.radius)
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
@@ -213,13 +215,7 @@ export default {
         .attr('transform', d => translate(d, this.layout))
         .attr('opacity', 1))
 
-      allNodes
-        .append('circle')
-        .attr('r', this.radius)
-
-      text.attr('x', d => { return d.textInfo ? d.textInfo.x : 0 })
-          .attr('dx', function (d) { return d.textInfo ? anchorTodx(d.textInfo.anchor, this) : 0 })
-          .attr('transform', d => 'rotate(' + (d.textInfo ? d.textInfo.rotate : 0) + ')')
+      const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
       const {transformText} = this.layout
       allNodes.each((d) => {
