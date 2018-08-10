@@ -170,8 +170,10 @@ export default {
       let forExit = source
       if (typeof source === 'object') {
         const origin = {x: source.x0, y: source.y0}
-        originBuilder = d => origin
+        originBuilder = d => ((d.parent != null) && (d.parent.x0 !== undefined)) ? {x: d.parent.x0, y: d.parent.y0} : origin
         forExit = d => ({x: source.x, y: source.y})
+      } else {
+        console.log('putain con')
       }
 
       const root = this.internaldata.root
@@ -179,9 +181,14 @@ export default {
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
       const updateLinks = links.enter().append('path').attr('class', 'linktree')
-      const node = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
-      const newNodes = node.enter().append('g').attr('class', 'nodetree')
-      const allNodes = newNodes.merge(node)
+      const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
+      const newNodes = nodes.enter().append('g').attr('class', 'nodetree')
+      const allNodes = newNodes.merge(nodes)
+
+      nodes.each(function (d) {
+        d.x0 = d.x
+        d.y0 = d.y
+      })
 
       newNodes.append('text')
         .attr('dy', '.35em')
@@ -193,6 +200,9 @@ export default {
           d3.event.stopPropagation()
           this.redraw()
           this.$emit('clicked', {element: d, data: d.data})
+        })
+        .each(d => {
+          console.log(d, originBuilder(d))
         })
 
       updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
@@ -232,7 +242,7 @@ export default {
         d.y0 = d.y
       })
 
-      const exitingNodes = node.exit()
+      const exitingNodes = nodes.exit()
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
                   .attr('transform', d => translate(forExit(d), this.layout))
                   .attr('opacity', 0).remove())
