@@ -5,7 +5,7 @@
 <script>
 import resize from 'vue-resize-directive'
 import layout from './circular-layout'
-import {anchorTodx, compareNode, removeTextAndGraph, roundPath, toPromise, translate, updateTexts} from './d3-utils'
+import {anchorTodx, compareNode, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
 import * as d3 from 'd3'
 
@@ -140,17 +140,16 @@ export default {
       newNodes.on('mouseover', this.mouseOvered).on('mouseout', this.mouseOuted).on('click', this.nodeClick)
 
       const allNodes = this.internaldata.nodes = newNodes.merge(node)
-
-      removeTextAndGraph(node)
-
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration).attr('transform', d => translate(d, layout)).attr('opacity', 1))
 
       const {transformText, transformNode} = layout
       allNodes.each((d) => {
         d.textInfo = transformText(d, false)
       })
-      const text = allNodes.append('text')
-        .attr('dy', '.35em')
+
+      newNodes.append('text').attr('dy', '.35em')
+
+      const text = allNodes.select('text')
         .text(d => d.data[this.nodeText])
         .attr('x', d => d.textInfo.x)
         .call(updateTexts, this.maxTextWidth)

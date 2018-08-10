@@ -43,12 +43,6 @@ function mapMany (arr, mapper) {
   }, [])
 }
 
-function removeTextAndGraph (selection) {
-  ['circle', 'text'].forEach(select => {
-    selection.selectAll(select).remove()
-  })
-}
-
 function roundPath (pathString, precision = 0) {
   return pathString.replace(/\d+\.\d+/g, s => parseFloat(s).toFixed(precision))
 }
@@ -120,7 +114,6 @@ export {
   drawLink,
   findInParents,
   mapMany,
-  removeTextAndGraph,
   roundPath,
   toPromise,
   translate,
