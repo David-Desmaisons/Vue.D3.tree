@@ -9,7 +9,7 @@
     "unit": "karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit/specs",
-    "prepublishOnly" : "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "main": "dist/index.js",
   "files": [
@@ -24,6 +24,7 @@
   ],
   "dependencies": {
     "d3": "^4.10.2",
+    "gremlins.js": "github:marmelab/gremlins.js",
     "vue": "^2.1.0",
     "vue-resize-directive": "^1.0.0"
   },
