@@ -170,12 +170,20 @@ export default {
       let forExit = source
       if (typeof source === 'object') {
         const origin = {x: source.x0, y: source.y0}
-        originBuilder = d => ((d.parent != null) && (d.parent.x0 !== undefined)) ? {x: d.parent.x0, y: d.parent.y0} : origin
+        originBuilder = d => {
+          if (d.parent == null) {
+            return origin
+          }
+          if (d.parent.x0 !== undefined) {
+            return {x: d.parent.x0, y: d.parent.y0}
+          }
+          if (d.parent._x0 !== undefined) {
+            return {x: d.parent._x0, y: d.parent._y0}
+          }
+          return origin
+        }
         forExit = d => ({x: source.x, y: source.y})
-      } else {
-        console.log('putain con')
       }
-
       const root = this.internaldata.root
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
@@ -186,8 +194,8 @@ export default {
       const allNodes = newNodes.merge(nodes)
 
       nodes.each(function (d) {
-        d.x0 = d.x
-        d.y0 = d.y
+        d._x0 = d.x
+        d._y0 = d.y
       })
 
       newNodes.append('text')
