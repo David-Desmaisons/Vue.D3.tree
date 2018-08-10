@@ -3,7 +3,7 @@
         <div class="panel-heading">Events</div>
 
         <div class="panel-body log">
-          <div v-for="event in events">
+          <div v-for="(event,index) in events" :key="index">
             <p><b>Name:</b> {{event.eventName}} <b>Data:</b>{{event.data.text}}</p>
           </div>
         </div>

@@ -73,10 +73,10 @@
               <input id="zoomable" class="form-check-input" type="checkbox" v-model="zoomable">
             </div> 
 
-            <div class="form-group">
+            <div class="form-group feedback">
+              <i v-show="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
-              <span v-else>No Node selected.</span>
-               <i v-if="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+              <span v-else>No Node selected.</span>            
             </div>  
 
             <button type="button" :disabled="!currentNode" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
@@ -97,6 +97,10 @@
 
             <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom" data-toggle="tooltip" data-placement="top" title="Reset Zoom">
             <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
+            </button>
+            
+            <button type="button" class="btn btn-danger" @click="gremlins" data-toggle="tooltip" data-placement="top" title="unleash gremlins">
+            <i class="fa" :class="isUnderGremlinsAttack ? 'fa-stop': 'fa-optin-monster'" aria-hidden="true"></i>           
             </button>
 
         </div>
@@ -126,6 +130,7 @@
 <script>
 import {tree} from '../../src/'
 import data from '../../data/data'
+import {getGremlin} from './gremlinConfiguration'
 
 Object.assign(data, {
   type: 'tree',
@@ -138,6 +143,7 @@ Object.assign(data, {
   currentNode: null,
   zoomable: true,
   isLoading: false,
+  isUnderGremlinsAttack: false,
   events: []
 })
 
@@ -188,6 +194,18 @@ export default {
     resetZoom () {
       this.isLoading = true
       this.$refs['tree'].resetZoom().then(() => { this.isLoading = false })
+    },
+    gremlins () {
+      if (this.isUnderGremlinsAttack) {
+        this.horde.stop()
+        this.horde = null
+        return
+      }
+      var horde = getGremlin()
+      horde.after(() => { this.isUnderGremlinsAttack = false })
+      horde.unleash()
+      this.horde = horde
+      this.isUnderGremlinsAttack = true
     }
   }
 }
@@ -213,12 +231,17 @@ export default {
   width: 100%;
 }
 
+.feedback{
+  height: 50px;
+  line-height: 50px;
+  vertical-align: middle;
+}
+
 .log  {
-  height: 500px;
+  height: 200px;
   overflow-x: auto;
   overflow-y: auto;
   overflow: auto;
   text-align: left;
 }
-
 </style>
