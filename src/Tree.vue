@@ -166,10 +166,12 @@ export default {
     },
 
     updateGraph (source) {
+      source = source || this.internaldata.root
       let originBuilder = source
       let forExit = source
-      if (typeof source === 'object') {
-        const origin = {x: source.x0, y: source.y0}
+      const origin = {x: source.x0, y: source.y0}
+
+      if (!arguments.length) {
         originBuilder = d => {
           if (d.parent == null) {
             return origin
@@ -183,7 +185,12 @@ export default {
           return origin
         }
         forExit = d => ({x: source.x, y: source.y})
+        source = this.internaldata.root
+      } else if (typeof source === 'object') {
+        originBuilder = d => origin
+        forExit = d => ({x: source.x, y: source.y})
       }
+
       const root = this.internaldata.root
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
@@ -208,9 +215,6 @@ export default {
           d3.event.stopPropagation()
           this.redraw()
           this.$emit('clicked', {element: d, data: d.data})
-        })
-        .each(d => {
-          console.log(d, originBuilder(d))
         })
 
       updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
@@ -308,9 +312,8 @@ export default {
     },
 
     redraw () {
-      const root = this.internaldata.root
-      if (root) {
-        return this.updateGraph(root)
+      if (this.internaldata.root) {
+        return this.updateGraph()
       }
       return Promise.resolve('no graph')
     },
