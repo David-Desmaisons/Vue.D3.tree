@@ -171,7 +171,7 @@ export default {
       let forExit = source
       const origin = {x: source.x0, y: source.y0}
 
-      if (!arguments.length) {
+      if (arguments.length === 0) {
         originBuilder = d => {
           if (d.parent == null) {
             return origin
@@ -221,7 +221,6 @@ export default {
 
       const updateAndNewLinks = links.merge(updateLinks)
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
-
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
       newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
@@ -413,10 +412,12 @@ export default {
       const path = d.ancestors().reverse()
       const shouldBeRetracted = mapMany(path, p => p.children ? p.children : []).filter(node => node && (path.indexOf(node) === -1))
       const mapped = {}
-      shouldBeRetracted.filter(node => node.children)
-                      .forEach(rectractedNode => rectractedNode.each(c => { mapped[c.id] = rectractedNode }))
+      shouldBeRetracted.filter(node => node.children).forEach(rectractedNode => rectractedNode.each(c => { mapped[c.id] = rectractedNode }))
       const origin = node => {
         const reference = mapped[node.id]
+        if (!reference) {
+          return node
+        }
         return {x: reference.x, y: reference.y}
       }
       const updater = node => {

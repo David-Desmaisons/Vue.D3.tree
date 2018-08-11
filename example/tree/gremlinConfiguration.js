@@ -1,9 +1,12 @@
 import gremlins from 'gremlins.js/src/main'
 
-function getGremlin (element, changeType, changeLayout, resetZoom) {
+function getGremlin (prohibited, element, changeType, changeLayout, resetZoom) {
   const horde = gremlins.createHorde()
     .gremlin(gremlins.species.clicker()
     .canClick((element) => {
+      if (prohibited === element) {
+        return false
+      }
       switch (element.tagName) {
         case 'circle':
         case 'BUTTON':
@@ -29,7 +32,7 @@ function getGremlin (element, changeType, changeLayout, resetZoom) {
     })
     .gremlin(function () {
       console.log('gremlin click circle')
-      const circles = [...element.getElementsByTagName('circle')]
+      const circles = [...element.getElementsByClassName('node--internal')]
       if (circles.length === 0) {
         return
       }

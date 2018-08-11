@@ -99,7 +99,7 @@
             <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
             </button>
             
-            <button type="button" class="btn btn-danger" @click="gremlins" data-toggle="tooltip" data-placement="top" title="unleash gremlins">
+            <button type="button" class="btn btn-danger" @click="gremlins" data-toggle="tooltip" data-placement="top" :title="isUnderGremlinsAttack ? 'stop attack' :'unleash gremlins'">
             <i class="fa" :disabled="isUnderGremlinsAttack" :class="isUnderGremlinsAttack ? 'fa-exclamation-triangle':'fa-optin-monster'" aria-hidden="true"></i>
             </button>
 
@@ -191,11 +191,15 @@ export default {
       this.events.push({eventName, data: data.data})
     },
     resetZoom () {
+      if (!this.$refs['tree']) {
+        return
+      }
       this.isLoading = true
       this.$refs['tree'].resetZoom().then(() => { this.isLoading = false })
     },
     gremlins () {
       if (this.isUnderGremlinsAttack) {
+        this.horde.stop()
         return
       }
 
@@ -203,9 +207,12 @@ export default {
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
       const changeType = () => { this.layoutType = (this.layoutType === 'euclidean') ? 'circular' : 'euclidean' }
       const resetZoom = this.resetZoom.bind(this)
-      var horde = getGremlin(this.$el.getElementsByClassName('tree')[0], changeType, changeLayout, resetZoom)
+      const [treeDiv] = this.$el.getElementsByClassName('tree')
+      const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')
+      var horde = getGremlin(gremlinsButton, treeDiv, changeType, changeLayout, resetZoom)
       horde.after(() => { this.isUnderGremlinsAttack = false })
       horde.unleash()
+      this.horde = horde
       this.isUnderGremlinsAttack = true
     }
   }
