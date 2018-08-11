@@ -100,7 +100,7 @@
             </button>
             
             <button type="button" class="btn btn-danger" @click="gremlins" data-toggle="tooltip" data-placement="top" title="unleash gremlins">
-            <i class="fa" :class="isUnderGremlinsAttack ? 'fa-stop': 'fa-optin-monster'" aria-hidden="true"></i>           
+            <i class="fa" :disabled="isUnderGremlinsAttack" :class="isUnderGremlinsAttack ? 'fa-exclamation-triangle':'fa-optin-monster'" aria-hidden="true"></i>
             </button>
 
         </div>
@@ -189,7 +189,6 @@ export default {
     },
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
-      console.log({eventName, data: data})
     },
     resetZoom () {
       this.isLoading = true
@@ -197,14 +196,16 @@ export default {
     },
     gremlins () {
       if (this.isUnderGremlinsAttack) {
-        this.horde.stop()
-        this.horde = null
         return
       }
-      var horde = getGremlin()
+
+      this.duration = 20
+      const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
+      const changeType = () => { this.layoutType = (this.layoutType === 'euclidean') ? 'circular' : 'euclidean' }
+      const resetZoom = this.resetZoom.bind(this)
+      var horde = getGremlin(this.$el.getElementsByClassName('tree')[0], changeType, changeLayout, resetZoom)
       horde.after(() => { this.isUnderGremlinsAttack = false })
       horde.unleash()
-      this.horde = horde
       this.isUnderGremlinsAttack = true
     }
   }
@@ -222,7 +223,7 @@ export default {
 }
 
 .tree {
-  height: 600px;
+  height: 800px;
   width: 100%;
 }
 
