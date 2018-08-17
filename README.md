@@ -192,7 +192,7 @@ Highlighted node: when set to a node data, the corresponding node and its relate
 ## Gotchas
 
 This component is responsive and will adjust to resizing.
-In order for this to work properly, you must define for this component or its parent weither:
+In order for this to work properly, you must define for this component or its parent wether:
   * a height or a max-height
   * or a width or a max-width.
   
