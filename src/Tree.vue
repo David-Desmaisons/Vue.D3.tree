@@ -537,4 +537,8 @@ export default {
   stroke-opacity: 0.4;
   stroke-width: 1.5px;
 }
+
+.treeclass {
+  max-height: 100%;
+}
 </style>
