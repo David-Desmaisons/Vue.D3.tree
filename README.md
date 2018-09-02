@@ -56,7 +56,7 @@ export default {
 | nodeText   | yes | `String`  | null|  name of the property of the node to be used as a display name |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
-| zoomable   | no | `Boolean`  | true |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
+| zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, usefull when dynimacally updating the tree |
 
 ## Events
