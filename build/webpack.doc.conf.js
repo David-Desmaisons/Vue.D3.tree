@@ -17,7 +17,7 @@ module.exports = merge(baseWebpackConfig, {
    output: {
     path: config.doc.assetsRoot,
     publicPath: config.doc.assetsPublicPath,
-    filename: "../docs/[name]_bundle.js"
+    filename: "[name]_bundle.js"
   },
   // eval-source-map is faster for development
   devtool: '#eval-source-map',
