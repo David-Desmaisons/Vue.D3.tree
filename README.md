@@ -15,7 +15,7 @@ Update documentationVue components to display graphics based on [D3.js](https://
 
 ## Live demo
 
-https://david-desmaisons.github.io/Vue.D3.tree/tree.html
+https://david-desmaisons.github.io/Vue.D3.tree/tree
 
 ## Usage
 
@@ -111,7 +111,7 @@ Failing to do so may result in a component whose size that will keep increasing.
 
 ## Live demo
 
-https://david-desmaisons.github.io/Vue.D3.tree/hierarchicalEdgeBundling.html
+https://david-desmaisons.github.io/Vue.D3.tree/hierarchicalEdgeBundling
 
 ## Usage
 
