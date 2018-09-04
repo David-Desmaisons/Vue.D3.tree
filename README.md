@@ -13,6 +13,10 @@ Update documentationVue components to display graphics based on [D3.js](https://
 
 ![demo](./documentation/treedemo.gif)
 
+## Live demo
+
+https://david-desmaisons.github.io/Vue.D3.tree/tree.html
+
 ## Usage
 
 ```html
@@ -104,6 +108,10 @@ Failing to do so may result in a component whose size that will keep increasing.
 # Hierarchical Edge Bundling
 
 ![demo](./documentation/hebdemo.gif)
+
+## Live demo
+
+https://david-desmaisons.github.io/Vue.D3.tree/hierarchicalEdgeBundling.html
 
 ## Usage
 
