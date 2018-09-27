@@ -1,6 +1,6 @@
 {
   "name": "vued3tree",
-  "version": "3.6.3",
+  "version": "3.6.4",
   "description": "A Vue.js project",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
@@ -27,7 +27,7 @@
     "d3": "^4.10.2",
     "gremlins.js": "github:marmelab/gremlins.js",
     "vue": "^2.1.0",
-    "vue-resize-directive": "^1.1.3"
+    "vue-resize-directive": "^1.1.4"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
