@@ -57,7 +57,7 @@ export default {
 | layoutType | no | 'circular' or 'euclidean' |  'euclidean'       | Circular or euclidean layout |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
-| nodeText   | yes | `String`  | null|  name of the property of the node to be used as a display name |
+| nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
