@@ -231,7 +231,6 @@ export default {
 
 .tree {
   height: 800px;
-  width: 100%;
 }
 
 .graph-root {
