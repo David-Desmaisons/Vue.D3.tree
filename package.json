@@ -1,7 +1,7 @@
 {
   "name": "vued3tree",
-  "version": "3.6.4",
-  "description": "A Vue.js project",
+  "version": "3.7.1",
+  "description": "D3 tree components for vue",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
     "dev": "node build/dev-server.js",

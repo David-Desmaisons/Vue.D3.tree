@@ -50,7 +50,7 @@ const props = {
   },
   nodeText: {
     type: String,
-    default: "name"
+    default: 'name'
   },
   identifier: {
     type: Function,
