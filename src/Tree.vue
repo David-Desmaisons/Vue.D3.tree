@@ -1,12 +1,9 @@
-<template>
-  <div class="viewport treeclass" v-resize="resize">
-  </div>
-</template>
 <script>
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
 import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import {renderInVueContext} from './vueHelper'
 
 import * as d3 from 'd3'
 
@@ -92,6 +89,10 @@ export default {
   props,
 
   directives,
+
+  render (h) {
+    return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
+  },
 
   data () {
     return {
@@ -197,7 +198,7 @@ export default {
 
       const updateLinks = links.enter().append('path').attr('class', 'linktree')
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
-      const newNodes = nodes.enter().append('g').attr('class', 'nodetree')
+      const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
       const allNodes = newNodes.merge(nodes)
 
       nodes.each(function (d) {
@@ -223,9 +224,12 @@ export default {
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
+      const {radius, $scopedSlots: {node}} = this
+      const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data}}) : d => `<circle r="${radius}"/>`
+
       newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
-        .append('circle')
-        .attr('r', this.radius)
+        .append('g')
+        .html(getHtml)
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
