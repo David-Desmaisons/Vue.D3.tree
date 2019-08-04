@@ -123,8 +123,11 @@
   <div class="col-md-9 panel panel-default">
     <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract">
       <template #node="{node: {depth}, radius}">
-        <circle :r="depth *radius"/>
-        <!-- <rect width="8" height="8" fill="#BBC42A" /> -->
+        <!-- <rect :width="8*radius" :height="8*radius" fill="#BBC42A" :x="-4*radius" :y="-4*radius"/>
+        <circle :r="depth *radius"/> -->
+        <g :transform="`translate(-12,-12)`">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        </g>
       </template>
     </tree>
   </div>

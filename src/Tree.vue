@@ -206,18 +206,6 @@ export default {
         d._y0 = d.y
       })
 
-      newNodes.append('text')
-        .attr('dy', '.35em')
-        .attr('x', 0)
-        .attr('dx', 0)
-        .attr('transform', 'rotate(0)')
-        .on('click', d => {
-          currentSelected = (currentSelected === d) ? null : d
-          d3.event.stopPropagation()
-          this.redraw()
-          this.$emit('clicked', {element: d, data: d.data})
-        })
-
       updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
 
       const updateAndNewLinks = links.merge(updateLinks)
@@ -230,6 +218,18 @@ export default {
       newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
         .append('g')
         .html(getHtml)
+
+      newNodes.append('text')
+        .attr('dy', '.35em')
+        .attr('x', 0)
+        .attr('dx', 0)
+        .attr('transform', 'rotate(0)')
+        .on('click', d => {
+          currentSelected = (currentSelected === d) ? null : d
+          d3.event.stopPropagation()
+          this.redraw()
+          this.$emit('clicked', {element: d, data: d.data})
+        })
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
