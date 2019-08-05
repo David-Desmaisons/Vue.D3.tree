@@ -138,8 +138,7 @@ export default {
 
   methods: {
     getSize () {
-      var width = this.$el.clientWidth
-      var height = this.$el.clientHeight
+      const {$el: {clientWidth: width, clientHeight: height}} = this
       return { width, height }
     },
 
@@ -174,6 +173,7 @@ export default {
       source = source || this.internaldata.root
       let originBuilder = source
       let forExit = source
+      const originAngle = source.layoutInfo ? source.layoutInfo.rotate : 0
       const origin = {x: source.x0, y: source.y0}
 
       if (arguments.length === 0) {
@@ -219,11 +219,12 @@ export default {
       const {radius, $scopedSlots: {node}} = this
       const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data}}) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
+      newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle})`)
         .append('g')
         .html(getHtml)
 
-      newNodes.append('text')
+      newNodes
+        .append('text')
         .attr('dy', '.35em')
         .attr('x', 0)
         .attr('dx', 0)
@@ -261,7 +262,7 @@ export default {
 
       const exitingNodes = nodes.exit()
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => translate(forExit(d), this.layout))
+                  .attr('transform', d => `${translate(forExit(d), this.layout)} rotate(${d.parent.layoutInfo.rotate})`)
                   .attr('opacity', 0).remove())
       exitingNodes.select('circle').attr('r', 1e-6)
 
