@@ -217,11 +217,11 @@ export default {
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
       const {radius, $scopedSlots: {node}} = this
-      const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data}}) : d => `<circle r="${radius}"/>`
+      const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data, isRetracted: !!d._children}}) : d => `<circle r="${radius}"/>`
 
       newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle})`)
         .append('g')
-        .html(getHtml)
+        .attr('class', 'node')
 
       newNodes
         .append('text')
@@ -234,6 +234,10 @@ export default {
           this.redraw()
           this.$emit('clicked', {element: d, data: d.data})
         })
+
+      allNodes
+        .select('.node')
+        .html(getHtml)
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
