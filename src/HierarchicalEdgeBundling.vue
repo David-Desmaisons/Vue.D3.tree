@@ -142,24 +142,24 @@ export default {
       const allNodes = this.internaldata.nodes = newNodes.merge(node)
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration).attr('transform', d => translate(d, layout)).attr('opacity', 1))
 
-      const {transformText, transformNode} = layout
+      const {layoutNode, transformNode} = layout
       allNodes.each((d) => {
-        d.textInfo = transformText(d, false)
+        d.layoutInfo = layoutNode(d, false)
       })
 
       newNodes.append('text').attr('dy', '.35em')
 
       const text = allNodes.select('text')
         .text(d => d.data[this.nodeText])
-        .attr('x', d => d.textInfo.x)
+        .attr('x', d => d.layoutInfo.x)
         .call(updateTexts, this.maxTextWidth)
         .each(function (d) {
-          if (d.textInfo.standardDx == null) {
-            d.textInfo.standardDx = anchorTodx(d.textInfo.anchor, this)
+          if (d.layoutInfo.standardDx == null) {
+            d.layoutInfo.standardDx = anchorTodx(d.layoutInfo.anchor, this)
           }
         })
-        .attr('dx', d => d.textInfo.standardDx)
-        .attr('transform', d => `rotate(${d.textInfo.rotate})`)
+        .attr('dx', d => d.layoutInfo.standardDx)
+        .attr('transform', d => `rotate(${d.layoutInfo.rotate + d.layoutInfo.textRotate})`)
 
       const tentative = []
       text.each(function (d) { tentative.push({ node: this, data: d, pos: transformNode(d.x, this.getComputedTextLength() + 6) }) })
@@ -251,10 +251,10 @@ export default {
 
       rootElement.style('display', 'block')
       nodesSelected.select('text').each(function (d) {
-        if (d.textInfo.zoomedDx == null) {
-          d.textInfo.zoomedDx = anchorTodx(d.textInfo.anchor, this)
+        if (d.layoutInfo.zoomedDx == null) {
+          d.layoutInfo.zoomedDx = anchorTodx(d.layoutInfo.anchor, this)
         }
-      }).attr('dx', d => d.textInfo.zoomedDx)
+      }).attr('dx', d => d.layoutInfo.zoomedDx)
     },
 
     reset (d) {
@@ -272,7 +272,7 @@ export default {
           .classed('node--selected', false)
 
       nodes.filter(n => ((n.target) || (n.source) || (n === d)))
-          .select('text').attr('dx', d => d.textInfo.standardDx)
+          .select('text').attr('dx', d => d.layoutInfo.standardDx)
 
       rootElement.style('display', 'block')
     },

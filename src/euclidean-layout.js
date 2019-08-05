@@ -21,7 +21,7 @@ export default {
             .y(d => d.data.y)
   },
 
-  transformText (text, children) {
+  layoutNode (text, children) {
     return {
       x: !children ? 6 : -6,
       rotate: 0,

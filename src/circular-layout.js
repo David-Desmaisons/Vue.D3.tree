@@ -46,7 +46,7 @@ export default {
               .angle(d => d.x / 180 * Math.PI)
   },
 
-  transformText (d, children) {
+  layoutNode (d, children) {
     const leafOrReversed = d.x < 180 === !children
     return {
       x: leafOrReversed ? 6 : -6,

@@ -237,18 +237,18 @@ export default {
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
-      const {transformText} = this.layout
+      const {layoutNode} = this.layout
       allNodes.each((d) => {
-        d.textInfo = transformText(d, hasChildren(d))
+        d.layoutInfo = layoutNode(d, hasChildren(d))
       })
 
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
-        .attr('transform', d => `${translate(d, this.layout)} rotate(${d.textInfo.rotate})`)
+        .attr('transform', d => `${translate(d, this.layout)} rotate(${d.layoutInfo.rotate})`)
         .attr('opacity', 1))
 
-      text.attr('x', d => d.textInfo.x)
-          .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          .attr('transform', d => `rotate(${d.textInfo.textRotate})`)
+      text.attr('x', d => d.layoutInfo.x)
+          .attr('dx', function (d) { return anchorTodx(d.layoutInfo.anchor, this) })
+          .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
       allNodes.each((d) => {
         d.x0 = d.x
