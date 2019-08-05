@@ -47,10 +47,12 @@ export default {
   },
 
   transformText (d, children) {
+    const leafOrReversed = d.x < 180 === !children
     return {
-      x: d.x < 180 === !children ? 6 : -6,
-      rotate: d.x < 180 ? d.x - 90 : d.x + 90,
-      anchor: d.x < 180 === !children ? 'start' : 'end'
+      x: leafOrReversed ? 6 : -6,
+      rotate: d.x - 90,
+      textRotate: d.x < 180 ? 0 : 180,
+      anchor: leafOrReversed ? 'start' : 'end'
     }
   }
 }

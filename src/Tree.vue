@@ -223,7 +223,6 @@ export default {
         .attr('dy', '.35em')
         .attr('x', 0)
         .attr('dx', 0)
-        .attr('transform', 'rotate(0)')
         .on('click', d => {
           currentSelected = (currentSelected === d) ? null : d
           d3.event.stopPropagation()
@@ -236,10 +235,6 @@ export default {
         .classed('selected', d => d === currentSelected)
         .on('click', this.onNodeClick)
 
-      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
-        .attr('transform', d => translate(d, this.layout))
-        .attr('opacity', 1))
-
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
       const {transformText} = this.layout
@@ -247,10 +242,13 @@ export default {
         d.textInfo = transformText(d, hasChildren(d))
       })
 
-      const textTransition = toPromise(text.transition().duration(this.duration)
-          .attr('x', d => d.textInfo.x)
+      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
+        .attr('transform', d => `${translate(d, this.layout)} rotate(${d.textInfo.rotate})`)
+        .attr('opacity', 1))
+
+      text.attr('x', d => d.textInfo.x)
           .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          .attr('transform', d => `rotate(${d.textInfo.rotate})`))
+          .attr('transform', d => `rotate(${d.textInfo.textRotate})`)
 
       allNodes.each((d) => {
         d.x0 = d.x
@@ -268,7 +266,7 @@ export default {
       const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
       const first = text.node().getComputedTextLength() + 6
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
-        return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
+        return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
       }
 
       this.maxTextLenght = {first, last}

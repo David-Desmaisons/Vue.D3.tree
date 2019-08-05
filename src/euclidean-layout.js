@@ -25,6 +25,7 @@ export default {
     return {
       x: !children ? 6 : -6,
       rotate: 0,
+      textRotate: 0,
       anchor: !children ? 'start' : 'end'
     }
   }
