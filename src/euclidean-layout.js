@@ -21,9 +21,9 @@ export default {
             .y(d => d.data.y)
   },
 
-  layoutNode (text, children) {
+  layoutNode (children, offset) {
     return {
-      x: !children ? 6 : -6,
+      x: !children ? offset : -6,
       rotate: 0,
       textRotate: 0,
       anchor: !children ? 'start' : 'end'

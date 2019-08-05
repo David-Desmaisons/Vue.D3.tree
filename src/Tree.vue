@@ -60,6 +60,10 @@ const props = {
   radius: {
     type: Number,
     default: 3
+  },
+  textMargin: {
+    type: Number,
+    default: 6
   }
 }
 
@@ -237,9 +241,9 @@ export default {
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
-      const {layoutNode} = this.layout
+      const { textMargin, layout: {layoutNode} } = this
       allNodes.each((d) => {
-        d.layoutInfo = layoutNode(d, hasChildren(d))
+        d.layoutInfo = layoutNode(hasChildren(d), textMargin, d)
       })
 
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
@@ -489,6 +493,10 @@ export default {
     },
 
     radius () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    textMargin () {
       this.completeRedraw({layout: this.layout})
     },
 

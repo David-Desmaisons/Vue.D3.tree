@@ -24,7 +24,7 @@
                   <select id="layout-type" class="form-control" v-model="layoutType">
                     <option>euclidean</option>
                     <option>circular</option>
-                  </select>       
+                  </select>
               </div>
             </div> 
 
@@ -34,9 +34,9 @@
                 <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
               </div> 
                 <div class="col-sm-2">
-                  <p>{{Marginx}}px</p>       
-              </div> 
-            </div>        
+                  <p>{{Marginx}}px</p>
+              </div>
+            </div>
 
             <div class="form-group">
               <label for="margin-y" class="control-label col-sm-3">marginy</label>
@@ -44,19 +44,19 @@
                 <input id="margin-y" class="form-control" type="range" min="0" max="200" v-model.number="Marginy">
               </div>
               <div class="col-sm-2">
-                <p>{{Marginy}}px</p>       
-              </div> 
-            </div>   
+                <p>{{Marginy}}px</p>
+              </div>
+            </div>
 
              <div class="form-group">
               <label for="margin-y" class="control-label col-sm-3">radius</label>
               <div class="col-sm-7">
-                <input id="margin-y" class="form-control" type="range" min="1" max="10" v-model.number="radius">
+                <input id="radius" class="form-control" type="range" min="1" max="10" v-model.number="radius">
               </div>
               <div class="col-sm-2">
-                <p>{{radius}}px</p>       
-              </div> 
-            </div>        
+                <p>{{radius}}px</p>
+              </div>
+            </div>
 
             <div class="form-group">
               <label for="velocity" class="control-label col-sm-3">Duration</label>
@@ -64,7 +64,17 @@
                 <input id="velocity" class="form-control" type="range" min="0" max="3000" v-model.number="duration">
               </div>
               <div class="col-sm-2">
-                <p>{{duration}}ms</p>       
+                <p>{{duration}}ms</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="text-margin" class="control-label col-sm-3">textMargin</label>
+              <div class="col-sm-7">
+                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="textMargin">
+              </div>
+              <div class="col-sm-2">
+                <p>{{textMargin}}px</p>
               </div>
             </div>
 
@@ -76,27 +86,27 @@
             <div class="form-group feedback">
               <i v-show="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
               <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
-              <span v-else>No Node selected.</span>            
-            </div>  
+              <span v-else>No Node selected.</span>
+            </div>
 
             <button type="button" :disabled="!currentNode" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
-            <i class="fa fa-expand" aria-hidden="true"></i>          
+            <i class="fa fa-expand" aria-hidden="true"></i>
             </button>
 
             <button type="button" :disabled="!currentNode" class="btn btn-secondary" @click="collapseAll" data-toggle="tooltip" data-placement="top" title="Collapse All from current">
-            <i class="fa fa-compress" aria-hidden="true"></i>            
+            <i class="fa fa-compress" aria-hidden="true"></i>
             </button>
 
             <button type="button" :disabled="!currentNode" class="btn btn-success" @click="showOnly" data-toggle="tooltip" data-placement="top" title="Show Only from current">
-            <i class="fa fa-search-plus" aria-hidden="true"></i>       
+            <i class="fa fa-search-plus" aria-hidden="true"></i>
             </button>
 
             <button type="button" :disabled="!currentNode" class="btn btn-warning" @click="show" data-toggle="tooltip" data-placement="top" title="Show current">
-            <i class="fa fa-binoculars" aria-hidden="true"></i>           
+            <i class="fa fa-binoculars" aria-hidden="true"></i>
             </button>
 
             <button v-if="zoomable" type="button" class="btn btn-warning" @click="resetZoom" data-toggle="tooltip" data-placement="top" title="Reset Zoom">
-            <i class="fa fa-arrows-alt" aria-hidden="true"></i>                             
+            <i class="fa fa-arrows-alt" aria-hidden="true"></i>
             </button>
             
             <button type="button" class="btn btn-danger" @click="gremlins" data-toggle="tooltip" data-placement="top" :title="isUnderGremlinsAttack ? 'stop attack' :'unleash gremlins'">
@@ -121,7 +131,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract">
+    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :text-margin="textMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract">
       <template #node="{node: {depth}, radius}">
         <path transform="scale(0.05) translate(-10,-250)" fill="currentColor" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path>
       </template>
@@ -143,6 +153,7 @@ Object.assign(data, {
   Marginx: 30,
   Marginy: 30,
   radius: 3,
+  textMargin: 6,
   nodeText: 'text',
   currentNode: null,
   zoomable: true,

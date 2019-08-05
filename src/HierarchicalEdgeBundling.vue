@@ -144,7 +144,7 @@ export default {
 
       const {layoutNode, transformNode} = layout
       allNodes.each((d) => {
-        d.layoutInfo = layoutNode(d, false)
+        d.layoutInfo = layoutNode(false, 6, d)
       })
 
       newNodes.append('text').attr('dy', '.35em')
