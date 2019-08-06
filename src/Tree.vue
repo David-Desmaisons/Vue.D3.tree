@@ -275,6 +275,7 @@ export default {
       const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
       const first = text.node().getComputedTextLength() + 6
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
+        this._scheduledRedraw = false
         return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
       }
 
@@ -322,10 +323,11 @@ export default {
     },
 
     redraw () {
-      if (this.internaldata.root) {
-        return this.updateGraph()
+      if (!this.internaldata.root || this._scheduledRedraw) {
+        return
       }
-      return Promise.resolve('no graph')
+      this._scheduledRedraw = true
+      this.$nextTick(() => this.updateGraph())
     },
 
     getNodeOriginComputer (originalVisibleNodes) {
