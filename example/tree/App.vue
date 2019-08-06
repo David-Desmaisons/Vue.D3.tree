@@ -139,7 +139,7 @@
           </path>
         </template>
         <template v-else>
-          <circle r="6" stroke="blue" fill="blue">
+          <circle r="6" :stroke="zoomable? 'blue' : 'yellow'" :fill="zoomable? 'blue' : 'yellow'">
              <title>{{data.text}} {{depth}}</title>
           </circle>
         </template>
