@@ -5,7 +5,7 @@
 <script>
 import resize from 'vue-resize-directive'
 import layout from './circular-layout'
-import {anchorTodx, compareNode, roundPath, toPromise, translate, updateTexts} from './d3-utils'
+import {compareNode, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
 import * as d3 from 'd3'
 
@@ -153,12 +153,7 @@ export default {
         .text(d => d.data[this.nodeText])
         .attr('x', d => d.layoutInfo.x)
         .call(updateTexts, this.maxTextWidth)
-        .each(function (d) {
-          if (d.layoutInfo.standardDx == null) {
-            d.layoutInfo.standardDx = anchorTodx(d.layoutInfo.anchor, this)
-          }
-        })
-        .attr('dx', d => d.layoutInfo.standardDx)
+        .attr('text-anchor', d => d.layoutInfo.anchor)
         .attr('transform', d => `rotate(${d.layoutInfo.rotate + d.layoutInfo.textRotate})`)
 
       const tentative = []
@@ -250,11 +245,9 @@ export default {
         .classed('node--selected', n => n === d)
 
       rootElement.style('display', 'block')
-      nodesSelected.select('text').each(function (d) {
-        if (d.layoutInfo.zoomedDx == null) {
-          d.layoutInfo.zoomedDx = anchorTodx(d.layoutInfo.anchor, this)
-        }
-      }).attr('dx', d => d.layoutInfo.zoomedDx)
+      nodesSelected
+        .select('text')
+        .attr('text-anchor', d => d.layoutInfo.anchor)
     },
 
     reset (d) {

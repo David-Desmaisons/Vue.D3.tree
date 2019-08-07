@@ -2,7 +2,7 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
-import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 
 import * as d3 from 'd3'
@@ -219,12 +219,9 @@ export default {
       const {radius, $scopedSlots: {node}} = this
       const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data, isRetracted: !!d._children}}) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle})`)
+      newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle}) scale(0.1)`)
         .append('g')
         .attr('class', 'node')
-        .attr('transform', 'scale(0)')
-        .transition().duration(this.duration)
-        .attr('transform', 'scale(1)')
 
       newNodes
         .append('text')
@@ -259,7 +256,7 @@ export default {
         .attr('opacity', 1))
 
       text.attr('x', d => d.layoutInfo.x)
-          .attr('dx', function (d) { return anchorTodx(d.layoutInfo.anchor, this) })
+          .attr('text-anchor', d => d.layoutInfo.anchor)
           .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
       allNodes.each((d) => {
@@ -269,7 +266,7 @@ export default {
 
       const exitingNodes = nodes.exit()
       exitingNodes.select('.node').transition().duration(this.duration)
-                  .attr('transform', 'scale(0)')
+                  .attr('transform', 'scale(0.1)')
 
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
                   .attr('transform', d => `${translate(forExit(d), this.layout)} rotate(${d.parent.layoutInfo.rotate})`)
