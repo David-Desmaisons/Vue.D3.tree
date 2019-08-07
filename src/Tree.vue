@@ -222,6 +222,9 @@ export default {
       newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle})`)
         .append('g')
         .attr('class', 'node')
+        .attr('transform', 'scale(0)')
+        .transition().duration(this.duration)
+        .attr('transform', 'scale(1)')
 
       newNodes
         .append('text')
@@ -265,10 +268,12 @@ export default {
       })
 
       const exitingNodes = nodes.exit()
+      exitingNodes.select('.node').transition().duration(this.duration)
+                  .attr('transform', 'scale(0)')
+
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
                   .attr('transform', d => `${translate(forExit(d), this.layout)} rotate(${d.parent.layoutInfo.rotate})`)
                   .attr('opacity', 0).remove())
-      exitingNodes.select('circle').attr('r', 1e-6)
 
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
