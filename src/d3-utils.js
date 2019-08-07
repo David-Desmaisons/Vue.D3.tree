@@ -51,7 +51,7 @@ function toPromise (transition) {
   let count = 0
   let interrupted = false
   transition.each(() => count++)
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     if (count === 0) {
       resolve('ended')
       return
