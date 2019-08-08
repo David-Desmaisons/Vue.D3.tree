@@ -13,12 +13,21 @@ const layout = {
 }
 
 var i = 0
-var currentSelected = null
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'euclidean']
+const defaultBehavior = ({graphNodes: {clickedNode}, actions: {toogleExpandCollapse}}) => {
+  clickedNode && toogleExpandCollapse(clickedNode)
+}
 
 const props = {
-  data: Object,
+  data: {
+    type: Object,
+    required: false
+  },
+  currentSelected: {
+    type: Object,
+    required: false
+  },
   duration: {
     type: Number,
     default: 750
@@ -104,6 +113,10 @@ export default {
       maxTextLenght: {
         first: 0,
         last: 0
+      },
+      graphNodes: {
+        clickedNode: null,
+        clickedText: null
       }
     }
   },
@@ -200,7 +213,7 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
-      const updateLinks = links.enter().append('path').attr('class', 'linktree')
+      const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
       const allNodes = newNodes.merge(nodes)
@@ -210,9 +223,8 @@ export default {
         d._y0 = d.y
       })
 
-      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
-
-      const updateAndNewLinks = links.merge(updateLinks)
+      newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+      const updateAndNewLinks = links.merge(newLinks)
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
@@ -228,12 +240,7 @@ export default {
         .attr('dy', '.35em')
         .attr('x', 0)
         .attr('dx', 0)
-        .on('click', d => {
-          currentSelected = (currentSelected === d) ? null : d
-          d3.event.stopPropagation()
-          this.redraw()
-          this.$emit('clicked', {element: d, data: d.data})
-        })
+        .on('click', this.onNodeTextClick)
 
       allNodes
         .select('.node')
@@ -241,7 +248,7 @@ export default {
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d === currentSelected)
+        .classed('selected', d => d === this.currentSelected)
         .on('click', this.onNodeClick)
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
@@ -293,7 +300,32 @@ export default {
       return this.updateGraph(source)
     },
 
+    onNodeTextClick (d) {
+      this.graphNodes.clickedNode = null
+      this.onEvent('clickedText', d)
+    },
+
     onNodeClick (d) {
+      this.graphNodes.clickedText = null
+      this.onEvent('clickedNode', d)
+    },
+
+    onEvent (name, d) {
+      this.graphNodes[name] = d
+      this.$emit(name, {element: d, data: d.data})
+      d3.event.stopPropagation()
+
+      const behavior = this.$scopedSlots.behavior || defaultBehavior
+      const {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse, graphNodes} = this
+      const rawActions = {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse}
+      const actions = Object.keys(rawActions).reduce((current, key) => {
+        current[key] = rawActions[key].bind(this)
+        return current
+      }, {})
+      behavior({graphNodes, actions})
+    },
+
+    toogleExpandCollapse (d) {
       if (d.children) {
         this.collapse(d)
       } else {

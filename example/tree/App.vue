@@ -131,7 +131,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :text-margin="textMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract">
+    <tree ref="tree" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :text-margin="textMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clicked="onClick" @expand="onExpand" @retract="onRetract" @clickedNode="onClickNode">
       <template #node="{data, node: {depth}, radius, isRetracted}">
         <template v-if="data.children && data.children.length">
           <path transform="scale(0.05) translate(-10,-250)" :fill="isRetracted? 'red' : 'blue'" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z">
@@ -204,6 +204,9 @@ export default {
     onClick (evt) {
       this.currentNode = evt.element
       this.onEvent('onClick', evt)
+    },
+    onClickNode (evt) {
+      this.onEvent('onClickNode', evt)
     },
     onExpand (evt) {
       this.onEvent('onExpand', evt)
