@@ -60,7 +60,7 @@ export default {
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
-| textMargin    | no | `Number`           | 6            | margin in pixel fr leaf node text |
+| textMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, usefull when dynimacally updating the tree |
 
@@ -98,6 +98,49 @@ Example:
 </template>
 ```
 
+### behavior
+
+Behavior slot provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
+
+The concept of this slot is to react to changes in node information by calling an action
+
+By design this slot is renderless.
+
+Slot-scope:
+
+
+| Name      | Type | Description  |
+| ---       | ---      | ---   |
+| nodes      | `Object`    | Value: { clickedNode: `D3.js node`, clickedText: `D3.js node` }  The last node click or which text has been clicked |
+| actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
+
+By default tree component use standardBehavior as component which provides toggle retract on node click.
+
+Example:
+
+```HTML
+<template #behavior="{nodes, actions}">
+  <CollapseOnClick v-bind="{nodes, actions}"/>
+</template>
+```
+
+With CollapseOnClick component:
+```javascript
+export default {
+  props: ['nodes', 'actions'],
+
+  render () {
+    return null
+  },
+
+  watch: {
+    'nodes.clickedNode': function (node) {
+      this.actions.toggleExpandCollapse(node)
+    }
+  }
+}
+```
+
 ## Events
 
 * `clicked`
@@ -130,6 +173,10 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
+| toggleExpandCollapse       | `D3.js node`      | a promise which resolve when animation is over             | Retract or collapse the given node depending on its current state. |
+
+
+
 
 ## Gotchas
 

@@ -3,7 +3,7 @@
  *Can be used as a behavior slot of tree component.
  */
 export default {
-  name: 'collapseOnClick',
+  name: 'standardBehavior',
   props: {
     /**
      *  Tree nodes. Typically provided by tree behavior slot.
@@ -29,7 +29,7 @@ export default {
   watch: {
     'nodes.clickedNode': {
       handler: function (node) {
-        this.actions.toogleExpandCollapse(node)
+        this.actions.toggleExpandCollapse(node)
       },
       immediate: true
     }

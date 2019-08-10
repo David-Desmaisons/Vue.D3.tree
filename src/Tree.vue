@@ -2,7 +2,7 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
-import collapseOnClick from './behaviors/CollapseOnClick'
+import standardBehavior from './behaviors/StandardBehavior'
 import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
@@ -103,15 +103,15 @@ export default {
 
   render (h) {
     const getProps = () => {
-      const {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse, graphNodes} = this
-      const rawActions = {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse}
+      const {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, graphNodes} = this
+      const rawActions = {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
       const actions = Object.keys(rawActions).reduce((current, key) => {
         current[key] = rawActions[key].bind(this)
         return current
       }, {})
       return {nodes: graphNodes, actions}
     }
-    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, collapseOnClick)
+    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
   },
 
@@ -325,15 +325,11 @@ export default {
       d3.event.stopPropagation()
     },
 
-    toogleExpandCollapse (d) {
+    toggleExpandCollapse (d) {
       if (!d) {
-        return
+        return Promise.resolve(false)
       }
-      if (d.children) {
-        this.collapse(d)
-      } else {
-        this.expand(d)
-      }
+      return d.children ? this.collapse(d) : this.expand(d)
     },
 
     onData (data) {

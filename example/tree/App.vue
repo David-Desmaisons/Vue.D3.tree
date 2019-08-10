@@ -146,7 +146,7 @@
       </template>
 
       <template #behavior="{nodes, actions}">
-        <CollapseOnClick v-bind="{nodes, actions}"/>
+        <StandardBehavior v-bind="{nodes, actions}"/>
       </template>
     </tree>
   </div>
@@ -157,7 +157,7 @@
 <script>
 import {tree} from '../../src/'
 import NoBehavior from '../../src/behaviors/NoBehavior'
-import CollapseOnClick from '../../src/behaviors/CollapseOnClick'
+import StandardBehavior from '../../src/behaviors/StandardBehavior'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
 
@@ -185,7 +185,7 @@ export default {
   components: {
     tree,
     NoBehavior,
-    CollapseOnClick
+    StandardBehavior
   },
   methods: {
     do (action) {
