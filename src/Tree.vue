@@ -2,8 +2,9 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
+import collapseOnClick from './behaviors/CollapseOnClick'
 import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
-import {renderInVueContext} from './vueHelper'
+import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
 import * as d3 from 'd3'
 
@@ -15,9 +16,6 @@ const layout = {
 var i = 0
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'euclidean']
-const defaultBehavior = ({graphNodes: {clickedNode}, actions: {toogleExpandCollapse}}) => {
-  clickedNode && toogleExpandCollapse(clickedNode)
-}
 
 const props = {
   data: {
@@ -104,6 +102,16 @@ export default {
   directives,
 
   render (h) {
+    const getProps = () => {
+      const {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse, graphNodes} = this
+      const rawActions = {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse}
+      const actions = Object.keys(rawActions).reduce((current, key) => {
+        current[key] = rawActions[key].bind(this)
+        return current
+      }, {})
+      return {nodes: graphNodes, actions}
+    }
+    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, collapseOnClick)
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
   },
 
@@ -314,18 +322,12 @@ export default {
       this.graphNodes[name] = d
       this.$emit(name, {element: d, data: d.data})
       d3.event.stopPropagation()
-
-      const behavior = this.$scopedSlots.behavior || defaultBehavior
-      const {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse, graphNodes} = this
-      const rawActions = {collapse, collapseAll, expand, expandAll, show, toogleExpandCollapse}
-      const actions = Object.keys(rawActions).reduce((current, key) => {
-        current[key] = rawActions[key].bind(this)
-        return current
-      }, {})
-      behavior({graphNodes, actions})
     },
 
     toogleExpandCollapse (d) {
+      if (!d) {
+        return
+      }
       if (d.children) {
         this.collapse(d)
       } else {
