@@ -64,6 +64,40 @@ export default {
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, usefull when dynimacally updating the tree |
 
+## Slots
+
+### node
+
+Use this slot to customize the rendering of individual node. 
+
+Note that the mark-up will be rendered inside a svg element, so only [svg elements](https://developer.mozilla.org/en-US/docs/Web/SVG/Element) are allowed here
+
+Slot-scope:
+
+
+| Name      | Type | Description  |
+| ---       | ---      | ---   |
+| radius      | `Number`    | tree radius props value    |
+| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+| data   | `Object` | node data as provided by the `data` props  |
+| isRetracted   | `Bool` | true if the node has hidden children -retracted state- |
+
+Example:
+```HTML
+<template #node="{data, node: {depth}, radius, isRetracted}">
+  <template v-if="data.children && data.children.length">
+    <path :fill="isRetracted? 'red' : 'blue'" d="M190.5..">
+      <title>{{data.text}} {{depth}}</title>
+    </path>
+  </template>
+  <template v-else>
+    <circle r="6" :stroke="blue? 'blue' : 'yellow'">
+      <title>{{data.text}} {{depth}}</title>
+    </circle>
+  </template>
+</template>
+```
+
 ## Events
 
 * `clicked`
@@ -100,7 +134,7 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 ## Gotchas
 
 This component is responsive and will adjust to resizing.
-In order for this to work properly, you must define for this component or its parent weither:
+In order for this to work properly, you must define for this component or its parent wether:
   * a height or a max-height
   * or a width or a max-width.
   
