@@ -77,10 +77,11 @@ Slot-scope:
 
 | Name      | Type | Description  |
 | ---       | ---      | ---   |
-| radius      | `Number`    | tree radius props value    |
-| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+| actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
 | data   | `Object` | node data as provided by the `data` props  |
 | isRetracted   | `Bool` | true if the node has hidden children -retracted state- |
+| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+| radius      | `Number`    | tree radius props value    |
 
 Example:
 ```HTML
