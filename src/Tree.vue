@@ -319,6 +319,7 @@ export default {
     },
 
     onEvent (name, d) {
+      this.graphNodes[name] = null
       this.graphNodes[name] = d
       this.$emit(name, {element: d, data: d.data})
       d3.event.stopPropagation()
