@@ -1,7 +1,8 @@
 <script>
 import resize from 'vue-resize-directive'
-import euclidean from './euclidean-layout'
-import circular from './circular-layout'
+import horizontal from './layout/horizontal'
+import vertical from './layout/vertical'
+import circular from './layout/circular'
 import standardBehavior from './behaviors/StandardBehavior'
 import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
@@ -9,13 +10,14 @@ import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 import * as d3 from 'd3'
 
 const layout = {
-  euclidean,
-  circular
+  horizontal,
+  circular,
+  vertical
 }
 
 var i = 0
 const types = ['tree', 'cluster']
-const layouts = ['circular', 'euclidean']
+const layouts = ['circular', 'horizontal', 'vertical']
 
 const props = {
   data: {
@@ -39,7 +41,7 @@ const props = {
   },
   layoutType: {
     type: String,
-    default: 'euclidean',
+    default: 'horizintal',
     validator (value) {
       return layouts.indexOf(value) !== -1
     }
@@ -309,8 +311,8 @@ export default {
 
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
-      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
-      const first = text.node().getComputedTextLength() + 6
+      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + textMargin
+      const first = text.node().getComputedTextLength() + textMargin
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
         this._scheduledRedraw = false
         return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])

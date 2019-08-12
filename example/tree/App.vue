@@ -22,7 +22,8 @@
               <label for="layout-type" class="control-label col-sm-3">layoutType</label>
                 <div  class="col-sm-9">
                   <select id="layout-type" class="form-control" v-model="layoutType">
-                    <option>euclidean</option>
+                    <option>horizontal</option>
+                    <option>vertical</option>
                     <option>circular</option>
                   </select>
               </div>
@@ -163,7 +164,7 @@ import {getGremlin} from './gremlinConfiguration'
 
 Object.assign(data, {
   type: 'tree',
-  layoutType: 'euclidean',
+  layoutType: 'horizontal',
   duration: 750,
   Marginx: 30,
   Marginy: 30,
