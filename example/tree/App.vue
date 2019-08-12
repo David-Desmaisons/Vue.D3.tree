@@ -146,8 +146,8 @@
         </template>
       </template>
 
-      <template #behavior="{nodes, actions}">
-        <StandardBehavior v-bind="{nodes, actions}"/>
+     <template #behavior="{nodes, actions}">
+        <StandardBehavior v-bind="{nodes, actions}"/> 
       </template>
     </tree>
   </div>
@@ -157,7 +157,6 @@
 
 <script>
 import {tree} from '../../src/'
-import NoBehavior from '../../src/behaviors/NoBehavior'
 import StandardBehavior from '../../src/behaviors/StandardBehavior'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
@@ -186,7 +185,6 @@ export default {
   },
   components: {
     tree,
-    NoBehavior,
     StandardBehavior
   },
   methods: {

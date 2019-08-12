@@ -21,12 +21,6 @@ export default {
     }
   },
 
-  data () {
-    return {
-      selected: null
-    }
-  },
-
   render () {
     // no rendering
     return null
