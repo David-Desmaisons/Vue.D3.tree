@@ -21,17 +21,24 @@ export default {
     }
   },
 
+  data () {
+    return {
+      selected: null
+    }
+  },
+
   render () {
     // no rendering
     return null
   },
 
   watch: {
-    'nodes.clickedNode': {
-      handler: function (node) {
-        this.actions.toggleExpandCollapse(node)
-      },
-      immediate: true
+    'nodes.clickedText': function (node) {
+      this.actions.setSelected(node.data)
+    },
+
+    'nodes.clickedNode': function (node) {
+      this.actions.toggleExpandCollapse(node)
     }
   }
 }

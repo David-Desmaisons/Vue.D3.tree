@@ -22,7 +22,7 @@ const props = {
     type: Object,
     required: false
   },
-  currentSelected: {
+  selected: {
     type: Object,
     required: false
   },
@@ -101,9 +101,14 @@ export default {
 
   directives,
 
+  model: {
+    prop: 'selected',
+    event: 'change'
+  },
+
   render (h) {
-    const {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
-    const rawActions = {collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
+    const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
     this.actions = Object.keys(rawActions).reduce((current, key) => {
       current[key] = rawActions[key].bind(this)
       return current
@@ -159,6 +164,10 @@ export default {
   },
 
   methods: {
+    setSelected (node) {
+      this.$emit('change', node)
+    },
+
     getSize () {
       const {$el: {clientWidth: width, clientHeight: height}} = this
       return { width, height }
@@ -237,8 +246,18 @@ export default {
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
-      const {actions, radius, $scopedSlots: {node}} = this
-      const getHtml = node ? d => renderInVueContext({scope: node, props: {actions, radius, node: d, data: d.data, isRetracted: !!d._children}}, this.redraw) : d => `<circle r="${radius}"/>`
+      const {actions, radius, selected, $scopedSlots: {node}} = this
+      const getHtml = node ? d => renderInVueContext({
+        scope: node,
+        props: {
+          actions,
+          radius,
+          node: d,
+          data: d.data,
+          isRetracted: !!d._children,
+          isSelected: d.data === selected
+        }
+      }, this.redraw) : d => `<circle r="${radius}"/>`
 
       newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle}) scale(0.1)`)
         .append('g')
@@ -257,7 +276,7 @@ export default {
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d === this.currentSelected)
+        .classed('selected', d => d.data === selected)
         .on('click', this.onNodeClick)
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
@@ -531,6 +550,10 @@ export default {
 
     layout (newLayout, oldLayout) {
       this.completeRedraw({layout: oldLayout})
+    },
+
+    selected () {
+      this.completeRedraw({layout: this.layout})
     },
 
     radius () {
