@@ -2,8 +2,9 @@
 import resize from 'vue-resize-directive'
 import euclidean from './euclidean-layout'
 import circular from './circular-layout'
+import standardBehavior from './behaviors/StandardBehavior'
 import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
-import {renderInVueContext} from './vueHelper'
+import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
 import * as d3 from 'd3'
 
@@ -13,12 +14,18 @@ const layout = {
 }
 
 var i = 0
-var currentSelected = null
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'euclidean']
 
 const props = {
-  data: Object,
+  data: {
+    type: Object,
+    required: false
+  },
+  selected: {
+    type: Object,
+    required: false
+  },
   duration: {
     type: Number,
     default: 750
@@ -94,7 +101,23 @@ export default {
 
   directives,
 
+  model: {
+    prop: 'selected',
+    event: 'change'
+  },
+
   render (h) {
+    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
+    const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    this.actions = Object.keys(rawActions).reduce((current, key) => {
+      current[key] = rawActions[key].bind(this)
+      return current
+    }, {})
+    const getProps = () => {
+      const {actions, graphNodes: nodes} = this
+      return {nodes, actions}
+    }
+    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
   },
 
@@ -104,6 +127,10 @@ export default {
       maxTextLenght: {
         first: 0,
         last: 0
+      },
+      graphNodes: {
+        clickedNode: null,
+        clickedText: null
       }
     }
   },
@@ -137,6 +164,10 @@ export default {
   },
 
   methods: {
+    setSelected (node) {
+      this.$emit('change', node)
+    },
+
     getSize () {
       const {$el: {clientWidth: width, clientHeight: height}} = this
       return { width, height }
@@ -200,7 +231,7 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
-      const updateLinks = links.enter().append('path').attr('class', 'linktree')
+      const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
       const allNodes = newNodes.merge(nodes)
@@ -210,14 +241,23 @@ export default {
         d._y0 = d.y
       })
 
-      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
-
-      const updateAndNewLinks = links.merge(updateLinks)
+      newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+      const updateAndNewLinks = links.merge(newLinks)
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
-      const {radius, $scopedSlots: {node}} = this
-      const getHtml = node ? d => renderInVueContext({scope: node, props: {radius, node: d, data: d.data, isRetracted: !!d._children}}, this.redraw) : d => `<circle r="${radius}"/>`
+      const {actions, radius, selected, $scopedSlots: {node}} = this
+      const getHtml = node ? d => renderInVueContext({
+        scope: node,
+        props: {
+          actions,
+          radius,
+          node: d,
+          data: d.data,
+          isRetracted: !!d._children,
+          isSelected: d.data === selected
+        }
+      }, this.redraw) : d => `<circle r="${radius}"/>`
 
       newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle}) scale(0.1)`)
         .append('g')
@@ -228,12 +268,7 @@ export default {
         .attr('dy', '.35em')
         .attr('x', 0)
         .attr('dx', 0)
-        .on('click', d => {
-          currentSelected = (currentSelected === d) ? null : d
-          d3.event.stopPropagation()
-          this.redraw()
-          this.$emit('clicked', {element: d, data: d.data})
-        })
+        .on('click', this.onNodeTextClick)
 
       allNodes
         .select('.node')
@@ -241,7 +276,7 @@ export default {
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d === currentSelected)
+        .classed('selected', d => d.data === selected)
         .on('click', this.onNodeClick)
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
@@ -293,12 +328,28 @@ export default {
       return this.updateGraph(source)
     },
 
+    onNodeTextClick (d) {
+      this.graphNodes.clickedNode = null
+      this.onEvent('clickedText', d)
+    },
+
     onNodeClick (d) {
-      if (d.children) {
-        this.collapse(d)
-      } else {
-        this.expand(d)
+      this.graphNodes.clickedText = null
+      this.onEvent('clickedNode', d)
+    },
+
+    onEvent (name, d) {
+      this.graphNodes[name] = null
+      this.graphNodes[name] = d
+      this.$emit(name, {element: d, data: d.data})
+      d3.event.stopPropagation()
+    },
+
+    toggleExpandCollapse (d) {
+      if (!d) {
+        return Promise.resolve(false)
       }
+      return d.children ? this.collapse(d) : this.expand(d)
     },
 
     onData (data) {
@@ -499,6 +550,10 @@ export default {
 
     layout (newLayout, oldLayout) {
       this.completeRedraw({layout: oldLayout})
+    },
+
+    selected () {
+      this.completeRedraw({layout: this.layout})
     },
 
     radius () {

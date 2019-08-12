@@ -48,21 +48,25 @@ export default {
   //...
 ```
 
-## Properties
+## Props
 
 | Name      | Required | Type/Value              | Default     | Description |
 | ---       | ---      | ---                     | ---         | ---         |
 | data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
 | duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
 | layoutType | no | 'circular' or 'euclidean' |  'euclidean'       | Circular or euclidean layout |
+| identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
-| type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
-| textMargin    | no | `Number`           | 6            | margin in pixel fr leaf node text |
+| selected    | no | `Object`           | `null`            | The selected node -on which a `selected` class is applied-. It can be bound using a `v-model` directive. By default, click on text to select a node but this behavior can be customized using the `behavior` slot. | 
+| textMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
+| type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
-| identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, usefull when dynimacally updating the tree |
+
+
+
 
 ## Slots
 
@@ -77,10 +81,12 @@ Slot-scope:
 
 | Name      | Type | Description  |
 | ---       | ---      | ---   |
-| radius      | `Number`    | tree radius props value    |
-| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+| actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, setSelected, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
 | data   | `Object` | node data as provided by the `data` props  |
 | isRetracted   | `Bool` | true if the node has hidden children -retracted state- |
+| isSelected   | `Bool` | true if the node is selected |
+| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+| radius      | `Number`    | tree radius props value    |
 
 Example:
 ```HTML
@@ -98,25 +104,72 @@ Example:
 </template>
 ```
 
+### behavior
+
+Behavior slot provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
+
+The concept of this slot is to react to changes in node information by calling an action
+
+By design this slot is renderless.
+
+Slot-scope:
+
+
+| Name      | Type | Description  |
+| ---       | ---      | ---   |
+| nodes      | `Object`    | Value: { clickedNode: `D3.js node`, clickedText: `D3.js node` }  The last node click or which text has been clicked |
+| actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, setSelected, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
+
+By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clickin on its text.
+
+Example:
+
+```HTML
+<template #behavior="{nodes, actions}">
+  <CollapseOnClick v-bind="{nodes, actions}"/>
+</template>
+```
+
+With CollapseOnClick component:
+```javascript
+export default {
+  props: ['nodes', 'actions'],
+
+  render () {
+    return null
+  },
+
+  watch: {
+    'nodes.clickedNode': function (node) {
+      this.actions.toggleExpandCollapse(node)
+    }
+  }
+}
+```
+
 ## Events
 
-* `clicked`
+### clicked
+  - Argument : `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+  - Sent when the node name is clicked
 
-Sent when the node name is clicked
+### expand
+  - Argument : same as [clicked](#clicked).
+  - Sent when the node is clicked and the node children are expanded
 
-* `expand`
+### retract
+  - Argument : same as [clicked](#clicked).
+  - Sent when the node is clicked and the node children are retracted
 
-Sent when the node is clicked and the node children are expanded
+### change
+  - Argument : node raw data.
+  - Sent when the node is selected
 
-* `retract`
+For all these events, the argument passed is `{element, data}` .
 
-Sent when the node is clicked and the node children are retracted
-
-For all these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
-
-* `zoom`
-
-Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms)
+## zoom
+  - Argument : `{transform}` where transform is [d3.zoom transform object](https://github.com/d3/d3-zoom#zoom-transforms).
+  - Sent when the tree is zoomed.
 
 
 ## Methods
@@ -129,7 +182,12 @@ Sent when the tree is zoomed. Argument: `{transform}` where transform is [d3.zoo
 | collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
+| setSelected       | `Object`: node data | `undefined`             | Select the given node by sending a `change` event. Should be used with a `v-model` binding|
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
+| toggleExpandCollapse       | `D3.js node`      | a promise which resolve when animation is over             | Retract or collapse the given node depending on its current state. |
+
+
+
 
 ## Gotchas
 
@@ -187,50 +245,47 @@ export default {
   //...
 ```
 
-## Properties
+## Props
 
 | Name      | Required | Type/Value              | Default     | Description |
 | ---       | ---      | ---                     | ---         | ---         |
 | data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
+| duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
 | links      | no    | `Array`                     | null        | Data representing links between the nodes, having `source` and `target` properties referencing node identifiers
 | identifier   | yes | `String` or `Function` | -|  name of the property of the node to be used as a identifier or function taking a node and returning its identifier|
-| nodeText   | yes | `String`  | -|  name of the property of the node to be used as a display name |
-| duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
 | maxTextWidth    | no | `Number`           | -1            | Max node text width (in pixel) to be displayed, if -1 text is not truncated.| 
 | nodeClass    | no | `String`           | 'graph'            | class to be applied to the root div. Useful when custom CSS rules have to be applied. | 
-
+| nodeText   | yes | `String`  | -|  name of the property of the node to be used as a display name |
 
 ## Events
 
-* `mouseNodeOver`
+### mouseNodeOver
+  - Argument: `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data. 
+  - Sent when the node name is hovered by mouse
 
-Sent when the node name is hovered by mouse
+### mouseNodeOut
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when mouse leaves the node name
 
-* `mouseNodeOut`
+### clickOutsideGraph
+  - Argument: none
+  - Sent when mouse is clicked outside any geometry or text of the hierarchical edge bundling
 
-Sent when mouse leaves the node name
+### nodesComputed
+  - Argument: [D3.js hierarchy node](https://github.com/d3/d3-hierarchy#hierarchy)
+  - Sent when D3.js nodes are computed using `data` props. Called with 
 
-For these events, the argument passed is `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
-
-* `clickOutsideGraph`
-
-Sent when mouse is clicked outside any geometry or text of the hierarchical edge bundling
-
-* `nodesComputed`
-
-Sent when D3.js nodes are computed using `data` props. Called with [D3.js hierarchy node](https://github.com/d3/d3-hierarchy#hierarchy)
-
-* `highlightedNodeChanged`
-
-Sent when highlighted node has changed.
+### highlightedNodeChanged
+  - Argument: none
+  - Sent when highlighted node has changed.
 
 ## Data
 
-* `highlightedNode`
+### highlightedNode
 
-Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
+  Highlighted node: when set to a node data, the corresponding node and its related links will be highlighted. If null standard display is showing.
 
 ## Gotchas
 

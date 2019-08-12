@@ -13,6 +13,22 @@ function renderInVueContext ({scope, props}, onChange) {
   return component.$mount().$el.innerHTML
 }
 
+function renderTemplateSlot (propsGetter, slot, fallBackComponent) {
+  const component = new Vue({
+    render (h) {
+      const props = propsGetter()
+      if (slot) {
+        const nodes = slot(props)
+        return h('template', nodes)
+      }
+      return h(fallBackComponent, { props }, [])
+    }
+  })
+  component.$mount()
+  return component
+}
+
 export {
-  renderInVueContext
+  renderInVueContext,
+  renderTemplateSlot
 }
