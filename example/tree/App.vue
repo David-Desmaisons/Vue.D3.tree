@@ -239,9 +239,22 @@ export default {
         return
       }
 
+      const updateType = (type) => {
+        switch (this.layoutType) {
+          case 'vertical':
+            return 'circular'
+
+          case 'circular':
+            return 'horizontal'
+
+          case 'horizontal':
+            return 'vertical'
+        }
+      }
+
       this.duration = 20
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
-      const changeType = () => { this.layoutType = (this.layoutType === 'euclidean') ? 'circular' : 'euclidean' }
+      const changeType = () => { this.layoutType === updateType(this.layoutType) }
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')

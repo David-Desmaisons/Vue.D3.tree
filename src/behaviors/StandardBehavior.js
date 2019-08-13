@@ -28,11 +28,11 @@ export default {
 
   watch: {
     'nodes.clickedText': function (node) {
-      this.actions.setSelected(node.data)
+      node && this.actions.setSelected(node.data)
     },
 
     'nodes.clickedNode': function (node) {
-      this.actions.toggleExpandCollapse(node)
+      node && this.actions.toggleExpandCollapse(node)
     }
   }
 }

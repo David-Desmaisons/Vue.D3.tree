@@ -1,6 +1,6 @@
 export default {
-  size (tree, size, margin, {last, first}) {
-    tree.size([size.width - (margin.y * 2), size.height - (margin.x * 2) - (last + first)])
+  size (tree, size, margin, {last}) {
+    tree.size([size.width - (margin.x * 2), size.height - (margin.y * 2) - last])
   },
 
   transformNode (x, y) {
@@ -8,11 +8,11 @@ export default {
   },
 
   transformSvg (svg, margin) {
-    return svg.attr('transform', 'translate(' + margin.x + ',' + margin.y + ')')
+    return svg.attr('transform', `translate(${margin.x},${margin.y})`)
   },
 
   updateTransform (transform, {x, y}) {
-    return transform.translate(y, x)
+    return transform.translate(x, y)
   },
 
   getLine (d3) {
