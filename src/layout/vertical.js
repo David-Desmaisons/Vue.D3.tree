@@ -1,6 +1,6 @@
 export default {
-  size (tree, size, margin, {last, first}) {
-    tree.size([size.width - (margin.y * 2), size.height - (margin.x * 2) - (last + first)])
+  size (tree, size, margin, {last}) {
+    tree.size([size.width - (margin.y * 2), size.height - (margin.x * 2) - last])
   },
 
   transformNode (x, y) {
