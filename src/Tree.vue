@@ -402,8 +402,8 @@ export default {
     },
 
     applyTransition (size, {margin, layout}) {
-      const {g, svg, zoom} = this.internaldata
-      if (this.zoomable) {
+      const {g, svg, zoom, zoomable} = this.internaldata
+      if (zoomable) {
         const transform = this.currentTransform
         const oldMargin = margin || this.margin
         const oldLayout = layout || this.layout
