@@ -41,7 +41,7 @@ const props = {
   },
   layoutType: {
     type: String,
-    default: 'horizintal',
+    default: 'horizontal',
     validator (value) {
       return layouts.indexOf(value) !== -1
     }
