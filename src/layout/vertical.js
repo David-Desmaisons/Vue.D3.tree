@@ -1,6 +1,8 @@
+const minMargin = 5;
+
 export default {
   size (tree, size, margin, {last}) {
-    tree.size([size.width - (margin.x * 2), size.height - (margin.y * 2) - last])
+    tree.size([size.width - (margin.x * 2), size.height - (margin.y * 2) - last - minMargin])
   },
 
   transformNode (x, y) {
@@ -8,7 +10,7 @@ export default {
   },
 
   transformSvg (svg, margin) {
-    return svg.attr('transform', `translate(${margin.x},${margin.y})`)
+    return svg.attr('transform', `translate(${margin.x},${margin.y + minMargin})`)
   },
 
   updateTransform (transform, {x, y}) {
