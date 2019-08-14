@@ -1,4 +1,4 @@
-const minMargin = 5
+const minMargin = 9
 
 export default {
   size (tree, size, margin, {last}) {
@@ -25,7 +25,8 @@ export default {
 
   layoutNode (children, offset) {
     return {
-      x: !children ? offset : -6,
+      x: !children ? offset : 0,
+      y: !children ? 0 : -minMargin,
       rotate: 90,
       textRotate: !children ? 0 : -90,
       anchor: !children ? 'start' : 'middle'

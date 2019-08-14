@@ -54,6 +54,7 @@ export default {
     const leafOrReversed = d.x < 180 === isLeaf
     return {
       x: (isLeaf ? offset : -6) * pole,
+      y: 0,
       rotate: d.x - 90,
       textRotate: d.x < 180 ? 0 : 180,
       anchor: leafOrReversed ? 'start' : 'end'

@@ -293,6 +293,7 @@ export default {
         .attr('opacity', 1))
 
       text.attr('x', d => d.layoutInfo.x)
+          .attr('y', d => d.layoutInfo.y)
           .attr('text-anchor', d => d.layoutInfo.anchor)
           .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 

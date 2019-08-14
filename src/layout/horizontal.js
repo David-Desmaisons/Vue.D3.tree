@@ -24,6 +24,7 @@ export default {
   layoutNode (children, offset) {
     return {
       x: !children ? offset : -6,
+      y: 0,
       rotate: 0,
       textRotate: 0,
       anchor: !children ? 'start' : 'end'
