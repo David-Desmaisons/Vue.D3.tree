@@ -1,4 +1,4 @@
-const minMargin = 5;
+const minMargin = 5
 
 export default {
   size (tree, size, margin, {last}) {
