@@ -240,7 +240,7 @@ export default {
       }
 
       const updateType = (type) => {
-        switch (this.layoutType) {
+        switch (type) {
           case 'vertical':
             return 'circular'
 
