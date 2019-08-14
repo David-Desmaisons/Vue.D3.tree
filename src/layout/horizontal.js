@@ -7,11 +7,11 @@ export default {
     return y + ',' + x
   },
 
-  transformSvg (svg, margin, size, {first}) {
-    return svg.attr('transform', 'translate(' + (margin.x + first) + ',' + margin.y + ')')
+  transformSvg (svg, margin, _, {first}) {
+    return svg.attr('transform', `translate(${margin.x + first},${margin.y})`)
   },
 
-  updateTransform (transform, {x, y}, size, {first}) {
+  updateTransform (transform, {x, y}, _, {first}) {
     return transform.translate(x + first, y)
   },
 

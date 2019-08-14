@@ -4,7 +4,7 @@
 </template>
 <script>
 import resize from 'vue-resize-directive'
-import layout from './circular-layout'
+import layout from './layout/circular'
 import {compareNode, roundPath, toPromise, translate, updateTexts} from './d3-utils'
 
 import * as d3 from 'd3'

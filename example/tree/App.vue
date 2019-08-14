@@ -22,7 +22,8 @@
               <label for="layout-type" class="control-label col-sm-3">layoutType</label>
                 <div  class="col-sm-9">
                   <select id="layout-type" class="form-control" v-model="layoutType">
-                    <option>euclidean</option>
+                    <option>horizontal</option>
+                    <option>vertical</option>
                     <option>circular</option>
                   </select>
               </div>
@@ -145,8 +146,8 @@
         </template>
       </template>
 
-      <template #behavior="{nodes, actions}">
-        <StandardBehavior v-bind="{nodes, actions}"/>
+     <template #behavior="{nodes, actions}">
+        <StandardBehavior v-bind="{nodes, actions}"/> 
       </template>
     </tree>
   </div>
@@ -156,14 +157,13 @@
 
 <script>
 import {tree} from '../../src/'
-import NoBehavior from '../../src/behaviors/NoBehavior'
 import StandardBehavior from '../../src/behaviors/StandardBehavior'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
 
 Object.assign(data, {
   type: 'tree',
-  layoutType: 'euclidean',
+  layoutType: 'horizontal',
   duration: 750,
   Marginx: 30,
   Marginy: 30,
@@ -185,7 +185,6 @@ export default {
   },
   components: {
     tree,
-    NoBehavior,
     StandardBehavior
   },
   methods: {
@@ -240,9 +239,22 @@ export default {
         return
       }
 
+      const updateType = (type) => {
+        switch (type) {
+          case 'vertical':
+            return 'circular'
+
+          case 'circular':
+            return 'horizontal'
+
+          case 'horizontal':
+            return 'vertical'
+        }
+      }
+
       this.duration = 20
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
-      const changeType = () => { this.layoutType = (this.layoutType === 'euclidean') ? 'circular' : 'euclidean' }
+      const changeType = () => { this.layoutType === updateType(this.layoutType) }
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')
