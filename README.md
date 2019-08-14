@@ -54,7 +54,7 @@ export default {
 | ---       | ---      | ---                     | ---         | ---         |
 | data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
 | duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
-| layoutType | no | 'circular' or 'euclidean' |  'euclidean'       | Circular or euclidean layout |
+| layoutType | no | 'circular' 'vertical' or 'horizontal' |  'horizontal'       | Circular, vertical or horizontal layout |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
@@ -64,8 +64,6 @@ export default {
 | textMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
-
-
 
 
 ## Slots
