@@ -13,17 +13,19 @@ function computeRay (space, extreme, trig) {
   return Math.abs(available / trig(angle))
 }
 
+function separation (a, b) {
+  return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1)
+}
+
 export default {
   size (tree, {width, height}, {x, y}, {last}) {
     const ray = Math.min(width - x, height - y) / 2 - last
-    tree.size([360, ray])
-        .separation((a, b) => { return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1) })
+    tree.size([360, ray]).separation(separation)
   },
 
   optimizeSize (tree, size, margin, extreme) {
     const ray = getRay(size, margin, extreme || {})
-    tree.size([360, ray])
-        .separation((a, b) => { return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1) })
+    tree.size([360, ray]).separation(separation)
   },
 
   transformNode (x, y) {
@@ -32,11 +34,11 @@ export default {
     return [~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle))]
   },
 
-  transformSvg (svg, margin, {width, height}) {
-    return svg.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')')
+  transformSvg (svg, _, {width, height}) {
+    return svg.attr('transform', `translate(${width / 2},${height / 2})`)
   },
 
-  updateTransform (transform, margin, {width, height}) {
+  updateTransform (transform, _, {width, height}) {
     return transform.translate(width / 2, height / 2)
   },
 
