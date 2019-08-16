@@ -7,11 +7,11 @@ export default {
     return y + ',' + x
   },
 
-  transformSvg (svg, margin, size, {first}) {
-    return svg.attr('transform', 'translate(' + (margin.x + first) + ',' + margin.y + ')')
+  transformSvg (svg, margin, _, {first}) {
+    return svg.attr('transform', `translate(${margin.x + first},${margin.y})`)
   },
 
-  updateTransform (transform, {x, y}, size, {first}) {
+  updateTransform (transform, {x, y}, _, {first}) {
     return transform.translate(x + first, y)
   },
 
@@ -21,10 +21,12 @@ export default {
             .y(d => d.data.y)
   },
 
-  transformText (text, children) {
+  layoutNode (children, {leaf, node}) {
     return {
-      x: !children ? 6 : -6,
+      x: !children ? leaf : -node,
+      y: 0,
       rotate: 0,
+      textRotate: 0,
       anchor: !children ? 'start' : 'end'
     }
   }

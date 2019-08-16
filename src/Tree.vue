@@ -1,27 +1,33 @@
-<template>
-  <div class="viewport treeclass" v-resize="resize">
-  </div>
-</template>
 <script>
 import resize from 'vue-resize-directive'
-import euclidean from './euclidean-layout'
-import circular from './circular-layout'
-import {compareString, anchorTodx, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import horizontal from './layout/horizontal'
+import vertical from './layout/vertical'
+import circular from './layout/circular'
+import standardBehavior from './behaviors/StandardBehavior'
+import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
 import * as d3 from 'd3'
 
 const layout = {
-  euclidean,
-  circular
+  horizontal,
+  circular,
+  vertical
 }
 
 var i = 0
-var currentSelected = null
 const types = ['tree', 'cluster']
-const layouts = ['circular', 'euclidean']
+const layouts = ['circular', 'horizontal', 'vertical']
 
 const props = {
-  data: Object,
+  data: {
+    type: Object,
+    required: false
+  },
+  selected: {
+    type: Object,
+    required: false
+  },
   duration: {
     type: Number,
     default: 750
@@ -35,7 +41,7 @@ const props = {
   },
   layoutType: {
     type: String,
-    default: 'euclidean',
+    default: 'horizontal',
     validator (value) {
       return layouts.indexOf(value) !== -1
     }
@@ -63,6 +69,14 @@ const props = {
   radius: {
     type: Number,
     default: 3
+  },
+  leafTextMargin: {
+    type: Number,
+    default: 6
+  },
+  nodeTextMargin: {
+    type: Number,
+    default: 6
   }
 }
 
@@ -93,12 +107,36 @@ export default {
 
   directives,
 
+  model: {
+    prop: 'selected',
+    event: 'change'
+  },
+
+  render (h) {
+    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
+    const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    this.actions = Object.keys(rawActions).reduce((current, key) => {
+      current[key] = rawActions[key].bind(this)
+      return current
+    }, {})
+    const getProps = () => {
+      const {actions, graphNodes: nodes} = this
+      return {nodes, actions}
+    }
+    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
+    return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
+  },
+
   data () {
     return {
       currentTransform: null,
       maxTextLenght: {
         first: 0,
         last: 0
+      },
+      graphNodes: {
+        clickedNode: null,
+        clickedText: null
       }
     }
   },
@@ -132,9 +170,12 @@ export default {
   },
 
   methods: {
+    setSelected (node) {
+      this.$emit('change', node)
+    },
+
     getSize () {
-      var width = this.$el.clientWidth
-      var height = this.$el.clientHeight
+      const {$el: {clientWidth: width, clientHeight: height}} = this
       return { width, height }
     },
 
@@ -169,6 +210,7 @@ export default {
       source = source || this.internaldata.root
       let originBuilder = source
       let forExit = source
+      const originAngle = source.layoutInfo ? source.layoutInfo.rotate : 0
       const origin = {x: source.x0, y: source.y0}
 
       if (arguments.length === 0) {
@@ -195,9 +237,9 @@ export default {
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
-      const updateLinks = links.enter().append('path').attr('class', 'linktree')
+      const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
-      const newNodes = nodes.enter().append('g').attr('class', 'nodetree')
+      const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
       const allNodes = newNodes.merge(nodes)
 
       nodes.each(function (d) {
@@ -205,48 +247,59 @@ export default {
         d._y0 = d.y
       })
 
-      newNodes.append('text')
-        .attr('dy', '.35em')
-        .attr('x', 0)
-        .attr('dx', 0)
-        .attr('transform', 'rotate(0)')
-        .on('click', d => {
-          currentSelected = (currentSelected === d) ? null : d
-          d3.event.stopPropagation()
-          this.redraw()
-          this.$emit('clicked', {element: d, data: d.data})
-        })
-
-      updateLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
-
-      const updateAndNewLinks = links.merge(updateLinks)
+      newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+      const updateAndNewLinks = links.merge(newLinks)
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
       const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
 
-      newNodes.attr('transform', d => translate(originBuilder(d), this.layout))
-        .append('circle')
-        .attr('r', this.radius)
+      const {actions, radius, selected, $scopedSlots: {node}} = this
+      const getHtml = node ? d => renderInVueContext({
+        scope: node,
+        props: {
+          actions,
+          radius,
+          node: d,
+          data: d.data,
+          isRetracted: !!d._children,
+          isSelected: d.data === selected
+        }
+      }, this.redraw) : d => `<circle r="${radius}"/>`
+
+      newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle}) scale(0.1)`)
+        .append('g')
+        .attr('class', 'node')
+
+      newNodes
+        .append('text')
+        .attr('dy', '.35em')
+        .attr('x', 0)
+        .attr('dx', 0)
+        .on('click', this.onNodeTextClick)
+
+      allNodes
+        .select('.node')
+        .html(getHtml)
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d === currentSelected)
+        .classed('selected', d => d.data === selected)
         .on('click', this.onNodeClick)
-
-      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
-        .attr('transform', d => translate(d, this.layout))
-        .attr('opacity', 1))
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
-      const {transformText} = this.layout
+      const { leafTextMargin, nodeTextMargin, layout: {layoutNode} } = this
       allNodes.each((d) => {
-        d.textInfo = transformText(d, hasChildren(d))
+        d.layoutInfo = layoutNode(hasChildren(d), {leaf: leafTextMargin, node: nodeTextMargin}, d)
       })
 
-      const textTransition = toPromise(text.transition().duration(this.duration)
-          .attr('x', d => d.textInfo.x)
-          .attr('dx', function (d) { return anchorTodx(d.textInfo.anchor, this) })
-          .attr('transform', d => `rotate(${d.textInfo.rotate})`))
+      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
+        .attr('transform', d => `${translate(d, this.layout)} rotate(${d.layoutInfo.rotate})`)
+        .attr('opacity', 1))
+
+      text.attr('x', d => d.layoutInfo.x)
+          .attr('y', d => d.layoutInfo.y)
+          .attr('text-anchor', d => d.layoutInfo.anchor)
+          .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
       allNodes.each((d) => {
         d.x0 = d.x
@@ -254,17 +307,20 @@ export default {
       })
 
       const exitingNodes = nodes.exit()
+      exitingNodes.select('.node').transition().duration(this.duration)
+                  .attr('transform', 'scale(0.1)')
+
       const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => translate(forExit(d), this.layout))
+                  .attr('transform', d => `${translate(forExit(d), this.layout)} rotate(${d.parent.layoutInfo.rotate})`)
                   .attr('opacity', 0).remove())
-      exitingNodes.select('circle').attr('r', 1e-6)
 
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
-      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + 6
-      const first = text.node().getComputedTextLength() + 6
+      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + leafTextMargin
+      const first = text.node().getComputedTextLength() + leafTextMargin
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
-        return Promise.all([allNodesPromise, exitingNodesPromise, textTransition, updateAndNewLinksPromise, exitingLinksPromise])
+        this._scheduledRedraw = false
+        return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
       }
 
       this.maxTextLenght = {first, last}
@@ -279,12 +335,28 @@ export default {
       return this.updateGraph(source)
     },
 
+    onNodeTextClick (d) {
+      this.graphNodes.clickedNode = null
+      this.onEvent('clickedText', d)
+    },
+
     onNodeClick (d) {
-      if (d.children) {
-        this.collapse(d)
-      } else {
-        this.expand(d)
+      this.graphNodes.clickedText = null
+      this.onEvent('clickedNode', d)
+    },
+
+    onEvent (name, d) {
+      this.graphNodes[name] = null
+      this.graphNodes[name] = d
+      this.$emit(name, {element: d, data: d.data})
+      d3.event.stopPropagation()
+    },
+
+    toggleExpandCollapse (d) {
+      if (!d) {
+        return Promise.resolve(false)
       }
+      return d.children ? this.collapse(d) : this.expand(d)
     },
 
     onData (data) {
@@ -311,10 +383,11 @@ export default {
     },
 
     redraw () {
-      if (this.internaldata.root) {
-        return this.updateGraph()
+      if (!this.internaldata.root || this._scheduledRedraw) {
+        return
       }
-      return Promise.resolve('no graph')
+      this._scheduledRedraw = true
+      this.$nextTick(() => this.updateGraph())
     },
 
     getNodeOriginComputer (originalVisibleNodes) {
@@ -334,8 +407,8 @@ export default {
     },
 
     applyTransition (size, {margin, layout}) {
-      const {g, svg, zoom} = this.internaldata
-      if (this.zoomable) {
+      const {g, svg, zoom, zoomable} = this.internaldata
+      if (zoomable) {
         const transform = this.currentTransform
         const oldMargin = margin || this.margin
         const oldLayout = layout || this.layout
@@ -486,7 +559,19 @@ export default {
       this.completeRedraw({layout: oldLayout})
     },
 
+    selected () {
+      this.completeRedraw({layout: this.layout})
+    },
+
     radius () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    leafTextMargin () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    nodeTextMargin () {
       this.completeRedraw({layout: this.layout})
     },
 

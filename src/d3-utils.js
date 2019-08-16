@@ -1,12 +1,3 @@
-function anchorTodx (d, el) {
-  if (d === 'middle') {
-    return -el.getBBox().width / 2
-  } else if (d === 'end') {
-    return -el.getBBox().width
-  }
-  return 0
-}
-
 function drawLink (source, target, { transformNode }) {
   return 'M' + transformNode(source.x, source.y) +
     'C' + transformNode(source.x, (source.y + target.y) / 2) +
@@ -51,7 +42,7 @@ function toPromise (transition) {
   let count = 0
   let interrupted = false
   transition.each(() => count++)
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     if (count === 0) {
       resolve('ended')
       return
@@ -108,7 +99,6 @@ function updateTexts (selection, maxLength) {
 }
 
 export {
-  anchorTodx,
   compareString,
   compareNode,
   drawLink,
