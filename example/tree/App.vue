@@ -70,12 +70,22 @@
             </div>
 
             <div class="form-group">
-              <label for="text-margin" class="control-label col-sm-3">textMargin</label>
+              <label for="text-margin" class="control-label col-sm-3">leafTextMargin</label>
               <div class="col-sm-7">
-                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="textMargin">
+                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="leafTextMargin">
               </div>
               <div class="col-sm-2">
-                <p>{{textMargin}}px</p>
+                <p>{{leafTextMargin}}px</p>
+              </div>
+            </div>
+
+             <div class="form-group">
+              <label for="text-margin" class="control-label col-sm-3">nodeTextMargin</label>
+              <div class="col-sm-7">
+                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="nodeTextMargin">
+              </div>
+              <div class="col-sm-2">
+                <p>{{nodeTextMargin}}px</p>
               </div>
             </div>
 
@@ -132,7 +142,7 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" v-model="currentData" :identifier="getId" :zoomable="zoomable" :data="Graph.tree" :text-margin="textMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clickedText="onClick" @expand="onExpand" @retract="onRetract" @clickedNode="onClickNode">
+    <tree ref="tree" v-model="currentData" :identifier="getId" :nodeTextMargin="nodeTextMargin" :zoomable="zoomable" :data="Graph.tree" :leafTextMargin="leafTextMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clickedText="onClick" @expand="onExpand" @retract="onRetract" @clickedNode="onClickNode">
       <!-- <template #node="{data, node: {depth}, radius, isRetracted}">
         <template v-if="data.children && data.children.length">
           <path transform="scale(0.05) translate(-10,-250)" :fill="isRetracted? 'red' : 'blue'" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z">
@@ -168,7 +178,8 @@ Object.assign(data, {
   Marginx: 30,
   Marginy: 30,
   radius: 3,
-  textMargin: 6,
+  leafTextMargin: 6,
+  nodeTextMargin: 6,
   nodeText: 'text',
   currentData: null,
   currentNode: null,
@@ -254,7 +265,7 @@ export default {
 
       this.duration = 20
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
-      const changeType = () => { this.layoutType === updateType(this.layoutType) }
+      const changeType = () => { this.layoutType = updateType(this.layoutType) }
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')

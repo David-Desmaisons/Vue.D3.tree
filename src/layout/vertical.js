@@ -23,10 +23,10 @@ export default {
       .y(d => d.data.y)
   },
 
-  layoutNode (children, offset) {
+  layoutNode (children, {leaf, node}) {
     return {
-      x: !children ? offset : 0,
-      y: !children ? 0 : -minMargin,
+      x: !children ? leaf : 0,
+      y: !children ? 0 : -(minMargin + node),
       rotate: 90,
       textRotate: !children ? 0 : -90,
       anchor: !children ? 'start' : 'middle'

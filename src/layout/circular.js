@@ -48,12 +48,12 @@ export default {
               .angle(d => d.x / 180 * Math.PI)
   },
 
-  layoutNode (children, offset, d) {
+  layoutNode (children, {leaf, node}, d) {
     const isLeaf = !children
     const pole = d.x < 180 ? 1 : -1
     const leafOrReversed = d.x < 180 === isLeaf
     return {
-      x: (isLeaf ? offset : -6) * pole,
+      x: (isLeaf ? leaf : -node) * pole,
       y: 0,
       rotate: d.x - 90,
       textRotate: d.x < 180 ? 0 : 180,

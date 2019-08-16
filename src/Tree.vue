@@ -70,7 +70,11 @@ const props = {
     type: Number,
     default: 3
   },
-  textMargin: {
+  leafTextMargin: {
+    type: Number,
+    default: 6
+  },
+  nodeTextMargin: {
     type: Number,
     default: 6
   }
@@ -283,9 +287,9 @@ export default {
 
       const text = allNodes.select('text').text(d => d.data[this.nodeText])
 
-      const { textMargin, layout: {layoutNode} } = this
+      const { leafTextMargin, nodeTextMargin, layout: {layoutNode} } = this
       allNodes.each((d) => {
-        d.layoutInfo = layoutNode(hasChildren(d), textMargin, d)
+        d.layoutInfo = layoutNode(hasChildren(d), {leaf: leafTextMargin, node: nodeTextMargin}, d)
       })
 
       const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
@@ -312,8 +316,8 @@ export default {
 
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
-      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + textMargin
-      const first = text.node().getComputedTextLength() + textMargin
+      const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + leafTextMargin
+      const first = text.node().getComputedTextLength() + leafTextMargin
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
         this._scheduledRedraw = false
         return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
@@ -563,7 +567,11 @@ export default {
       this.completeRedraw({layout: this.layout})
     },
 
-    textMargin () {
+    leafTextMargin () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    nodeTextMargin () {
       this.completeRedraw({layout: this.layout})
     },
 

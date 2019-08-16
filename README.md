@@ -55,13 +55,14 @@ export default {
 | data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
 | duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
 | layoutType | no | 'circular' 'vertical' or 'horizontal' |  'horizontal'       | Circular, vertical or horizontal layout |
+| leafTextMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
+| nodeTextMargin    | no | `Number`           | 6            | margin in pixel for node text |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
 | selected    | no | `Object`           | `null`            | The selected node -on which a `selected` class is applied-. It can be bound using a `v-model` directive. By default, click on text to select a node but this behavior can be customized using the `behavior` slot. | 
-| textMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
 | type      | no    | 'tree' or 'cluster'       | 'tree'      | kind of layout: [tree](https://github.com/d3/d3-hierarchy/blob/master/README.md#tree) or [cluster](https://github.com/d3/d3-hierarchy/blob/master/README.md#cluster) |
 | zoomable   | no | `Boolean`  | false |  If true tree can be zoomed in using mouse wheel and drag-and-drop |
 
