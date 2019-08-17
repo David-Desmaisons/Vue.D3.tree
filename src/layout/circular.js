@@ -17,6 +17,12 @@ function separation (a, b) {
   return (a.parent === b.parent ? 1 : 2) / (a.depth !== 0 ? a.depth : 1)
 }
 
+function transformNode (x, y) {
+  const angle = (x - 90) / 180 * Math.PI
+  const radius = y
+  return [~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle))]
+}
+
 export default {
   size (tree, {width, height}, {x, y}, {last}) {
     const ray = Math.min(width - x, height - y) / 2 - last
@@ -28,11 +34,7 @@ export default {
     tree.size([360, ray]).separation(separation)
   },
 
-  transformNode (x, y) {
-    const angle = (x - 90) / 180 * Math.PI
-    const radius = y
-    return [~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle))]
-  },
+  transformNode,
 
   transformSvg (svg, _, {width, height}) {
     return svg.attr('transform', `translate(${width / 2},${height / 2})`)
@@ -46,6 +48,10 @@ export default {
     return d3.radialLine()
               .radius(d => d.y)
               .angle(d => d.x / 180 * Math.PI)
+  },
+
+  verticalLine (target, source) {
+    return `A ${target.y},${target.y} 0 ${Math.abs(target.x - source.x) > 180 ? 1 : 0} ${target.x > source.x ? 1 : 0} ${transformNode(target.x, target.y)}`
   },
 
   layoutNode (children, {leaf, node}, d) {

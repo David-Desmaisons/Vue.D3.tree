@@ -1,10 +1,3 @@
-function drawLink (source, target, { transformNode }) {
-  return 'M' + transformNode(source.x, source.y) +
-    'C' + transformNode(source.x, (source.y + target.y) / 2) +
-    ' ' + transformNode(target.x, (source.y + target.y) / 2) +
-    ' ' + transformNode(target.x, target.y)
-}
-
 function compareString (a, b) {
   return (a < b) ? -1 : (a > b) ? 1 : 0
 }
@@ -101,7 +94,6 @@ function updateTexts (selection, maxLength) {
 export {
   compareString,
   compareNode,
-  drawLink,
   findInParents,
   mapMany,
   roundPath,

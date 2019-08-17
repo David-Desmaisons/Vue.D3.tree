@@ -4,7 +4,9 @@ import horizontal from './layout/horizontal'
 import vertical from './layout/vertical'
 import circular from './layout/circular'
 import standardBehavior from './behaviors/StandardBehavior'
-import {compareString, drawLink, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import { drawLink as bezier } from './linkLayout/bezier'
+import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
 import * as d3 from 'd3'
@@ -15,10 +17,16 @@ const layout = {
   vertical
 }
 
+const linkLayouts = {
+  bezier,
+  orthogonal
+}
+
 var i = 0
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'horizontal', 'vertical']
 const nodeDisplays = ['all', 'leaves', 'extremities']
+const linkLayoutsType = ['bezier', 'orthogonal']
 
 const props = {
   data: {
@@ -45,6 +53,13 @@ const props = {
     default: 'horizontal',
     validator (value) {
       return layouts.includes(value)
+    }
+  },
+  linkLayout: {
+    type: String,
+    default: 'bezier',
+    validator (value) {
+      return linkLayoutsType.includes(value)
     }
   },
   marginX: {
@@ -268,10 +283,12 @@ export default {
         d._y0 = d.y
       })
 
-      newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), this.layout))
+      const { layout, duration, drawLink } = this
+
+      newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), layout))
       const updateAndNewLinks = links.merge(newLinks)
-      const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(this.duration).attr('d', d => drawLink(d, d.parent, this.layout)))
-      const exitingLinksPromise = toPromise(links.exit().transition().duration(this.duration).attr('d', d => drawLink(forExit(d), forExit(d), this.layout)).remove())
+      const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(duration).attr('d', d => drawLink(d, d.parent, layout)))
+      const exitingLinksPromise = toPromise(links.exit().transition().duration(duration).attr('d', d => drawLink(forExit(d), forExit(d), layout)).remove())
 
       const {actions, radius, selected, $scopedSlots: {node}} = this
       const getHtml = node ? d => renderInVueContext({
@@ -286,7 +303,7 @@ export default {
         }
       }, this.redraw) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => `${translate(originBuilder(d), this.layout)} rotate(${originAngle}) scale(0.1)`)
+      newNodes.attr('transform', d => `${translate(originBuilder(d), layout)} rotate(${originAngle}) scale(0.1)`)
         .append('g')
         .attr('class', 'node')
 
@@ -315,8 +332,8 @@ export default {
         d.layoutInfo = layoutNode(hasChildren(d), {leaf: leafTextMargin, node: nodeTextMargin}, d)
       })
 
-      const allNodesPromise = toPromise(allNodes.transition().duration(this.duration)
-        .attr('transform', d => `${translate(d, this.layout)} rotate(${d.layoutInfo.rotate})`)
+      const allNodesPromise = toPromise(allNodes.transition().duration(duration)
+        .attr('transform', d => `${translate(d, layout)} rotate(${d.layoutInfo.rotate})`)
         .attr('opacity', 1))
 
       text.attr('x', d => d.layoutInfo.x)
@@ -330,11 +347,11 @@ export default {
       })
 
       const exitingNodes = nodes.exit()
-      exitingNodes.select('.node').transition().duration(this.duration)
+      exitingNodes.select('.node').transition().duration(duration)
                   .attr('transform', 'scale(0.1)')
 
-      const exitingNodesPromise = toPromise(exitingNodes.transition().duration(this.duration)
-                  .attr('transform', d => `${translate(forExit(d), this.layout)} rotate(${d.parent.layoutInfo.rotate})`)
+      const exitingNodesPromise = toPromise(exitingNodes.transition().duration(duration)
+                  .attr('transform', d => `${translate(forExit(d), layout)} rotate(${d.parent.layoutInfo.rotate})`)
                   .attr('opacity', 0).remove())
 
       const leaves = root.leaves()
@@ -551,6 +568,10 @@ export default {
 
     layout () {
       return layout[this.layoutType]
+    },
+
+    drawLink () {
+      return linkLayouts[this.linkLayout]
     }
   },
 
@@ -599,6 +620,10 @@ export default {
     },
 
     nodeTextDisplay () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    linkLayout () {
       this.completeRedraw({layout: this.layout})
     },
 
