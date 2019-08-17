@@ -18,6 +18,7 @@ const layout = {
 var i = 0
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'horizontal', 'vertical']
+const nodeDisplays = ['all', 'leaves', 'extremities']
 
 const props = {
   data: {
@@ -36,14 +37,14 @@ const props = {
     type: String,
     default: 'tree',
     validator (value) {
-      return types.indexOf(value) !== -1
+      return types.includes(value)
     }
   },
   layoutType: {
     type: String,
     default: 'horizontal',
     validator (value) {
-      return layouts.indexOf(value) !== -1
+      return layouts.includes(value)
     }
   },
   marginX: {
@@ -65,6 +66,13 @@ const props = {
   zoomable: {
     type: Boolean,
     default: false
+  },
+  nodeTextDisplay: {
+    type: String,
+    default: 'all',
+    validator (value) {
+      return nodeDisplays.includes(value)
+    }
   },
   radius: {
     type: Number,
@@ -98,6 +106,19 @@ function onAllChilddren (d, callback, fatherVisible = undefined) {
   }
   var directChildren = getChildren(d)
   directChildren && directChildren.children.forEach(child => onAllChilddren(child, callback, directChildren.visible))
+}
+
+function filterTextNode (nodeTextDisplay, root) {
+  switch (nodeTextDisplay) {
+    case 'all':
+      return d => true
+
+    case 'leaves':
+      return d => !hasChildren(d)
+
+    case 'extremities':
+      return d => !hasChildren(d) || d === root
+  }
 }
 
 export default {
@@ -285,9 +306,11 @@ export default {
         .classed('selected', d => d.data === selected)
         .on('click', this.onNodeClick)
 
-      const text = allNodes.select('text').text(d => d.data[this.nodeText])
+      const { leafTextMargin, nodeTextMargin, layout: {layoutNode}, nodeTextDisplay } = this
+      const showNode = filterTextNode(nodeTextDisplay, root)
+      allNodes.filter(d => !showNode(d)).select('text').text('')
+      const text = allNodes.filter(showNode).select('text').text(d => d.data[this.nodeText])
 
-      const { leafTextMargin, nodeTextMargin, layout: {layoutNode} } = this
       allNodes.each((d) => {
         d.layoutInfo = layoutNode(hasChildren(d), {leaf: leafTextMargin, node: nodeTextMargin}, d)
       })
@@ -572,6 +595,10 @@ export default {
     },
 
     nodeTextMargin () {
+      this.completeRedraw({layout: this.layout})
+    },
+
+    nodeTextDisplay () {
       this.completeRedraw({layout: this.layout})
     },
 

@@ -54,12 +54,13 @@ export default {
 | ---       | ---      | ---                     | ---         | ---         |
 | data      | no    | `Object`                     | null        | Data representing tree structure, children nodes are represented by children property
 | duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
-| layoutType | no | 'circular' 'vertical' or 'horizontal' |  'horizontal'       | Circular, vertical or horizontal layout |
+| layoutType | no |  'circular' 'vertical' or 'horizontal' |  'horizontal'       | Circular, vertical or horizontal layout |
 | leafTextMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
+| nodeTextDisplay    | no | 'all' 'leaves' or 'extremities' | 'all' | Determine wether all node texts are displayed or only leaf nodes or leaves and root node respectively. | 
 | nodeTextMargin    | no | `Number`           | 6            | margin in pixel for node text |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
 | selected    | no | `Object`           | `null`            | The selected node -on which a `selected` class is applied-. It can be bound using a `v-model` directive. By default, click on text to select a node but this behavior can be customized using the `behavior` slot. | 
@@ -180,8 +181,8 @@ For all these events, the argument passed is `{element, data}` .
 | collapse      | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node.|
 | collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
-| show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | setSelected       | `Object`: node data | `undefined`             | Select the given node by sending a `change` event. Should be used with a `v-model` binding|
+| show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 | toggleExpandCollapse       | `D3.js node`      | a promise which resolve when animation is over             | Retract or collapse the given node depending on its current state. |
 
