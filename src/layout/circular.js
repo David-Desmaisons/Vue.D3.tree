@@ -51,6 +51,9 @@ export default {
   },
 
   verticalLine (target, source) {
+    if (target.x === source.x && target.y === source.y) {
+      return ''
+    }
     return `A ${target.y},${target.y} 0 ${Math.abs(target.x - source.x) > 180 ? 1 : 0} ${target.x > source.x ? 1 : 0} ${transformNode(target.x, target.y)}`
   },
 
