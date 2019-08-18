@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "d3": "^4.10.2",
-    "d3-interpolate-path": "^2.1.0",
+    "d3-interpolate-path": "^2.1.1",
     "vue": "^2.6.10",
     "vue-resize-directive": "^1.2.0"
   },
