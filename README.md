@@ -56,6 +56,7 @@ export default {
 | duration   | no | `Number`  | 750 |  Animation duration in milliseconds |
 | layoutType | no |  'circular' 'vertical' or 'horizontal' |  'horizontal'       | Circular, vertical or horizontal layout |
 | leafTextMargin    | no | `Number`           | 6            | margin in pixel for leaf node text |
+| linkLayout    | no | 'bezier' or 'orthogonal' | bezier'  | Define the link layout |
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |

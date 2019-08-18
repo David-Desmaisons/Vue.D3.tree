@@ -296,7 +296,6 @@ export default {
           const final = drawLink(d, d.parent, layout)
           return interpolatePath(previous, final)
         })
-        // attr('d', d => drawLink(d, d.parent, layout))
       )
       const exitingLinksPromise = toPromise(links.exit().transition().duration(duration).attr('d', d => drawLink(forExit(d), forExit(d), layout)).remove())
 
