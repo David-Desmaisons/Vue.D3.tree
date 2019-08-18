@@ -1,12 +1,14 @@
 <script>
 import resize from 'vue-resize-directive'
+import { interpolatePath } from 'd3-interpolate-path'
+
 import horizontal from './layout/horizontal'
 import vertical from './layout/vertical'
 import circular from './layout/circular'
-import standardBehavior from './behaviors/StandardBehavior'
-import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
+import standardBehavior from './behaviors/StandardBehavior'
+import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
 
 import * as d3 from 'd3'
@@ -287,7 +289,15 @@ export default {
 
       newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), layout))
       const updateAndNewLinks = links.merge(newLinks)
-      const updateAndNewLinksPromise = toPromise(updateAndNewLinks.transition().duration(duration).attr('d', d => drawLink(d, d.parent, layout)))
+      const updateAndNewLinksPromise = toPromise(updateAndNewLinks
+        .transition().duration(duration)
+        .attrTween('d', function (d) {
+          const previous = d3.select(this).attr('d')
+          const final = drawLink(d, d.parent, layout)
+          return interpolatePath(previous, final)
+        })
+        // attr('d', d => drawLink(d, d.parent, layout))
+      )
       const exitingLinksPromise = toPromise(links.exit().transition().duration(duration).attr('d', d => drawLink(forExit(d), forExit(d), layout)).remove())
 
       const {actions, radius, selected, $scopedSlots: {node}} = this
