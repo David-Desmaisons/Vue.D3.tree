@@ -1,13 +1,14 @@
 const minMargin = 9
+function transformNode (x, y) {
+  return `${x},${y}`
+}
 
 export default {
   size (tree, size, margin, {last}) {
     tree.size([size.width - (margin.x * 2), size.height - (margin.y * 2) - last - minMargin])
   },
 
-  transformNode (x, y) {
-    return x + ',' + y
-  },
+  transformNode,
 
   transformSvg (svg, margin) {
     return svg.attr('transform', `translate(${margin.x},${margin.y + minMargin})`)
@@ -21,6 +22,10 @@ export default {
     return d3.line()
       .x(d => d.data.x)
       .y(d => d.data.y)
+  },
+
+  verticalLine (target) {
+    return `L ${transformNode(target.x, target.y)}`
   },
 
   layoutNode (children, {leaf, node}) {

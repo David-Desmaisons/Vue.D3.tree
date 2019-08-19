@@ -1,11 +1,13 @@
+function transformNode (x, y) {
+  return `${y},${x}`
+}
+
 export default {
   size (tree, size, margin, {last, first}) {
     tree.size([size.height - (margin.y * 2), size.width - (margin.x * 2) - (last + first)])
   },
 
-  transformNode (x, y) {
-    return y + ',' + x
-  },
+  transformNode,
 
   transformSvg (svg, margin, _, {first}) {
     return svg.attr('transform', `translate(${margin.x + first},${margin.y})`)
@@ -19,6 +21,10 @@ export default {
     return d3.line()
             .x(d => d.data.x)
             .y(d => d.data.y)
+  },
+
+  verticalLine (target) {
+    return `L ${transformNode(target.x, target.y)}`
   },
 
   layoutNode (children, {leaf, node}) {

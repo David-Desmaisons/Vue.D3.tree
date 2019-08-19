@@ -40,6 +40,15 @@
               </div>
             </div>
 
+            <div class="form-group">
+              <label for="layout-type" class="control-label col-sm-3">linkLayout</label>
+                <div  class="col-sm-9">
+                  <select id="layout-type" class="form-control" v-model="linkLayout">
+                    <option>bezier</option>
+                    <option>orthogonal</option>
+                  </select>
+              </div>
+            </div>
 
             <div class="form-group">
               <label for="margin-x" class="control-label col-sm-3">marginx</label>
@@ -168,6 +177,7 @@
       :radius="radius"
       :type="type"
       :layout-type="layoutType"
+      :linkLayout="linkLayout"
       :duration="duration"
       class="tree"
       @clickedText="onClick"
@@ -175,7 +185,7 @@
       @retract="onRetract"
       @clickedNode="onClickNode">
 
-      <template #node />
+      <!-- <template #node /> -->
 
       <!-- <template #node="{data, node: {depth}, radius, isRetracted}">
         <template v-if="data.children && data.children.length">
@@ -221,6 +231,7 @@ Object.assign(data, {
   isLoading: false,
   isUnderGremlinsAttack: false,
   nodeTextDisplay: 'all',
+  linkLayout: 'bezier',
   events: []
 })
 
