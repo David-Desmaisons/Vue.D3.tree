@@ -315,7 +315,7 @@ export default {
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')
-      var horde = getGremlin(gremlinsButton, treeDiv, changeType, changeLayout, resetZoom)
+      var horde = getGremlin(gremlinsButton, treeDiv, {changeType, changeLayout, resetZoom})
       horde.after(() => { this.isUnderGremlinsAttack = false })
       horde.unleash()
       this.horde = horde

@@ -1,6 +1,6 @@
 import gremlins from 'gremlins.js/src/main'
 
-function getGremlin (prohibited, element, changeType, changeLayout, resetZoom) {
+function getGremlin (prohibited, element, {changeType, changeLayout, resetZoom}) {
   const horde = gremlins.createHorde()
     .gremlin(gremlins.species.clicker()
     .canClick((element) => {
