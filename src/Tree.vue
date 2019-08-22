@@ -84,6 +84,14 @@ const props = {
     type: Boolean,
     default: false
   },
+  minZoom: {
+    type: Number,
+    default: 0.8
+  },
+  maxZoom: {
+    type: Number,
+    default: 9
+  },
   nodeTextDisplay: {
     type: String,
     default: 'all',
@@ -184,26 +192,16 @@ export default {
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
-    let g = null
-    let zoom = null
+    const {zoomable, tree} = this
+    const g = zoomable ? svg.append('g') : this.transformSvg(svg.append('g'), size)
 
-    if (this.zoomable) {
-      g = svg.append('g')
-      zoom = d3.zoom().scaleExtent([0.9, 8]).on('zoom', this.zoomed(g))
-      svg.call(zoom).on('wheel', () => d3.event.preventDefault())
-      svg.call(zoom.transform, d3.zoomIdentity)
-    } else {
-      g = this.transformSvg(svg.append('g'), size)
-    }
-
-    const tree = this.tree
     this.internaldata = {
       svg,
       g,
-      tree,
-      zoom
+      tree
     }
 
+    this.internaldata.zoom = zoomable ? this.setUpZoom() : null
     this.data && this.onData(this.data)
   },
 
@@ -225,6 +223,29 @@ export default {
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyZoom(size)
       this.redraw()
+    },
+
+    setUpZoom () {
+      const { minZoom, maxZoom, internaldata: { svg, g } } = this
+      const zoom = d3.zoom().scaleExtent([minZoom, maxZoom])
+      zoom.on('zoom', this.zoomed(g))
+      svg.call(zoom).on('wheel', () => d3.event.preventDefault())
+      svg.call(zoom.transform, this.currentTransform || d3.zoomIdentity)
+      return zoom
+    },
+
+    removeZoom () {
+      const { internaldata } = this
+      internaldata.zoom.on('zoom', null)
+      internaldata.zoom = null
+    },
+
+    updateZoom () {
+      if (!this.zoomable) {
+        return
+      }
+      this.removeZoom()
+      this.setUpZoom()
     },
 
     completeRedraw ({margin = null, layout = null}) {
@@ -636,19 +657,20 @@ export default {
       this.completeRedraw({layout: this.layout})
     },
 
+    minZoom () {
+      this.updateZoom()
+    },
+
+    maxZoom () {
+      this.updateZoom()
+    },
+
     zoomable (newValue) {
-      const { svg, g } = this.internaldata
-      let { zoom } = this.internaldata
       if (newValue) {
-        zoom = d3.zoom().scaleExtent([0.9, 8])
-        zoom.on('zoom', this.zoomed(g))
-        svg.call(zoom).on('wheel', () => d3.event.preventDefault())
-        svg.call(zoom.transform, this.currentTransform || d3.zoomIdentity)
-      } else {
-        zoom.on('zoom', null)
-        zoom = null
+        this.internaldata.zoom = this.setUpZoom()
+        return
       }
-      this.internaldata.zoom = zoom
+      this.removeZoom()
     }
   }
 }
