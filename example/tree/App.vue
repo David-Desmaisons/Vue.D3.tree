@@ -91,9 +91,9 @@
             </div>
 
             <div class="form-group">
-              <label for="text-margin" class="control-label col-sm-3">leafTextMargin</label>
+              <label for="leaf-text-margin" class="control-label col-sm-3">leafTextMargin</label>
               <div class="col-sm-7">
-                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="leafTextMargin">
+                <input id="leaf-text-margin" class="form-control" type="range" min="0" max="100" v-model.number="leafTextMargin">
               </div>
               <div class="col-sm-2">
                 <p>{{leafTextMargin}}px</p>
@@ -101,12 +101,32 @@
             </div>
 
              <div class="form-group">
-              <label for="text-margin" class="control-label col-sm-3">nodeTextMargin</label>
+              <label for="node-text-margin" class="control-label col-sm-3">nodeTextMargin</label>
               <div class="col-sm-7">
-                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="nodeTextMargin">
+                <input id="node-text-margin" class="form-control" type="range" min="0" max="100" v-model.number="nodeTextMargin">
               </div>
               <div class="col-sm-2">
                 <p>{{nodeTextMargin}}px</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="minZoom" class="control-label col-sm-3">minZoom</label>
+              <div class="col-sm-7">
+                <input id="minZoom" class="form-control" type="range" min="0.01" max="1" step="0.05" v-model.number="minZoom">
+              </div>
+              <div class="col-sm-2">
+                <p>{{minZoom}}</p>
+              </div>
+            </div>
+
+              <div class="form-group">
+              <label for="maxZoom" class="control-label col-sm-3">maxZoom</label>
+              <div class="col-sm-7">
+                <input id="maxZoom" class="form-control" type="range" min="1" max="100" v-model.number="maxZoom">
+              </div>
+              <div class="col-sm-2">
+                <p>{{maxZoom}}</p>
               </div>
             </div>
 
@@ -179,6 +199,8 @@
       :layout-type="layoutType"
       :linkLayout="linkLayout"
       :duration="duration"
+      :minZoom="minZoom"
+      :maxZoom="maxZoom"
       class="tree"
       @clickedText="onClick"
       @expand="onExpand"
@@ -232,6 +254,8 @@ Object.assign(data, {
   isUnderGremlinsAttack: false,
   nodeTextDisplay: 'all',
   linkLayout: 'bezier',
+  minZoom: 0.8,
+  maxZoom: 9,
   events: []
 })
 

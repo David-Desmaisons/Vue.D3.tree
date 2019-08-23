@@ -245,7 +245,7 @@ export default {
         return
       }
       this.removeZoom()
-      this.setUpZoom()
+      this.internaldata.zoom = this.setUpZoom()
     },
 
     completeRedraw ({margin = null, layout = null}) {

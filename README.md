@@ -60,6 +60,8 @@ export default {
 | identifier   | no | `Function`  | () => i++ |  Function that receives a data and returns its identity that can be a number or a string, useful when dynamically updating the tree |
 | marginX    | no | `Number`          | 20       | margin for X axis in pixel |
 | marginY    | no | `Number`           | 20            | margin for Y axis in pixel |
+| maxZoom  | no | `Number`           | 0.8            | minimal zoom value |
+| minZoom  | no | `Number`           | 9            | maximum zoom value |
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
 | nodeTextDisplay    | no | 'all' 'leaves' or 'extremities' | 'all' | Determine wether all node texts are displayed or only leaf nodes or leaves and root node respectively. | 
 | nodeTextMargin    | no | `Number`           | 6            | margin in pixel for node text |
