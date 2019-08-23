@@ -227,7 +227,7 @@ Object.assign(data, {
   nodeText: 'text',
   currentData: null,
   currentNode: null,
-  zoomable: false,
+  zoomable: true,
   isLoading: false,
   isUnderGremlinsAttack: false,
   nodeTextDisplay: 'all',

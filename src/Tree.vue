@@ -395,12 +395,7 @@ export default {
 
       this.maxTextLenght = {first, last}
       const size = this.getSize()
-      if (this.zoomable) {
-        this.internaldata.svg.call(this.internaldata.zoom.transform, this.currentTransform)
-      } else {
-        const {g} = this.internaldata
-        this.transformSvg(g, size)
-      }
+      this.applyZoom(size)
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       return this.updateGraph(source)
     },
@@ -468,17 +463,17 @@ export default {
     },
 
     applyZoom (size) {
-      const {g, zoom} = this.internaldata
-      if (this.zoomable) {
+      const {g, zoom, zoomable} = this.internaldata
+      if (zoomable && zoom) {
         g.call(zoom.transform, this.currentTransform)
-      } else {
-        this.transformSvg(g, size)
+        return
       }
+      this.transformSvg(g, size)
     },
 
     applyTransition (size, {margin, layout}) {
       const {g, svg, zoom, zoomable} = this.internaldata
-      if (zoomable) {
+      if (zoomable & zoom) {
         const transform = this.currentTransform
         const oldMargin = margin || this.margin
         const oldLayout = layout || this.layout
@@ -488,10 +483,10 @@ export default {
         const current = d3.zoomIdentity.translate(transform.x + nowTransform.x - nextRealTransform.x, transform.y + nowTransform.y - nextRealTransform.y).scale(transform.k)
 
         svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
-      } else {
-        const transitiong = g.transition().duration(this.duration)
-        this.transformSvg(transitiong, size)
+        return
       }
+      const transitiong = g.transition().duration(this.duration)
+      this.transformSvg(transitiong, size)
     },
 
     zoomed (g) {
@@ -558,10 +553,7 @@ export default {
       shouldBeRetracted.filter(node => node.children).forEach(rectractedNode => rectractedNode.each(c => { mapped[c.id] = rectractedNode }))
       const origin = node => {
         const reference = mapped[node.id]
-        if (!reference) {
-          return node
-        }
-        return {x: reference.x, y: reference.y}
+        return !reference ? node : {x: reference.x, y: reference.y}
       }
       const updater = node => {
         if (shouldBeRetracted.indexOf(node) !== -1) {
