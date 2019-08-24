@@ -492,8 +492,7 @@ export default {
     zoomed (g) {
       return () => {
         const transform = d3.event.transform
-        const size = this.getSize()
-        const transformToApply = this.updateTransform(transform, size)
+        const transformToApply = this.updateTransform(transform)
         this.currentTransform = transform
         this.$emit('zoom', {transform})
         g.attr('transform', transformToApply)
