@@ -53,8 +53,12 @@ function toPromise (transition) {
   })
 }
 
-function translate (vector, { transformNode }) {
-  return 'translate(' + transformNode(vector.x, vector.y) + ')'
+function translate (vector, { transformNode }, transformation) {
+  let destination = transformNode(vector.x, vector.y)
+  if (transformation) {
+    destination = destination.apply(transformation)
+  }
+  return `translate( ${destination} )`
 }
 
 function binarySearch (arr, left, right, value) {
