@@ -10,6 +10,7 @@ import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import standardBehavior from './behaviors/StandardBehavior'
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
+import {setUpZoom, zoomWholeSvg} from './zoom/zoomBehavior'
 
 import * as d3 from 'd3'
 
@@ -226,12 +227,13 @@ export default {
     },
 
     setUpZoom () {
-      const { minZoom, maxZoom, internaldata: { svg, g } } = this
-      const zoom = d3.zoom().scaleExtent([minZoom, maxZoom])
-      zoom.on('zoom', this.zoomed(g))
-      svg.call(zoom).on('wheel', () => d3.event.preventDefault())
-      svg.call(zoom.transform, this.currentTransform || d3.zoomIdentity)
-      return zoom
+      const { currentTransform, minZoom, maxZoom, updateTransform, onZoomed, internaldata: { svg, g } } = this
+      return setUpZoom({ currentTransform, minZoom, maxZoom, svg, g }, zoomWholeSvg, updateTransform, onZoomed)
+    },
+
+    onZoomed ({transform}) {
+      this.$emit('zoom', {transform})
+      this.currentTransform = transform
     },
 
     removeZoom () {
@@ -487,16 +489,6 @@ export default {
       }
       const transitiong = g.transition().duration(this.duration)
       this.transformSvg(transitiong, size)
-    },
-
-    zoomed (g) {
-      return () => {
-        const transform = d3.event.transform
-        const transformToApply = this.updateTransform(transform)
-        this.currentTransform = transform
-        this.$emit('zoom', {transform})
-        g.attr('transform', transformToApply)
-      }
     },
 
     updateIfNeeded (d, update) {
