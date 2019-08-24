@@ -1,3 +1,5 @@
+import Point from './point'
+
 function getRay ({width, height}, {x, y}, {xExtreme = null, yExtreme = null}) {
   const firstRay = computeRay((width - x) / 2, xExtreme, Math.cos)
   const secondRay = computeRay((height - y) / 2, yExtreme, Math.sin)
@@ -20,7 +22,7 @@ function separation (a, b) {
 function transformNode (x, y) {
   const angle = (x - 90) / 180 * Math.PI
   const radius = y
-  return [~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle))]
+  return new Point(~~(radius * Math.cos(angle)), ~~(radius * Math.sin(angle)))
 }
 
 export default {

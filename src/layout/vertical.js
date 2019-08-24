@@ -1,6 +1,8 @@
+import Point from './point'
+
 const minMargin = 9
 function transformNode (x, y) {
-  return `${x},${y}`
+  return new Point(x, y)
 }
 
 export default {
