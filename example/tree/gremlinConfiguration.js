@@ -1,6 +1,6 @@
 import gremlins from 'gremlins.js/src/main'
 
-function getGremlin (prohibited, element, {changeType, changeLayout, changeNode, resetZoom}) {
+function getGremlin (prohibited, element, {changeType, changeLayout, changeNodeTextDisplay, changeNode, resetZoom}) {
   const horde = gremlins.createHorde()
     .gremlin(gremlins.species.clicker()
     .canClick((element) => {
@@ -29,6 +29,10 @@ function getGremlin (prohibited, element, {changeType, changeLayout, changeNode,
     .gremlin(function () {
       console.log('gremlin changeNode')
       changeNode()
+    })
+    .gremlin(function () {
+      console.log('gremlin changeNodeTextDisplay')
+      changeNodeTextDisplay()
     })
     .gremlin(function () {
       console.log('gremlin resetZoom')
