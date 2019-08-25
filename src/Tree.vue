@@ -636,6 +636,10 @@ export default {
       this.completeRedraw({layout: this.layout})
     },
 
+    strokeWidth () {
+      this.completeRedraw({layout: this.layout})
+    },
+
     minZoom () {
       this.updateZoom()
     },
