@@ -237,7 +237,8 @@ export default {
 
     onZoomed ({transform}) {
       this.$emit('zoom', {transform})
-      this.currentTransform = transform
+      this._originalZoom = transform
+      this.currentTransform = this.updateTransform(transform)
       this.redraw({transitionDuration: 0})
     },
 
@@ -258,7 +259,7 @@ export default {
     completeRedraw ({margin = null, layout = null}) {
       const size = this.getSize()
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
-      this.applyTransition(size, {margin, layout})
+      this.applyZoom(size, true)
       this.redraw()
     },
 
@@ -267,9 +268,9 @@ export default {
       return this.layout.transformSvg(g, this.margin, size, this.maxTextLenght)
     },
 
-    updateTransform (g, size) {
+    updateTransform (transform, size) {
       size = size || this.getSize()
-      return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
+      return this.layout.updateTransform(transform, this.margin, size, this.maxTextLenght)
     },
 
     updateGraph (source, {transitionDuration = undefined} = {}) {
@@ -476,31 +477,14 @@ export default {
       }
     },
 
-    applyZoom (size) {
-      const {g, zoom, zoomable} = this.internaldata
+    applyZoom (size, transition) {
+      const { internaldata: {g, zoom}, zoomable } = this
       if (zoomable && zoom) {
-        g.call(zoom.transform, this.currentTransform)
+        this.currentTransform = this.updateTransform(this._originalZoom)
         return
       }
-      this.transformSvg(g, size)
-    },
-
-    applyTransition (size, {margin, layout}) {
-      const {g, svg, zoom, zoomable} = this.internaldata
-      if (zoomable & zoom) {
-        const transform = this.currentTransform
-        const oldMargin = margin || this.margin
-        const oldLayout = layout || this.layout
-
-        const nowTransform = oldLayout.updateTransform(transform, oldMargin, size, this.maxTextLenght)
-        const nextRealTransform = this.updateTransform(transform, size)
-        const current = d3.zoomIdentity.translate(transform.x + nowTransform.x - nextRealTransform.x, transform.y + nowTransform.y - nextRealTransform.y).scale(transform.k)
-
-        svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
-        return
-      }
-      const transitiong = g.transition().duration(this.duration)
-      this.transformSvg(transitiong, size)
+      const element = transition ? g.transition().duration(this.duration) : g
+      this.transformSvg(element, size)
     },
 
     updateIfNeeded (d, update) {
