@@ -252,8 +252,8 @@ export default {
       if (!this.zoomable) {
         return
       }
-      this.removeZoom()
-      this.internaldata.zoom = this.setUpZoom()
+      const {minZoom, maxZoom} = this
+      this.internaldata.zoom.scaleExtent([minZoom, maxZoom])
     },
 
     completeRedraw ({margin = null, layout = null}) {
