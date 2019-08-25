@@ -164,8 +164,8 @@ export default {
         const max = Math.max(...mapped1.map(el => el.value))
         return mapped1.find(el => el.value === max)
       }
-      const xExtreme = getMaxNode(0)
-      const yExtreme = getMaxNode(1)
+      const xExtreme = getMaxNode('x')
+      const yExtreme = getMaxNode('y')
       const textContraint = {xExtreme, yExtreme}
 
       if ((this.textContraint) && (this.textContraint.xExtreme.value === xExtreme.value) &&
