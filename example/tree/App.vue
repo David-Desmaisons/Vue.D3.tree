@@ -335,11 +335,12 @@ export default {
 
       this.duration = 20
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
+      const changeNode = () => { this.linkLayout = (this.linkLayout === 'bezier') ? 'orthogonal' : 'bezier' }
       const changeType = () => { this.layoutType = updateType(this.layoutType) }
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')
-      var horde = getGremlin(gremlinsButton, treeDiv, {changeType, changeLayout, resetZoom})
+      var horde = getGremlin(gremlinsButton, treeDiv, {changeType, changeLayout, changeNode, resetZoom})
       horde.after(() => { this.isUnderGremlinsAttack = false })
       horde.unleash()
       this.horde = horde
