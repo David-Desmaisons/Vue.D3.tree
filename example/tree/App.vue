@@ -30,6 +30,27 @@
             </div> 
 
             <div class="form-group">
+              <label for="layout-type" class="control-label col-sm-3">nodeTextDisplay</label>
+                <div  class="col-sm-9">
+                  <select id="layout-type" class="form-control" v-model="nodeTextDisplay">
+                    <option>all</option>
+                    <option>leaves</option>
+                    <option>extremities</option>
+                  </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="layout-type" class="control-label col-sm-3">linkLayout</label>
+                <div  class="col-sm-9">
+                  <select id="layout-type" class="form-control" v-model="linkLayout">
+                    <option>bezier</option>
+                    <option>orthogonal</option>
+                  </select>
+              </div>
+            </div>
+
+            <div class="form-group">
               <label for="margin-x" class="control-label col-sm-3">marginx</label>
               <div class="col-sm-7">
                 <input id="margin-x" class="form-control" type="range" min="0" max="200" v-model.number="Marginx">
@@ -70,9 +91,9 @@
             </div>
 
             <div class="form-group">
-              <label for="text-margin" class="control-label col-sm-3">leafTextMargin</label>
+              <label for="leaf-text-margin" class="control-label col-sm-3">leafTextMargin</label>
               <div class="col-sm-7">
-                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="leafTextMargin">
+                <input id="leaf-text-margin" class="form-control" type="range" min="0" max="100" v-model.number="leafTextMargin">
               </div>
               <div class="col-sm-2">
                 <p>{{leafTextMargin}}px</p>
@@ -80,9 +101,9 @@
             </div>
 
              <div class="form-group">
-              <label for="text-margin" class="control-label col-sm-3">nodeTextMargin</label>
+              <label for="node-text-margin" class="control-label col-sm-3">nodeTextMargin</label>
               <div class="col-sm-7">
-                <input id="text-margin" class="form-control" type="range" min="0" max="100" v-model.number="nodeTextMargin">
+                <input id="node-text-margin" class="form-control" type="range" min="0" max="100" v-model.number="nodeTextMargin">
               </div>
               <div class="col-sm-2">
                 <p>{{nodeTextMargin}}px</p>
@@ -90,9 +111,29 @@
             </div>
 
             <div class="form-group">
+              <label for="minZoom" class="control-label col-sm-3">minZoom</label>
+              <div class="col-sm-7">
+                <input id="minZoom" class="form-control" type="range" min="0.01" max="1" step="0.05" v-model.number="minZoom">
+              </div>
+              <div class="col-sm-2">
+                <p>{{minZoom}}</p>
+              </div>
+            </div>
+
+              <div class="form-group">
+              <label for="maxZoom" class="control-label col-sm-3">maxZoom</label>
+              <div class="col-sm-7">
+                <input id="maxZoom" class="form-control" type="range" min="1" max="100" v-model.number="maxZoom">
+              </div>
+              <div class="col-sm-2">
+                <p>{{maxZoom}}</p>
+              </div>
+            </div>
+
+            <div class="form-group">
               <label for="zoomable" class="">Zoomable</label>
               <input id="zoomable" class="form-check-input" type="checkbox" v-model="zoomable">
-            </div> 
+            </div>
 
             <div class="form-group feedback">
               <i v-show="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
@@ -142,7 +183,32 @@
   </div>
 
   <div class="col-md-9 panel panel-default">
-    <tree ref="tree" v-model="currentData" :identifier="getId" :nodeTextMargin="nodeTextMargin" :zoomable="zoomable" :data="Graph.tree" :leafTextMargin="leafTextMargin" :node-text="nodeText"  :margin-x="Marginx" :margin-y="Marginy" :radius="radius" :type="type" :layout-type="layoutType" :duration="duration" class="tree" @clickedText="onClick" @expand="onExpand" @retract="onRetract" @clickedNode="onClickNode">
+    <tree ref="tree"
+      v-model="currentData"
+      :nodeTextDisplay="nodeTextDisplay"
+      :identifier="getId" 
+      :nodeTextMargin="nodeTextMargin"
+      :zoomable="zoomable"
+      :data="Graph.tree"
+      :leafTextMargin="leafTextMargin"
+      :node-text="nodeText"
+      :margin-x="Marginx"
+      :margin-y="Marginy"
+      :radius="radius"
+      :type="type"
+      :layout-type="layoutType"
+      :linkLayout="linkLayout"
+      :duration="duration"
+      :minZoom="minZoom"
+      :maxZoom="maxZoom"
+      class="tree"
+      @clickedText="onClick"
+      @expand="onExpand"
+      @retract="onRetract"
+      @clickedNode="onClickNode">
+
+      <!-- <template #node /> -->
+
       <!-- <template #node="{data, node: {depth}, radius, isRetracted}">
         <template v-if="data.children && data.children.length">
           <path transform="scale(0.05) translate(-10,-250)" :fill="isRetracted? 'red' : 'blue'" d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z">
@@ -186,6 +252,10 @@ Object.assign(data, {
   zoomable: true,
   isLoading: false,
   isUnderGremlinsAttack: false,
+  nodeTextDisplay: 'all',
+  linkLayout: 'bezier',
+  minZoom: 0.8,
+  maxZoom: 9,
   events: []
 })
 
@@ -263,13 +333,28 @@ export default {
         }
       }
 
+      const updateNodeTextDisplay = (display) => {
+        switch (display) {
+          case 'all':
+            return 'leaves'
+
+          case 'leaves':
+            return 'extremities'
+
+          case 'extremities':
+            return 'all'
+        }
+      }
+
       this.duration = 20
       const changeLayout = () => { this.type = (this.type === 'tree') ? 'cluster' : 'tree' }
+      const changeNode = () => { this.linkLayout = (this.linkLayout === 'bezier') ? 'orthogonal' : 'bezier' }
       const changeType = () => { this.layoutType = updateType(this.layoutType) }
+      const changeNodeTextDisplay = () => { this.nodeTextDisplay = updateNodeTextDisplay(this.nodeTextDisplay) }
       const resetZoom = this.resetZoom.bind(this)
       const [treeDiv] = this.$el.getElementsByClassName('tree')
       const [gremlinsButton] = this.$el.getElementsByClassName('btn-danger')
-      var horde = getGremlin(gremlinsButton, treeDiv, changeType, changeLayout, resetZoom)
+      var horde = getGremlin(gremlinsButton, treeDiv, {changeType, changeLayout, changeNode, changeNodeTextDisplay, resetZoom})
       horde.after(() => { this.isUnderGremlinsAttack = false })
       horde.unleash()
       this.horde = horde
