@@ -1,5 +1,7 @@
+import Point from './point'
+
 function transformNode (x, y) {
-  return `${y},${x}`
+  return new Point(y, x)
 }
 
 export default {

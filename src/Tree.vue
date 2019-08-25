@@ -10,6 +10,7 @@ import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import standardBehavior from './behaviors/StandardBehavior'
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext, renderTemplateSlot} from './vueHelper'
+import {setUpZoom} from './zoom/zoomBehavior'
 
 import * as d3 from 'd3'
 
@@ -102,6 +103,10 @@ const props = {
   radius: {
     type: Number,
     default: 3
+  },
+  strokeWidth: {
+    type: Number,
+    default: 1.5
   },
   leafTextMargin: {
     type: Number,
@@ -226,12 +231,15 @@ export default {
     },
 
     setUpZoom () {
-      const { minZoom, maxZoom, internaldata: { svg, g } } = this
-      const zoom = d3.zoom().scaleExtent([minZoom, maxZoom])
-      zoom.on('zoom', this.zoomed(g))
-      svg.call(zoom).on('wheel', () => d3.event.preventDefault())
-      svg.call(zoom.transform, this.currentTransform || d3.zoomIdentity)
-      return zoom
+      const { currentTransform, minZoom, maxZoom, onZoomed, internaldata: { svg } } = this
+      return setUpZoom({ currentTransform, minZoom, maxZoom, svg }, onZoomed)
+    },
+
+    onZoomed ({transform}) {
+      this.$emit('zoom', {transform})
+      this._originalZoom = transform
+      this.currentTransform = this.updateTransform(transform)
+      this.redraw({transitionDuration: 0})
     },
 
     removeZoom () {
@@ -244,14 +252,14 @@ export default {
       if (!this.zoomable) {
         return
       }
-      this.removeZoom()
-      this.internaldata.zoom = this.setUpZoom()
+      const {minZoom, maxZoom} = this
+      this.internaldata.zoom.scaleExtent([minZoom, maxZoom])
     },
 
     completeRedraw ({margin = null, layout = null}) {
       const size = this.getSize()
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
-      this.applyTransition(size, {margin, layout})
+      this.applyZoom(size, true)
       this.redraw()
     },
 
@@ -260,12 +268,12 @@ export default {
       return this.layout.transformSvg(g, this.margin, size, this.maxTextLenght)
     },
 
-    updateTransform (g, size) {
+    updateTransform (transform, size) {
       size = size || this.getSize()
-      return this.layout.updateTransform(g, this.margin, size, this.maxTextLenght)
+      return this.layout.updateTransform(transform, this.margin, size, this.maxTextLenght)
     },
 
-    updateGraph (source) {
+    updateGraph (source, {transitionDuration = undefined} = {}) {
       source = source || this.internaldata.root
       let originBuilder = source
       let forExit = source
@@ -306,20 +314,26 @@ export default {
         d._y0 = d.y
       })
 
-      const { layout, duration, drawLink } = this
+      const { strokeWidth, layout, duration, drawLink } = this
+      transitionDuration = (transitionDuration === undefined) ? duration : transitionDuration
+      const transform = this.currentTransform || d3.zoomIdentity
+      const strokeWidthFinal = `${strokeWidth / transform.k}px`
 
       newLinks.attr('d', d => drawLink(originBuilder(d), originBuilder(d), layout))
+        .attr('transform', transform)
+        .attr('stroke-width', strokeWidthFinal)
       const updateAndNewLinks = links.merge(newLinks)
       const updateAndNewLinksPromise = toPromise(updateAndNewLinks
-        .transition().duration(duration)
+        .transition().duration(transitionDuration)
+        .attr('transform', transform)
+        .attr('stroke-width', strokeWidthFinal)
         .attrTween('d', function (d) {
           const previous = d3.select(this).attr('d')
           const final = drawLink(d, d.parent, layout)
           return interpolatePath(previous, final)
         })
       )
-      const exitingLinksPromise = toPromise(links.exit().transition().duration(duration).attr('d', d => drawLink(forExit(d), forExit(d), layout)).remove())
-
+      const exitingLinksPromise = toPromise(links.exit().transition().duration(transitionDuration).attr('d', d => drawLink(forExit(d), forExit(d), layout)).remove())
       const {actions, radius, selected, $scopedSlots: {node}} = this
       const getHtml = node ? d => renderInVueContext({
         scope: node,
@@ -333,7 +347,7 @@ export default {
         }
       }, this.redraw) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => `${translate(originBuilder(d), layout)} rotate(${originAngle}) scale(0.1)`)
+      newNodes.attr('transform', d => `${translate(originBuilder(d), layout, transform)} rotate(${originAngle}) scale(0.1)`)
         .append('g')
         .attr('class', 'node')
 
@@ -362,8 +376,8 @@ export default {
         d.layoutInfo = layoutNode(hasChildren(d), {leaf: leafTextMargin, node: nodeTextMargin}, d)
       })
 
-      const allNodesPromise = toPromise(allNodes.transition().duration(duration)
-        .attr('transform', d => `${translate(d, layout)} rotate(${d.layoutInfo.rotate})`)
+      const allNodesPromise = toPromise(allNodes.transition().duration(transitionDuration)
+        .attr('transform', d => `${translate(d, layout, transform)} rotate(${d.layoutInfo.rotate})`)
         .attr('opacity', 1))
 
       text.attr('x', d => d.layoutInfo.x)
@@ -377,11 +391,11 @@ export default {
       })
 
       const exitingNodes = nodes.exit()
-      exitingNodes.select('.node').transition().duration(duration)
+      exitingNodes.select('.node').transition().duration(transitionDuration)
                   .attr('transform', 'scale(0.1)')
 
-      const exitingNodesPromise = toPromise(exitingNodes.transition().duration(duration)
-                  .attr('transform', d => `${translate(forExit(d), layout)} rotate(${d.parent.layoutInfo.rotate})`)
+      const exitingNodesPromise = toPromise(exitingNodes.transition().duration(transitionDuration)
+                  .attr('transform', d => `${translate(forExit(d), layout, transform)} rotate(${d.parent.layoutInfo.rotate})`)
                   .attr('opacity', 0).remove())
 
       const leaves = root.leaves()
@@ -447,12 +461,13 @@ export default {
       })
     },
 
-    redraw () {
-      if (!this.internaldata.root || this._scheduledRedraw) {
+    redraw (option) {
+      const { internaldata: { root }, _scheduledRedraw } = this
+      if (!root || _scheduledRedraw) {
         return
       }
       this._scheduledRedraw = true
-      this.$nextTick(() => this.updateGraph())
+      this.$nextTick(() => this.updateGraph(root, option))
     },
 
     getNodeOriginComputer (originalVisibleNodes) {
@@ -462,42 +477,14 @@ export default {
       }
     },
 
-    applyZoom (size) {
-      const {g, zoom, zoomable} = this.internaldata
+    applyZoom (size, transition) {
+      const { internaldata: {g, zoom}, zoomable } = this
       if (zoomable && zoom) {
-        g.call(zoom.transform, this.currentTransform)
+        this.currentTransform = this.updateTransform(this._originalZoom)
         return
       }
-      this.transformSvg(g, size)
-    },
-
-    applyTransition (size, {margin, layout}) {
-      const {g, svg, zoom, zoomable} = this.internaldata
-      if (zoomable & zoom) {
-        const transform = this.currentTransform
-        const oldMargin = margin || this.margin
-        const oldLayout = layout || this.layout
-
-        const nowTransform = oldLayout.updateTransform(transform, oldMargin, size, this.maxTextLenght)
-        const nextRealTransform = this.updateTransform(transform, size)
-        const current = d3.zoomIdentity.translate(transform.x + nowTransform.x - nextRealTransform.x, transform.y + nowTransform.y - nextRealTransform.y).scale(transform.k)
-
-        svg.call(zoom.transform, current).transition().duration(this.duration).call(zoom.transform, transform)
-        return
-      }
-      const transitiong = g.transition().duration(this.duration)
-      this.transformSvg(transitiong, size)
-    },
-
-    zoomed (g) {
-      return () => {
-        const transform = d3.event.transform
-        const size = this.getSize()
-        const transformToApply = this.updateTransform(transform, size)
-        this.currentTransform = transform
-        this.$emit('zoom', {transform})
-        g.attr('transform', transformToApply)
-      }
+      const element = transition ? g.transition().duration(this.duration) : g
+      this.transformSvg(element, size)
     },
 
     updateIfNeeded (d, update) {
@@ -695,7 +682,6 @@ export default {
   fill: none;
   stroke: #555;
   stroke-opacity: 0.4;
-  stroke-width: 1.5px;
 }
 
 .treeclass {
