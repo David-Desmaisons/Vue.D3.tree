@@ -164,17 +164,19 @@ export default {
   },
 
   render (h) {
-    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
-    const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
-    this.actions = Object.keys(rawActions).reduce((current, key) => {
-      current[key] = rawActions[key].bind(this)
-      return current
-    }, {})
-    const getProps = () => {
-      const {actions, graphNodes: nodes} = this
-      return {nodes, actions}
+    if (!this._behaviour) {
+      const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
+      const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+      this.actions = Object.keys(rawActions).reduce((current, key) => {
+        current[key] = rawActions[key].bind(this)
+        return current
+      }, {})
+      const getProps = () => {
+        const {actions, graphNodes: nodes, $on: on} = this
+        return {nodes, actions, on: on.bind(this)}
+      }
+      this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
     }
-    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
   },
 

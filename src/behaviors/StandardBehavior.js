@@ -6,11 +6,11 @@ export default {
   name: 'standardBehavior',
   props: {
     /**
-     *  Tree nodes. Typically provided by tree behavior slot.
+     *  Parent event listener.
      */
-    nodes: {
-      required: false,
-      type: Object
+    on: {
+      required: true,
+      type: Function
     },
     /**
      *  Tree actions. Typically provided by tree behavior slot.
@@ -26,13 +26,15 @@ export default {
     return null
   },
 
-  watch: {
-    'nodes.clickedText': function (node) {
-      node && this.actions.setSelected(node.data)
-    },
+  created () {
+    const {on, actions} = this
 
-    'nodes.clickedNode': function (node) {
-      node && this.actions.toggleExpandCollapse(node)
-    }
+    on('clickedText', ({element}) => {
+      actions.setSelected(element)
+    })
+
+    on('clickedNode', ({element}) => {
+      actions.toggleExpandCollapse(element)
+    })
   }
 }

@@ -222,8 +222,8 @@
         </template>
       </template> -->
 
-     <template #behavior="{nodes, actions}">
-        <StandardBehavior v-bind="{nodes, actions}"/> 
+     <template #behavior="{on, actions}">
+        <StandardBehavior v-bind="{on, actions}"/> 
       </template>
     </tree>
   </div>
