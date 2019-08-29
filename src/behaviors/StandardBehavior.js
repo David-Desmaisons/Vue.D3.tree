@@ -1,5 +1,5 @@
 /**
- * Renderless component providing the collapse on click behavior.
+ * Render-less component providing the collapse on click behavior.
  *Can be used as a behavior slot of tree component.
  */
 export default {
@@ -21,10 +21,7 @@ export default {
     }
   },
 
-  render () {
-    // no rendering
-    return null
-  },
+  render: () => null,
 
   created () {
     const {on, actions} = this
