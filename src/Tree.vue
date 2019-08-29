@@ -7,9 +7,11 @@ import vertical from './layout/vertical'
 import circular from './layout/circular'
 import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
-import standardBehavior from './behaviors/StandardBehavior'
+import collapseOnClick from './behaviors/CollapseOnClick'
+import selectOnTextClick from './behaviors/SelectOnTextClick'
+
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
-import {renderInVueContext, renderTemplateSlot} from './vueHelper'
+import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
 
 import * as d3 from 'd3'
@@ -38,7 +40,8 @@ const props = {
   },
   selected: {
     type: Object,
-    required: false
+    required: false,
+    default: null
   },
   duration: {
     type: Number,
@@ -164,18 +167,17 @@ export default {
   },
 
   render (h) {
-    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse} = this
-    const rawActions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
-    this.actions = Object.keys(rawActions).reduce((current, key) => {
-      current[key] = rawActions[key].bind(this)
-      return current
-    }, {})
-    const getProps = () => {
-      const {actions, graphNodes: nodes} = this
-      return {nodes, actions}
-    }
-    this._behaviour = renderTemplateSlot(getProps, this.$scopedSlots.behavior, standardBehavior)
-    return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]})
+    const {$behaviorProps: behaviorProps} = this
+    const slotNodes = [collapseOnClick, selectOnTextClick].map(component => h(component, this._b({}, component.name, behaviorProps, false)))
+    return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
+      this._t('behavior', slotNodes, null, behaviorProps)
+    ])
+  },
+
+  created () {
+    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
+    const actions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    this.$behaviorProps = {actions, on: on.bind(this)}
   },
 
   data () {
@@ -184,10 +186,6 @@ export default {
       maxTextLenght: {
         first: 0,
         last: 0
-      },
-      graphNodes: {
-        clickedNode: null,
-        clickedText: null
       }
     }
   },
@@ -364,7 +362,7 @@ export default {
 
       allNodes.classed('node--internal', d => hasChildren(d))
         .classed('node--leaf', d => !hasChildren(d))
-        .classed('selected', d => d.data === selected)
+        .classed('selected', d => d === selected)
         .on('click', this.onNodeClick)
 
       const { leafTextMargin, nodeTextMargin, layout: {layoutNode}, nodeTextDisplay } = this
@@ -415,18 +413,14 @@ export default {
     },
 
     onNodeTextClick (d) {
-      this.graphNodes.clickedNode = null
       this.onEvent('clickedText', d)
     },
 
     onNodeClick (d) {
-      this.graphNodes.clickedText = null
       this.onEvent('clickedNode', d)
     },
 
     onEvent (name, d) {
-      this.graphNodes[name] = null
-      this.graphNodes[name] = d
       this.$emit(name, {element: d, data: d.data})
       d3.event.stopPropagation()
     },

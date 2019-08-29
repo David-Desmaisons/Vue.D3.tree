@@ -1,9 +1,13 @@
 import tree from './Tree'
 import hierarchicalEdgeBundling from './HierarchicalEdgeBundling'
-import standardBehavior from './behaviors/StandardBehavior'
+import collapseOnClick from './behaviors/CollapseOnClick'
+import selectOnTextClick from './behaviors/SelectOnTextClick'
+import behaviorMixin from './behaviors/behaviorMixin'
 
 export {
     tree,
     hierarchicalEdgeBundling,
-    standardBehavior
+    collapseOnClick,
+    selectOnTextClick,
+    behaviorMixin
 }
