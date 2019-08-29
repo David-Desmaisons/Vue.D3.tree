@@ -121,7 +121,7 @@ Slot-scope:
 
 | Name      | Type | Description  |
 | ---       | ---      | ---   |
-| nodes      | `Object`    | Value: { clickedNode: `D3.js node`, clickedText: `D3.js node` }  The last node click or which text has been clicked |
+| on      | `Function`    | Value: $on method of the tree component, exposing all events |
 | actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, setSelected, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
 
 By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clickin on its text.
@@ -129,24 +129,24 @@ By default tree component use standardBehavior as component which provides toggl
 Example:
 
 ```HTML
-<template #behavior="{nodes, actions}">
-  <CollapseOnClick v-bind="{nodes, actions}"/>
+<template #behavior="{on, actions}">
+  <CollapseOnClick v-bind="{on, actions}"/>
 </template>
 ```
 
 With CollapseOnClick component:
 ```javascript
 export default {
-  props: ['nodes', 'actions'],
+  props: ['on', 'actions'],
 
-  render () {
-    return null
-  },
+  render: () => null,
 
-  watch: {
-    'nodes.clickedNode': function (node) {
-      this.actions.toggleExpandCollapse(node)
-    }
+  created () {
+    const {on, actions: {toggleExpandCollapse}} = this;
+
+    on('clickedNode', ({element}) => {
+      toggleExpandCollapse(element);
+    })
   }
 }
 ```
