@@ -137,23 +137,23 @@
 
             <div class="form-group feedback">
               <i v-show="isLoading" class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
-              <span v-if="currentNode">Current Node: {{currentNode.data.text}}</span>
+              <span v-if="currentData">Current Node: {{currentData.data.text}}</span>
               <span v-else>No Node selected.</span>
             </div>
 
-            <button type="button" :disabled="!currentNode" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
+            <button type="button" :disabled="!currentData" class="btn btn-primary" @click="expandAll" data-toggle="tooltip" data-placement="top" title="Expand All from current">
             <i class="fa fa-expand" aria-hidden="true"></i>
             </button>
 
-            <button type="button" :disabled="!currentNode" class="btn btn-secondary" @click="collapseAll" data-toggle="tooltip" data-placement="top" title="Collapse All from current">
+            <button type="button" :disabled="!currentData" class="btn btn-secondary" @click="collapseAll" data-toggle="tooltip" data-placement="top" title="Collapse All from current">
             <i class="fa fa-compress" aria-hidden="true"></i>
             </button>
 
-            <button type="button" :disabled="!currentNode" class="btn btn-success" @click="showOnly" data-toggle="tooltip" data-placement="top" title="Show Only from current">
+            <button type="button" :disabled="!currentData" class="btn btn-success" @click="showOnly" data-toggle="tooltip" data-placement="top" title="Show Only from current">
             <i class="fa fa-search-plus" aria-hidden="true"></i>
             </button>
 
-            <button type="button" :disabled="!currentNode" class="btn btn-warning" @click="show" data-toggle="tooltip" data-placement="top" title="Show current">
+            <button type="button" :disabled="!currentData" class="btn btn-warning" @click="show" data-toggle="tooltip" data-placement="top" title="Show current">
             <i class="fa fa-binoculars" aria-hidden="true"></i>
             </button>
 
@@ -222,9 +222,9 @@
         </template>
       </template> -->
 
-     <template #behavior="{on, actions}">
-        <StandardBehavior v-bind="{on, actions}"/> 
-      </template>
+     <!-- <template #behavior="{on, actions}">
+        <StandardBehavior v-bind="{on, actions}"/>
+      </template> -->
     </tree>
   </div>
   
@@ -248,7 +248,6 @@ Object.assign(data, {
   nodeTextMargin: 6,
   nodeText: 'text',
   currentData: null,
-  currentNode: null,
   zoomable: true,
   isLoading: false,
   isUnderGremlinsAttack: false,
@@ -270,9 +269,9 @@ export default {
   },
   methods: {
     async do (action) {
-      if (this.currentNode) {
+      if (this.currentData) {
         this.isLoading = true
-        await this.$refs['tree'][action](this.currentNode)
+        await this.$refs['tree'][action](this.currentData)
         this.isLoading = false
       }
     },
@@ -292,7 +291,6 @@ export default {
       this.do('show')
     },
     onClick (evt) {
-      this.currentNode = evt.element
       this.onEvent('clickedText', evt)
     },
     onClickNode (evt) {
