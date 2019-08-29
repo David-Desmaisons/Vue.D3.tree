@@ -3,7 +3,6 @@
  *Can be used as a behavior slot of tree component.
  */
 export default {
-  name: 'standardBehavior',
   props: {
     /**
      *  Parent event listener.
@@ -21,17 +20,5 @@ export default {
     }
   },
 
-  render: () => null,
-
-  created () {
-    const {on, actions} = this
-
-    on('clickedText', ({element}) => {
-      actions.setSelected(element)
-    })
-
-    on('clickedNode', ({element}) => {
-      actions.toggleExpandCollapse(element)
-    })
-  }
+  render: () => null
 }

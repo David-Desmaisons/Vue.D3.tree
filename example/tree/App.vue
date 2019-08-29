@@ -233,7 +233,6 @@
 
 <script>
 import {tree} from '../../src/'
-import StandardBehavior from '../../src/behaviors/StandardBehavior'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
 
@@ -264,8 +263,7 @@ export default {
     return data
   },
   components: {
-    tree,
-    StandardBehavior
+    tree
   },
   methods: {
     async do (action) {

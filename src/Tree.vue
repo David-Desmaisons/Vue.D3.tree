@@ -7,7 +7,9 @@ import vertical from './layout/vertical'
 import circular from './layout/circular'
 import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
-import standardBehavior from './behaviors/StandardBehavior'
+import collapseOnClick from './behaviors/CollapseOnClick'
+import selectOnTextClick from './behaviors/SelectOnTextClick'
+
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
@@ -166,9 +168,9 @@ export default {
 
   render (h) {
     const {$behaviorProps: behaviorProps} = this
-    const defaultSlot = h(standardBehavior, this._b({}, 'StandardBehavior', behaviorProps, false))
+    const slotNodes = [collapseOnClick, selectOnTextClick].map(component => h(component, this._b({}, component.name, behaviorProps, false)))
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
-      this._t('behavior', [defaultSlot], null, behaviorProps)
+      this._t('behavior', slotNodes, null, behaviorProps)
     ])
   },
 
