@@ -1,6 +1,6 @@
 /**
  * Render-less component providing the collapse on click behavior.
- *Can be used as a behavior slot of tree component.
+ * Designed to be used as a behavior slot of tree component.
  */
 import behaviorMixin from './behaviorMixin'
 

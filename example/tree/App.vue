@@ -222,8 +222,8 @@
         </template>
       </template> -->
 
-     <!-- <template #behavior="{on, actions}">
-        <StandardBehavior v-bind="{on, actions}"/>
+      <!-- <template #behavior>
+        <noBehavior/>
       </template> -->
     </tree>
   </div>
@@ -235,6 +235,7 @@
 import {tree} from '../../src/'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
+import noBehavior from '../../src/behaviors/noBehavior'
 
 Object.assign(data, {
   type: 'tree',
@@ -263,7 +264,8 @@ export default {
     return data
   },
   components: {
-    tree
+    tree,
+    noBehavior
   },
   methods: {
     async do (action) {
