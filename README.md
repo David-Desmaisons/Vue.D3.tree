@@ -1,5 +1,5 @@
 # Vue.D3.tree
-[![GitHub open issues](https://img.shields.io/github/issues/David-Desmaisons/Vue.D3.tree.svg?maxAge=2592000)](https://github.com/David-Desmaisons/Vue.D3.tree/issues)
+[![GitHub open issues](https://img.shields.io/github/issues/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/issues)
 [![Npm version](https://img.shields.io/npm/v/vued3tree.svg)](https://www.npmjs.com/package/vued3tree)
 [![npm download](https://img.shields.io/npm/dt/vued3tree.svg)](https://www.npmjs.com/package/vued3tree)
 [![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
