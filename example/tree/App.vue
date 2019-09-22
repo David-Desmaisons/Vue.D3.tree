@@ -225,6 +225,12 @@
       <!-- <template #behavior>
         <noBehavior/>
       </template> -->
+
+      <template #contextMenu="{data}">
+        <div style="opacity:0.5;">
+          <pre>{{data.text}}</pre>
+        </div>
+      </template>
     </tree>
   </div>
   

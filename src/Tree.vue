@@ -9,10 +9,12 @@ import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
+import contextMenuOnClickText from './behaviors/contextMenuOnClickText'
 
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
+import {createPopper} from './contextMenu'
 
 import * as d3 from 'd3'
 
@@ -118,6 +120,10 @@ const props = {
   nodeTextMargin: {
     type: Number,
     default: 6
+  },
+  contextMenuPlacement: {
+    type: String,
+    default: 'bottom'
   }
 }
 
@@ -154,6 +160,12 @@ function filterTextNode (nodeTextDisplay, root) {
   }
 }
 
+const defaultBehaviors = [
+  collapseOnClick,
+  selectOnTextClick,
+  contextMenuOnClickText
+]
+
 export default {
   name: 'D3Tree',
 
@@ -167,22 +179,34 @@ export default {
   },
 
   render (h) {
-    const {$behaviorProps: behaviorProps} = this
-    const slotNodes = [collapseOnClick, selectOnTextClick].map(component => h(component, this._b({}, component.name, behaviorProps, false)))
+    const {$behaviorProps: behaviorProps, $scopedSlots: {contextMenu}, contextMenu: {node, style}} = this
+    const slotNodes = defaultBehaviors.map(component => h(component, this._b({}, component.name, behaviorProps, false)))
+    const menu = h('div', {
+      class: 'context-menu-tree',
+      style
+    }, [
+      (!contextMenu || (node === null)) ? null : contextMenu({node, data: node.data})
+    ])
+
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
+      menu,
       this._t('behavior', slotNodes, null, behaviorProps)
     ])
   },
 
   created () {
-    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
-    const actions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    const {setSelected, setContextMenu, resetContextMenu, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
+    const actions = {setSelected, setContextMenu, resetContextMenu, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
     this.$behaviorProps = {actions, on: on.bind(this)}
   },
 
   data () {
     return {
       currentTransform: null,
+      contextMenu: {
+        node: null,
+        style: null
+      },
       maxTextLenght: {
         first: 0,
         last: 0
@@ -213,6 +237,21 @@ export default {
       this.$emit('change', node)
     },
 
+    setContextMenu ({element, target}) {
+      const {contextMenu, contextMenuPlacement} = this
+      contextMenu.node = element
+      createPopper({
+        target,
+        element: this.$el.querySelector('.context-menu-tree'),
+        placement: contextMenuPlacement,
+        styleCallback: style => { contextMenu.style = style }
+      })
+    },
+
+    resetContextMenu () {
+      this.contextMenu.node = null
+    },
+
     getSize () {
       const {$el: {clientWidth: width, clientHeight: height}} = this
       return { width, height }
@@ -237,7 +276,7 @@ export default {
       this.$emit('zoom', {transform})
       this._originalZoom = transform
       this.currentTransform = this.updateTransform(transform)
-      this.redraw({transitionDuration: 0})
+      this.redraw({transitionDuration: 0, resetContextMenu: true})
     },
 
     removeZoom () {
@@ -254,11 +293,11 @@ export default {
       this.internaldata.zoom.scaleExtent([minZoom, maxZoom])
     },
 
-    completeRedraw ({margin = null, layout = null}) {
+    completeRedraw ({margin = null, layout = null, resetContextMenu = true}) {
       const size = this.getSize()
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyZoom(size, true)
-      this.redraw()
+      this.redraw({resetContextMenu})
     },
 
     transformSvg (g, size) {
@@ -421,8 +460,9 @@ export default {
     },
 
     onEvent (name, d) {
-      this.$emit(name, {element: d, data: d.data})
-      d3.event.stopPropagation()
+      const event = d3.event
+      this.$emit(name, {element: d, data: d.data, target: event.target})
+      event.stopPropagation()
     },
 
     toggleExpandCollapse (d) {
@@ -455,7 +495,10 @@ export default {
       })
     },
 
-    redraw (option) {
+    redraw (option = {resetContextMenu: true}) {
+      if (option.resetContextMenu) {
+        this.resetContextMenu()
+      }
       const { internaldata: { root }, _scheduledRedraw } = this
       if (!root || _scheduledRedraw) {
         return
@@ -607,7 +650,7 @@ export default {
     },
 
     selected () {
-      this.completeRedraw({layout: this.layout})
+      this.completeRedraw({layout: this.layout, resetContextMenu: false})
     },
 
     radius () {
@@ -654,6 +697,10 @@ export default {
 </script>
 
 <style>
+.context-menu-tree {
+  position: absolute;
+}
+
 .treeclass .nodetree  circle {
   fill: #999;
 }
