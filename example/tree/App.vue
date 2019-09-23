@@ -201,6 +201,7 @@
       :duration="duration"
       :minZoom="minZoom"
       :maxZoom="maxZoom"
+      contextMenuPlacement="bottom-start"
       class="tree"
       @clickedText="onClick"
       @expand="onExpand"
@@ -227,8 +228,10 @@
       </template> -->
 
       <template #contextMenu="{data}">
-        <div style="opacity:0.5;">
-          <pre>{{data.text}}</pre>
+        <div>
+           <button type="button" class="btn btn-primary" @click="addFor(data)" data-toggle="tooltip" title="Add children">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
         </div>
       </template>
     </tree>
@@ -242,6 +245,7 @@ import {tree} from '../../src/'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
 import noBehavior from '../../src/behaviors/noBehavior'
+let currentId = 500
 
 Object.assign(data, {
   type: 'tree',
@@ -310,6 +314,14 @@ export default {
     },
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
+    },
+    addFor (data) {
+      const newData = {
+        id: currentId++,
+        children: [],
+        text: Math.random().toString(36).substring(7)
+      }
+      data.children.push(newData)
     },
     resetZoom () {
       if (!this.$refs['tree']) {
