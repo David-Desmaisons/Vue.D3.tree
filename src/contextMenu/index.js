@@ -13,8 +13,7 @@ function createPopper ({target, element, placement, styleCallback}) {
       onCreate: onStyle,
       onUpdate: onStyle,
       modifiers: { applyStyle: { enabled: false } },
-      placement,
-      removeOnDestroy: true
+      placement
     })
 }
 

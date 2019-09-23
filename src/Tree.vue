@@ -9,8 +9,7 @@ import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
-import contextMenuOnClickText from './behaviors/contextMenuOnClickText'
-
+import contextMenuOnClickText from './behaviors/ContextMenuOnClickText'
 import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
@@ -219,6 +218,7 @@ export default {
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
+          .on('click', () => { this.$emit('clickOutside') })
     const {zoomable, tree} = this
     const g = zoomable ? svg.append('g') : this.transformSvg(svg.append('g'), size)
 
@@ -310,7 +310,10 @@ export default {
       return this.layout.updateTransform(transform, this.margin, size, this.maxTextLenght)
     },
 
-    updateGraph (source, {transitionDuration = undefined} = {}) {
+    updateGraph (source, {transitionDuration = undefined, resetContextMenu = true} = {}) {
+      if (resetContextMenu) {
+        this.resetContextMenu()
+      }
       source = source || this.internaldata.root
       let originBuilder = source
       let forExit = source
@@ -394,6 +397,8 @@ export default {
         .attr('x', 0)
         .attr('dx', 0)
         .on('click', this.onNodeTextClick)
+        .on('mouseover', this.onNodeTextOver)
+        .on('mouseleave', this.onNodeTextLeave)
 
       allNodes
         .select('.node')
@@ -451,6 +456,14 @@ export default {
       return this.updateGraph(source)
     },
 
+    onNodeTextOver (d) {
+      this.onEvent('mouseOverText', d)
+    },
+
+    onNodeTextLeave (d) {
+      this.onEvent('mouseLeaveText', d)
+    },
+
     onNodeTextClick (d) {
       this.onEvent('clickedText', d)
     },
@@ -496,9 +509,6 @@ export default {
     },
 
     redraw (option = {resetContextMenu: true}) {
-      if (option.resetContextMenu) {
-        this.resetContextMenu()
-      }
       const { internaldata: { root }, _scheduledRedraw } = this
       if (!root || _scheduledRedraw) {
         return

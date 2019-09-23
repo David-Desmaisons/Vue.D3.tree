@@ -1,21 +1,21 @@
 /**
- * Render-less component providing the context on click text behavior.
+ * Render-less component providing the context on hover text behavior.
  * Designed to be used as a behavior slot of tree component.
  */
 import behaviorMixin from './behaviorMixin'
 
 export default {
-  name: 'menuOnTextClick',
+  name: 'menuOnTextHover',
   mixins: [behaviorMixin],
 
   created () {
     const {on, actions: {setContextMenu, resetContextMenu}} = this
 
-    on('clickedText', (context) => {
+    on('mouseOverText', (context) => {
       setContextMenu(context)
     })
 
-    on('clickOutside', () => {
+    on('mouseLeaveText', () => {
       resetContextMenu()
     })
   }
