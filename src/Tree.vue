@@ -178,13 +178,13 @@ export default {
   },
 
   render (h) {
-    const {$behaviorProps: behaviorProps, $scopedSlots: {contextMenu}, contextMenu: {node, style}} = this
+    const {$behaviorProps: behaviorProps, $scopedSlots: {contextMenu}, resetContextMenu: close, contextMenu: {node, style}} = this
     const slotNodes = defaultBehaviors.map(component => h(component, this._b({}, component.name, behaviorProps, false)))
     const menu = h('div', {
       class: 'context-menu-tree',
       style
     }, [
-      (!contextMenu || (node === null)) ? null : contextMenu({node, data: node.data})
+      (!contextMenu || (node === null)) ? null : contextMenu({node, data: node.data, close})
     ])
 
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
@@ -319,6 +319,14 @@ export default {
       const originAngle = () => correctedSource.layoutInfo ? correctedSource.layoutInfo.rotate : 0
       const {currentPosition} = this
       const getOldPosition = (id) => currentPosition ? currentPosition.get(id) : {x: correctedSource.x0, y: correctedSource.y0}
+      const currentNodesById = new Map()
+      const getExitingParentIfAny = (node) => {
+        const survivingParent = node.ancestors().find(a => currentNodesById.has(a.id))
+        if (!survivingParent) {
+          return {x: correctedSource.x, y: correctedSource.y}
+        }
+        return currentNodesById.get(survivingParent.id)
+      }
       const origin = getOldPosition(correctedSource.id)
       const originBuilder = d => {
         if (source || !d.parent) {
@@ -326,7 +334,12 @@ export default {
         }
         return getOldPosition(d.parent.id)
       }
-      const forExit = d => ({x: correctedSource.x, y: correctedSource.y})
+      const forExit = d => {
+        if (source || !d.parent) {
+          return {x: correctedSource.x, y: correctedSource.y}
+        }
+        return getExitingParentIfAny(d.parent)
+      }
 
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
@@ -334,7 +347,9 @@ export default {
       const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
-      const allNodes = newNodes.merge(nodes)
+      const allNodes = newNodes.merge(nodes).each(n => {
+        currentNodesById.set(n.id, n)
+      })
 
       const { strokeWidth, layout, duration, drawLink } = this
       transitionDuration = (transitionDuration === undefined) ? duration : transitionDuration
