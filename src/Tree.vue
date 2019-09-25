@@ -28,7 +28,7 @@ const linkLayouts = {
   orthogonal
 }
 
-var i = 0
+let i = 0
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'horizontal', 'vertical']
 const nodeDisplays = ['all', 'leaves', 'extremities']
@@ -314,33 +314,20 @@ export default {
       if (resetContextMenu) {
         this.resetContextMenu()
       }
-      source = source || this.internaldata.root
-      let originBuilder = source
-      let forExit = source
-      const originAngle = source.layoutInfo ? source.layoutInfo.rotate : 0
-      const origin = {x: source.x0, y: source.y0}
-
-      if (arguments.length === 0) {
-        originBuilder = d => {
-          if (d.parent == null) {
-            return origin
-          }
-          if (d.parent.x0 !== undefined) {
-            return {x: d.parent.x0, y: d.parent.y0}
-          }
-          if (d.parent._x0 !== undefined) {
-            return {x: d.parent._x0, y: d.parent._y0}
-          }
+      const {root} = this.internaldata
+      const correctedSource = source || root
+      const originAngle = () => correctedSource.layoutInfo ? correctedSource.layoutInfo.rotate : 0
+      const {currentPosition} = this
+      const getOldPosition = (id) => currentPosition ? currentPosition.get(id) : {x: correctedSource.x0, y: correctedSource.y0}
+      const origin = getOldPosition(correctedSource.id)
+      const originBuilder = d => {
+        if (source || !d.parent) {
           return origin
         }
-        forExit = d => ({x: source.x, y: source.y})
-        source = this.internaldata.root
-      } else if (typeof source === 'object') {
-        originBuilder = d => origin
-        forExit = d => ({x: source.x, y: source.y})
+        return getOldPosition(d.parent.id)
       }
+      const forExit = d => ({x: correctedSource.x, y: correctedSource.y})
 
-      const root = this.internaldata.root
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
@@ -348,11 +335,6 @@ export default {
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
       const allNodes = newNodes.merge(nodes)
-
-      nodes.each(function (d) {
-        d._x0 = d.x
-        d._y0 = d.y
-      })
 
       const { strokeWidth, layout, duration, drawLink } = this
       transitionDuration = (transitionDuration === undefined) ? duration : transitionDuration
@@ -387,7 +369,7 @@ export default {
         }
       }, this.redraw) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => `${translate(originBuilder(d), layout, transform)} rotate(${originAngle}) scale(0.1)`)
+      newNodes.attr('transform', d => `${translate(originBuilder(d), layout, transform)} rotate(${originAngle(d)}) scale(0.1)`)
         .append('g')
         .attr('class', 'node')
 
@@ -427,10 +409,11 @@ export default {
           .attr('text-anchor', d => d.layoutInfo.anchor)
           .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
-      allNodes.each((d) => {
-        d.x0 = d.x
-        d.y0 = d.y
+      const newPosition = new Map()
+      allNodes.each(({id, x, y}) => {
+        newPosition.set(id, {x, y})
       })
+      this.currentPosition = newPosition
 
       const exitingNodes = nodes.exit()
       exitingNodes.select('.node').transition().duration(transitionDuration)
@@ -514,7 +497,7 @@ export default {
         return
       }
       this._scheduledRedraw = true
-      this.$nextTick(() => this.updateGraph(root, option))
+      this.$nextTick(() => this.updateGraph(null, option))
     },
 
     getNodeOriginComputer (originalVisibleNodes) {
