@@ -9,14 +9,14 @@ export default {
   mixins: [behaviorMixin],
 
   created () {
-    const {on, actions: {setContextMenu, resetContextMenu}} = this
+    const {on, actions: {setPopUp, resetPopUp}} = this
 
     on('clickedText', (context) => {
-      setContextMenu(context)
+      setPopUp(context)
     })
 
     on('clickOutside', () => {
-      resetContextMenu()
+      resetPopUp()
     })
   }
 }

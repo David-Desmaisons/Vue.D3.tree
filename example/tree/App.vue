@@ -227,7 +227,7 @@
         <noBehavior/>
       </template> -->
 
-      <template #contextMenu="{data,node}">
+      <template #popUp="{data,node}">
         <div class="btn-group-vertical">
            <button type="button" class="btn btn-primary" @click="addFor(data)" data-toggle="tooltip" title="Add children">
               <i class="fa fa-plus" aria-hidden="true"></i>

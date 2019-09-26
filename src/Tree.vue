@@ -13,7 +13,7 @@ import contextMenuOnClickText from './behaviors/ContextMenuOnClickText'
 import {compareString, toPromise, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
-import {createPopper} from './contextMenu'
+import {createPopper} from './popUp'
 
 import * as d3 from 'd3'
 
@@ -165,6 +165,8 @@ const defaultBehaviors = [
   contextMenuOnClickText
 ]
 
+const popUpClass = 'pop-up-tree'
+
 export default {
   name: 'D3Tree',
 
@@ -178,13 +180,13 @@ export default {
   },
 
   render (h) {
-    const {$behaviorProps: behaviorProps, $scopedSlots: {contextMenu}, resetContextMenu: close, contextMenu: {node, style}} = this
+    const {$behaviorProps: behaviorProps, $scopedSlots: {popUp}, resetPopUp: close, contextMenu: {node, style}} = this
     const slotNodes = defaultBehaviors.map(component => h(component, this._b({}, component.name, behaviorProps, false)))
     const menu = h('div', {
-      class: 'context-menu-tree',
+      class: popUpClass,
       style
     }, [
-      (!contextMenu || (node === null)) ? null : contextMenu({node, data: node.data, close})
+      (!popUp || (node === null)) ? null : popUp({node, data: node.data, close})
     ])
 
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
@@ -194,8 +196,8 @@ export default {
   },
 
   created () {
-    const {setSelected, setContextMenu, resetContextMenu, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
-    const actions = {setSelected, setContextMenu, resetContextMenu, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    const {setSelected, setPopUp, resetPopUp, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
+    const actions = {setSelected, setPopUp, resetPopUp, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
     this.$behaviorProps = {actions, on: on.bind(this)}
   },
 
@@ -237,18 +239,18 @@ export default {
       this.$emit('change', node)
     },
 
-    setContextMenu ({element, target}) {
+    setPopUp ({element, target}) {
       const {contextMenu, contextMenuPlacement} = this
       contextMenu.node = element
       createPopper({
         target,
-        element: this.$el.querySelector('.context-menu-tree'),
+        element: this.$el.querySelector(`.${popUpClass}`),
         placement: contextMenuPlacement,
         styleCallback: style => { contextMenu.style = style }
       })
     },
 
-    resetContextMenu () {
+    resetPopUp () {
       this.contextMenu.node = null
     },
 
@@ -276,7 +278,7 @@ export default {
       this.$emit('zoom', {transform})
       this._originalZoom = transform
       this.currentTransform = this.updateTransform(transform)
-      this.redraw({transitionDuration: 0, resetContextMenu: true})
+      this.redraw({transitionDuration: 0, resetPopUp: true})
     },
 
     removeZoom () {
@@ -293,11 +295,11 @@ export default {
       this.internaldata.zoom.scaleExtent([minZoom, maxZoom])
     },
 
-    completeRedraw ({margin = null, layout = null, resetContextMenu = true}) {
+    completeRedraw ({margin = null, layout = null, resetPopUp = true}) {
       const size = this.getSize()
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyZoom(size, true)
-      this.redraw({resetContextMenu})
+      this.redraw({resetPopUp})
     },
 
     transformSvg (g, size) {
@@ -310,9 +312,9 @@ export default {
       return this.layout.updateTransform(transform, this.margin, size, this.maxTextLenght)
     },
 
-    updateGraph (source, {transitionDuration = undefined, resetContextMenu = true} = {}) {
-      if (resetContextMenu) {
-        this.resetContextMenu()
+    updateGraph (source, {transitionDuration = undefined, resetPopUp = true} = {}) {
+      if (resetPopUp) {
+        this.resetPopUp()
       }
       const {root} = this.internaldata
       const correctedSource = source || root
@@ -513,7 +515,7 @@ export default {
       })
     },
 
-    redraw (option = {resetContextMenu: true}) {
+    redraw (option = {resetPopUp: true}) {
       const { internaldata: { root }, _scheduledRedraw } = this
       if (!root || _scheduledRedraw) {
         return
@@ -657,7 +659,7 @@ export default {
     },
 
     selected () {
-      this.completeRedraw({layout: this.layout, resetContextMenu: false})
+      this.completeRedraw({layout: this.layout, resetPopUp: false})
     },
 
     radius () {
@@ -704,7 +706,7 @@ export default {
 </script>
 
 <style>
-.context-menu-tree {
+.pop-up-tree {
   position: absolute;
 }
 
