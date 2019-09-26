@@ -6,7 +6,7 @@
 [![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
 
-Update documentationVue components to display graphics based on [D3.js](https://d3js.org/) layout.
+Vue components to display graphics based on [D3.js](https://d3js.org/) layout.
 
 
 # Tree
@@ -111,10 +111,9 @@ Example:
 
 ### popUp
 
-Use this slot to create a pop-up, tooltip or context menu for nodes.
+Use this slot to create a pop-up, tooltip or context menu for nodes. The position of the pop-up relative to its target is defined by the `popUpPlacement` prop.
 
-By default, pop-up will open when clicking on node text. This behavior can be overridden using behavioral slot.
-For example by using the `PopUpOnTextHover` component provides opening of pop-up when hovering the node test.
+By default, pop-up will open when clicking on node text. This behavior can be overridden using behavioral slot. For example by using the `PopUpOnTextHover` component provides opening of pop-up when hovering the node test. See below for example.
 
 
 Slot-scope:
@@ -158,14 +157,16 @@ Slot-scope:
 | on      | `Function`    | Value: $on method of the tree component, exposing all events |
 | actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, setSelected, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
 
-By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clickin on its text.
+By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clicking on its text.
 
 Example:
 
 ```HTML
-<template #behavior="{on, actions}">
-  <CollapseOnClick v-bind="{on, actions}"/>
-</template>
+<tree>
+  <template #behavior="{on, actions}">
+    <CollapseOnClick v-bind="{on, actions}"/>
+  </template>
+</tree>
 ```
 
 With CollapseOnClick component:
@@ -183,6 +184,28 @@ export default {
     })
   }
 }
+```
+
+
+To display pop-up on hover, use the built-in `PopUpOnTextHover`:
+
+```HTML
+<tree>
+  <template #behavior="{on, actions}">
+    <popUpOnTextHover v-bind="{on, actions}"/>
+  </template>
+</tree>
+```
+
+```javascript
+import {tree, popUpOnTextHover} from 'vued3tree'
+
+export default {
+  components: {
+    tree,
+    popUpOnTextHover
+  },
+  //...
 ```
 
 ## Events
