@@ -65,6 +65,7 @@ export default {
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
 | nodeTextDisplay    | no | 'all' 'leaves' or 'extremities' | 'all' | Determine wether all node texts are displayed or only leaf nodes or leaves and root node respectively. | 
 | nodeTextMargin    | no | `Number`           | 6            | margin in pixel for node text |
+| popUpPlacement    | no | `String`           | 'bottom-start'            | Pop-up position as defined by [popper.js](https://popper.js.org/) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
 | selected    | no | `Object`           | `null`            | The selected node -on which a `selected` class is applied-. It can be bound using a `v-model` directive. By default, click on text to select a node but this behavior can be customized using the `behavior` slot. | 
 | strokeWidth    | no | `Number`           | 1.5            | The path stroke-width in pixel. | 
@@ -105,6 +106,36 @@ Example:
       <title>{{data.text}} {{depth}}</title>
     </circle>
   </template>
+</template>
+```
+
+### popUp
+
+Use this slot to create a pop-up: tooltip or context menu for nodes.
+
+By default, 
+
+
+Slot-scope:
+
+
+| Name      | Type | Description  |
+| ---       | ---      | ---   |
+| data   | `Object` | node data as provided by the `data` props  |
+| close   | `Function` | function to close the pop-up |
+| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+
+Example:
+```HTML
+<template #popUp="{data,node}">
+  <div class="btn-group-vertical">
+    <button @click="addFor(data)">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </button>
+    <button @click="remove(data, node)">
+      <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
 </template>
 ```
 
@@ -185,6 +216,7 @@ For all these events, the argument passed is `{element, data}` .
 | collapse      | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node.|
 | collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
+| setPopUp       |  |   | |
 | setSelected       | `Object`: node data | `undefined`             | Select the given node by sending a `change` event. Should be used with a `v-model` binding|
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
