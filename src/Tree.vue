@@ -10,7 +10,7 @@ import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
 import contextMenuOnClickText from './behaviors/ContextMenuOnClickText'
-import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import {compareString, toPromise, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
 import {createPopper} from './contextMenu'
@@ -522,13 +522,6 @@ export default {
       this.$nextTick(() => this.updateGraph(null, option))
     },
 
-    getNodeOriginComputer (originalVisibleNodes) {
-      return node => {
-        const parentVisible = findInParents(node, originalVisibleNodes)
-        return {x: parentVisible.x0, y: parentVisible.y0}
-      }
-    },
-
     applyZoom (size, transition) {
       const { internaldata: {g, zoom}, zoomable } = this
       if (zoomable && zoom) {
@@ -567,9 +560,8 @@ export default {
     },
 
     expandAll (d, update = true) {
-      const lastVisible = d.leaves()
       onAllChilddren(d, child => { this.expand(child, false) })
-      return this.updateIfNeeded(this.getNodeOriginComputer(lastVisible), update)
+      return this.updateIfNeeded(null, update)
     },
 
     collapseAll (d, update = true) {

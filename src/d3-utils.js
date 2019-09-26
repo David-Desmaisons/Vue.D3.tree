@@ -12,15 +12,6 @@ function compareNode (a, b, attribute) {
   return compareString(a.data[attribute], b.data[attribute])
 }
 
-function findInParents (node, nodes) {
-  if (nodes.indexOf(node) !== -1) {
-    return node
-  }
-
-  const parent = node.parent
-  return (parent === null) ? node : findInParents(parent, nodes)
-}
-
 function mapMany (arr, mapper) {
   return arr.reduce(function (prev, curr) {
     return prev.concat(mapper(curr))
@@ -98,7 +89,6 @@ function updateTexts (selection, maxLength) {
 export {
   compareString,
   compareNode,
-  findInParents,
   mapMany,
   roundPath,
   toPromise,
