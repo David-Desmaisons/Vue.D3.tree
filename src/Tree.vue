@@ -120,9 +120,9 @@ const props = {
     type: Number,
     default: 6
   },
-  contextMenuPlacement: {
+  popUpPlacement: {
     type: String,
-    default: 'bottom'
+    default: 'bottom-start'
   }
 }
 
@@ -240,12 +240,12 @@ export default {
     },
 
     setPopUp ({element, target}) {
-      const {contextMenu, contextMenuPlacement} = this
+      const {contextMenu, popUpPlacement} = this
       contextMenu.node = element
       createPopper({
         target,
         element: this.$el.querySelector(`.${popUpClass}`),
-        placement: contextMenuPlacement,
+        placement: popUpPlacement,
         styleCallback: style => { contextMenu.style = style }
       })
     },
