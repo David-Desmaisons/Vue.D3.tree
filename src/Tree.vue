@@ -318,7 +318,13 @@ export default {
       const correctedSource = source || root
       const originAngle = () => correctedSource.layoutInfo ? correctedSource.layoutInfo.rotate : 0
       const {currentPosition} = this
-      const getOldPosition = (id) => currentPosition ? currentPosition.get(id) : {x: correctedSource.x0, y: correctedSource.y0}
+      const getOldPosition = (node) => {
+        if (!currentPosition) {
+          return null
+        }
+        const survivingParent = node.ancestors().find(({id}) => currentPosition.has(id))
+        return survivingParent ? currentPosition.get(survivingParent.id) : null
+      }
       const currentNodesById = new Map()
       const getExitingParentIfAny = (node) => {
         const survivingParent = node.ancestors().find(a => currentNodesById.has(a.id))
@@ -327,12 +333,12 @@ export default {
         }
         return currentNodesById.get(survivingParent.id)
       }
-      const origin = getOldPosition(correctedSource.id)
+      const origin = currentPosition ? currentPosition.get(correctedSource.id) : {x: correctedSource.x0, y: correctedSource.y0}
       const originBuilder = d => {
         if (source || !d.parent) {
           return origin
         }
-        return getOldPosition(d.parent.id)
+        return getOldPosition(d.parent) || origin
       }
       const forExit = d => {
         if (source || !d.parent) {
