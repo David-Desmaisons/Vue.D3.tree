@@ -447,7 +447,8 @@ export default {
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
       const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + leafTextMargin
-      const first = text.node().getComputedTextLength() + leafTextMargin
+      const textNode = text.node()
+      const first = (textNode ? textNode.getComputedTextLength() : 0) + leafTextMargin
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
         this._scheduledRedraw = false
         return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
