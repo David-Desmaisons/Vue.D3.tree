@@ -210,21 +210,39 @@ export default {
 
 ## Events
 
-### clicked
+### change
+  - Argument : node raw data.
+  - Sent when the node is selected
+
+### clickedNode
   - Argument : `{element, data, target}` where `element` represents the node build by `D3.js`, `data` is the node raw data and `target` the target DOM element.
-  - Sent when the node name is clicked
+  - Sent when the node is clicked
+
+
+### clickOutside
+  - Argument: none
+  - Sent when mouse is clicked outside any geometry or text of the tree
+
+### clickedText
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when the node text is clicked
 
 ### expand
   - Argument : same as [clicked](#clicked).
   - Sent when the node is clicked and the node children are expanded
 
+### mouseOverText
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when mouse hovers the node text
+
+### onNodeTextLeave
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when mouse leaves the node text
+
 ### retract
   - Argument : same as [clicked](#clicked).
   - Sent when the node is clicked and the node children are retracted
 
-### change
-  - Argument : node raw data.
-  - Sent when the node is selected
 
 For all these events, the argument passed is `{element, data}` .
 
