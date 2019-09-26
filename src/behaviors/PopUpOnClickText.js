@@ -5,7 +5,7 @@
 import behaviorMixin from './behaviorMixin'
 
 export default {
-  name: 'menuOnTextClick',
+  name: 'PopUpOnTextClick',
   mixins: [behaviorMixin],
 
   created () {

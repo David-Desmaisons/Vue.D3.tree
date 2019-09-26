@@ -9,7 +9,7 @@ import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
-import contextMenuOnClickText from './behaviors/ContextMenuOnClickText'
+import popUpOnClickText from './behaviors/PopUpOnClickText'
 import {compareString, toPromise, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
@@ -162,7 +162,7 @@ function filterTextNode (nodeTextDisplay, root) {
 const defaultBehaviors = [
   collapseOnClick,
   selectOnTextClick,
-  contextMenuOnClickText
+  popUpOnClickText
 ]
 
 const popUpClass = 'pop-up-tree'

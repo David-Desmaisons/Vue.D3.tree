@@ -111,9 +111,10 @@ Example:
 
 ### popUp
 
-Use this slot to create a pop-up: tooltip or context menu for nodes.
+Use this slot to create a pop-up, tooltip or context menu for nodes.
 
-By default, 
+By default, pop-up will open when clicking on node text. This behavior can be overridden using behavioral slot.
+For example by using the `PopUpOnTextHover` component provides opening of pop-up when hovering the node test.
 
 
 Slot-scope:
@@ -141,11 +142,13 @@ Example:
 
 ### behavior
 
-Behavior slot provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
+[Behavior slots](https://alligator.io/vuejs/renderless-behavior-slots/) provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
 
 The concept of this slot is to react to changes in node information by calling an action
 
 By design this slot is renderless.
+
+For more about this pattern, you can [check here](https://alligator.io/vuejs/renderless-behavior-slots/).
 
 Slot-scope:
 
@@ -185,7 +188,7 @@ export default {
 ## Events
 
 ### clicked
-  - Argument : `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
+  - Argument : `{element, data, target}` where `element` represents the node build by `D3.js`, `data` is the node raw data and `target` the target DOM element.
   - Sent when the node name is clicked
 
 ### expand
@@ -216,13 +219,12 @@ For all these events, the argument passed is `{element, data}` .
 | collapse      | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node.|
 | collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
-| setPopUp       |  |   | |
+| resetPopUp       | - |  `undefined` | close pop-up |
+| setPopUp       | `{target, node}` |  `undefined` | Open pop-up for the corresponding node, using the target DOM element as reference. Designed to be called with event argument. |
 | setSelected       | `Object`: node data | `undefined`             | Select the given node by sending a `change` event. Should be used with a `v-model` binding|
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 | toggleExpandCollapse       | `D3.js node`      | a promise which resolve when animation is over             | Retract or collapse the given node depending on its current state. |
-
-
 
 
 ## Gotchas

@@ -5,7 +5,7 @@
 import behaviorMixin from './behaviorMixin'
 
 export default {
-  name: 'menuOnTextHover',
+  name: 'PopUpOnTextHover',
   mixins: [behaviorMixin],
 
   created () {

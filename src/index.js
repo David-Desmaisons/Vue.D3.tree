@@ -2,8 +2,8 @@ import tree from './Tree'
 import hierarchicalEdgeBundling from './HierarchicalEdgeBundling'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
-import contextMenuOnClickText from './behaviors/ContextMenuOnClickText'
-import contextMenuOnHoverText from './behaviors/ContextMenuOnHoverText'
+import popUpOnClickText from './behaviors/PopUpOnClickText'
+import popUpOnHoverText from './behaviors/PopUpOnHoverText'
 import noBehavior from './behaviors/noBehavior'
 import behaviorMixin from './behaviors/behaviorMixin'
 
@@ -14,6 +14,6 @@ export {
     collapseOnClick,
     noBehavior,
     selectOnTextClick,
-    contextMenuOnHoverText,
-    contextMenuOnClickText
+    popUpOnClickText,
+    popUpOnHoverText
 }
