@@ -324,16 +324,16 @@ export default {
         if (!currentPosition) {
           return null
         }
-        const survivingParent = node.ancestors().find(({id}) => currentPosition.has(id))
-        return survivingParent ? currentPosition.get(survivingParent.id) : null
+        const visibleParent = node.ancestors().find(({id}) => currentPosition.has(id))
+        return visibleParent ? currentPosition.get(visibleParent.id) : null
       }
       const currentNodesById = new Map()
       const getExitingParentIfAny = (node) => {
-        const survivingParent = node.ancestors().find(a => currentNodesById.has(a.id))
-        if (!survivingParent) {
+        const visibleParent = node.ancestors().find(a => currentNodesById.has(a.id))
+        if (!visibleParent) {
           return {x: correctedSource.x, y: correctedSource.y}
         }
-        return currentNodesById.get(survivingParent.id)
+        return currentNodesById.get(visibleParent.id)
       }
       const origin = currentPosition ? currentPosition.get(correctedSource.id) : {x: correctedSource.x0, y: correctedSource.y0}
       const originBuilder = d => {
@@ -355,8 +355,8 @@ export default {
       const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
-      const allNodes = newNodes.merge(nodes).each(n => {
-        currentNodesById.set(n.id, n)
+      const allNodes = newNodes.merge(nodes).each(({id, x, y}) => {
+        currentNodesById.set(id, {x, y})
       })
 
       const { strokeWidth, layout, duration, drawLink } = this
@@ -432,11 +432,7 @@ export default {
           .attr('text-anchor', d => d.layoutInfo.anchor)
           .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
-      const newPosition = new Map()
-      allNodes.each(({id, x, y}) => {
-        newPosition.set(id, {x, y})
-      })
-      this.currentPosition = newPosition
+      this.currentPosition = currentNodesById
 
       const exitingNodes = nodes.exit()
       exitingNodes.select('.node').transition().duration(transitionDuration)
