@@ -26,6 +26,7 @@
   "dependencies": {
     "d3": "^5.11.0",
     "d3-interpolate-path": "^2.1.1",
+    "popper.js": "^1.15.0",
     "vue": "^2.6.10",
     "vue-resize-directive": "^1.2.0"
   },

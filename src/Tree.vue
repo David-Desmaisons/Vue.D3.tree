@@ -9,10 +9,11 @@ import { drawLink as bezier } from './linkLayout/bezier'
 import { drawLink as orthogonal } from './linkLayout/orthogonal'
 import collapseOnClick from './behaviors/CollapseOnClick'
 import selectOnTextClick from './behaviors/SelectOnTextClick'
-
-import {compareString, toPromise, findInParents, mapMany, translate} from './d3-utils'
+import popUpOnClickText from './behaviors/PopUpOnClickText'
+import {compareString, toPromise, mapMany, translate} from './d3-utils'
 import {renderInVueContext} from './vueHelper'
 import {setUpZoom} from './zoom/zoomBehavior'
+import {createPopper} from './popUp'
 
 import * as d3 from 'd3'
 
@@ -27,7 +28,7 @@ const linkLayouts = {
   orthogonal
 }
 
-var i = 0
+let i = 0
 const types = ['tree', 'cluster']
 const layouts = ['circular', 'horizontal', 'vertical']
 const nodeDisplays = ['all', 'leaves', 'extremities']
@@ -118,6 +119,10 @@ const props = {
   nodeTextMargin: {
     type: Number,
     default: 6
+  },
+  popUpPlacement: {
+    type: String,
+    default: 'bottom-start'
   }
 }
 
@@ -154,6 +159,14 @@ function filterTextNode (nodeTextDisplay, root) {
   }
 }
 
+const defaultBehaviors = [
+  collapseOnClick,
+  selectOnTextClick,
+  popUpOnClickText
+]
+
+const popUpClass = 'pop-up-tree'
+
 export default {
   name: 'D3Tree',
 
@@ -167,22 +180,34 @@ export default {
   },
 
   render (h) {
-    const {$behaviorProps: behaviorProps} = this
-    const slotNodes = [collapseOnClick, selectOnTextClick].map(component => h(component, this._b({}, component.name, behaviorProps, false)))
+    const {$behaviorProps: behaviorProps, $scopedSlots: {popUp}, resetPopUp: close, contextMenu: {node, style}} = this
+    const slotNodes = defaultBehaviors.map(component => h(component, this._b({}, component.name, behaviorProps, false)))
+    const menu = h('div', {
+      class: popUpClass,
+      style
+    }, [
+      (!popUp || (node === null)) ? null : popUp({node, data: node.data, close})
+    ])
+
     return h('div', {class: 'viewport treeclass', directives: [{name: 'resize', value: this.resize}]}, [
+      menu,
       this._t('behavior', slotNodes, null, behaviorProps)
     ])
   },
 
   created () {
-    const {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
-    const actions = {setSelected, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
+    const {setSelected, setPopUp, resetPopUp, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse, $on: on} = this
+    const actions = {setSelected, setPopUp, resetPopUp, collapse, collapseAll, expand, expandAll, show, toggleExpandCollapse}
     this.$behaviorProps = {actions, on: on.bind(this)}
   },
 
   data () {
     return {
       currentTransform: null,
+      contextMenu: {
+        node: null,
+        style: null
+      },
       maxTextLenght: {
         first: 0,
         last: 0
@@ -195,6 +220,7 @@ export default {
     const svg = d3.select(this.$el).append('svg')
           .attr('width', size.width)
           .attr('height', size.height)
+          .on('click', () => { this.$emit('clickOutside') })
     const {zoomable, tree} = this
     const g = zoomable ? svg.append('g') : this.transformSvg(svg.append('g'), size)
 
@@ -211,6 +237,21 @@ export default {
   methods: {
     setSelected (node) {
       this.$emit('change', node)
+    },
+
+    setPopUp ({element, target}) {
+      const {contextMenu, popUpPlacement} = this
+      contextMenu.node = element
+      createPopper({
+        target,
+        element: this.$el.querySelector(`.${popUpClass}`),
+        placement: popUpPlacement,
+        styleCallback: style => { contextMenu.style = style }
+      })
+    },
+
+    resetPopUp () {
+      this.contextMenu.node = null
     },
 
     getSize () {
@@ -237,7 +278,7 @@ export default {
       this.$emit('zoom', {transform})
       this._originalZoom = transform
       this.currentTransform = this.updateTransform(transform)
-      this.redraw({transitionDuration: 0})
+      this.redraw({transitionDuration: 0, resetPopUp: true})
     },
 
     removeZoom () {
@@ -254,11 +295,11 @@ export default {
       this.internaldata.zoom.scaleExtent([minZoom, maxZoom])
     },
 
-    completeRedraw ({margin = null, layout = null}) {
+    completeRedraw ({margin = null, layout = null, resetPopUp = true}) {
       const size = this.getSize()
       this.layout.size(this.internaldata.tree, size, this.margin, this.maxTextLenght)
       this.applyZoom(size, true)
-      this.redraw()
+      this.redraw({resetPopUp})
     },
 
     transformSvg (g, size) {
@@ -271,45 +312,51 @@ export default {
       return this.layout.updateTransform(transform, this.margin, size, this.maxTextLenght)
     },
 
-    updateGraph (source, {transitionDuration = undefined} = {}) {
-      source = source || this.internaldata.root
-      let originBuilder = source
-      let forExit = source
-      const originAngle = source.layoutInfo ? source.layoutInfo.rotate : 0
-      const origin = {x: source.x0, y: source.y0}
-
-      if (arguments.length === 0) {
-        originBuilder = d => {
-          if (d.parent == null) {
-            return origin
-          }
-          if (d.parent.x0 !== undefined) {
-            return {x: d.parent.x0, y: d.parent.y0}
-          }
-          if (d.parent._x0 !== undefined) {
-            return {x: d.parent._x0, y: d.parent._y0}
-          }
+    updateGraph (source, {transitionDuration = undefined, resetPopUp = true} = {}) {
+      if (resetPopUp) {
+        this.resetPopUp()
+      }
+      const {root} = this.internaldata
+      const correctedSource = source || root
+      const originAngle = () => correctedSource.layoutInfo ? correctedSource.layoutInfo.rotate : 0
+      const {currentPosition} = this
+      const getOldPosition = (node) => {
+        if (!currentPosition) {
+          return null
+        }
+        const visibleParent = node.ancestors().find(({id}) => currentPosition.has(id))
+        return visibleParent ? currentPosition.get(visibleParent.id) : null
+      }
+      const currentNodesById = new Map()
+      const getExitingParentIfAny = (node) => {
+        const visibleParent = node.ancestors().find(a => currentNodesById.has(a.id))
+        if (!visibleParent) {
+          return {x: correctedSource.x, y: correctedSource.y}
+        }
+        return currentNodesById.get(visibleParent.id)
+      }
+      const origin = currentPosition ? currentPosition.get(correctedSource.id) : {x: correctedSource.x0, y: correctedSource.y0}
+      const originBuilder = d => {
+        if (source || !d.parent) {
           return origin
         }
-        forExit = d => ({x: source.x, y: source.y})
-        source = this.internaldata.root
-      } else if (typeof source === 'object') {
-        originBuilder = d => origin
-        forExit = d => ({x: source.x, y: source.y})
+        return getOldPosition(d.parent) || origin
+      }
+      const forExit = d => {
+        if (source || !d.parent) {
+          return {x: correctedSource.x, y: correctedSource.y}
+        }
+        return getExitingParentIfAny(d.parent)
       }
 
-      const root = this.internaldata.root
       const links = this.internaldata.g.selectAll('.linktree')
          .data(this.internaldata.tree(root).descendants().slice(1), d => d.id)
 
       const newLinks = links.enter().append('path').attr('class', 'linktree').lower()
       const nodes = this.internaldata.g.selectAll('.nodetree').data(root.descendants(), d => d.id)
       const newNodes = nodes.enter().append('g').attr('class', d => `nodetree node-rank-${d.depth}`)
-      const allNodes = newNodes.merge(nodes)
-
-      nodes.each(function (d) {
-        d._x0 = d.x
-        d._y0 = d.y
+      const allNodes = newNodes.merge(nodes).each(({id, x, y}) => {
+        currentNodesById.set(id, {x, y})
       })
 
       const { strokeWidth, layout, duration, drawLink } = this
@@ -345,7 +392,7 @@ export default {
         }
       }, this.redraw) : d => `<circle r="${radius}"/>`
 
-      newNodes.attr('transform', d => `${translate(originBuilder(d), layout, transform)} rotate(${originAngle}) scale(0.1)`)
+      newNodes.attr('transform', d => `${translate(originBuilder(d), layout, transform)} rotate(${originAngle(d)}) scale(0.1)`)
         .append('g')
         .attr('class', 'node')
 
@@ -355,6 +402,8 @@ export default {
         .attr('x', 0)
         .attr('dx', 0)
         .on('click', this.onNodeTextClick)
+        .on('mouseover', this.onNodeTextOver)
+        .on('mouseleave', this.onNodeTextLeave)
 
       allNodes
         .select('.node')
@@ -383,10 +432,7 @@ export default {
           .attr('text-anchor', d => d.layoutInfo.anchor)
           .attr('transform', d => `rotate(${d.layoutInfo.textRotate})`)
 
-      allNodes.each((d) => {
-        d.x0 = d.x
-        d.y0 = d.y
-      })
+      this.currentPosition = currentNodesById
 
       const exitingNodes = nodes.exit()
       exitingNodes.select('.node').transition().duration(transitionDuration)
@@ -399,7 +445,8 @@ export default {
       const leaves = root.leaves()
       const extremeNodes = text.filter(d => leaves.indexOf(d) !== -1).nodes()
       const last = Math.max(...extremeNodes.map(node => node.getComputedTextLength())) + leafTextMargin
-      const first = text.node().getComputedTextLength() + leafTextMargin
+      const textNode = text.node()
+      const first = (textNode ? textNode.getComputedTextLength() : 0) + leafTextMargin
       if (last <= this.maxTextLenght.last && first <= this.maxTextLenght.first) {
         this._scheduledRedraw = false
         return Promise.all([allNodesPromise, exitingNodesPromise, updateAndNewLinksPromise, exitingLinksPromise])
@@ -412,6 +459,14 @@ export default {
       return this.updateGraph(source)
     },
 
+    onNodeTextOver (d) {
+      this.onEvent('mouseOverText', d)
+    },
+
+    onNodeTextLeave (d) {
+      this.onEvent('mouseLeaveText', d)
+    },
+
     onNodeTextClick (d) {
       this.onEvent('clickedText', d)
     },
@@ -421,8 +476,9 @@ export default {
     },
 
     onEvent (name, d) {
-      this.$emit(name, {element: d, data: d.data})
-      d3.event.stopPropagation()
+      const event = d3.event
+      this.$emit(name, {element: d, data: d.data, target: event.target})
+      event.stopPropagation()
     },
 
     toggleExpandCollapse (d) {
@@ -455,20 +511,13 @@ export default {
       })
     },
 
-    redraw (option) {
+    redraw (option = {resetPopUp: true}) {
       const { internaldata: { root }, _scheduledRedraw } = this
       if (!root || _scheduledRedraw) {
         return
       }
       this._scheduledRedraw = true
-      this.$nextTick(() => this.updateGraph(root, option))
-    },
-
-    getNodeOriginComputer (originalVisibleNodes) {
-      return node => {
-        const parentVisible = findInParents(node, originalVisibleNodes)
-        return {x: parentVisible.x0, y: parentVisible.y0}
-      }
+      this.$nextTick(() => this.updateGraph(null, option))
     },
 
     applyZoom (size, transition) {
@@ -509,9 +558,8 @@ export default {
     },
 
     expandAll (d, update = true) {
-      const lastVisible = d.leaves()
       onAllChilddren(d, child => { this.expand(child, false) })
-      return this.updateIfNeeded(this.getNodeOriginComputer(lastVisible), update)
+      return this.updateIfNeeded(null, update)
     },
 
     collapseAll (d, update = true) {
@@ -607,7 +655,7 @@ export default {
     },
 
     selected () {
-      this.completeRedraw({layout: this.layout})
+      this.completeRedraw({layout: this.layout, resetPopUp: false})
     },
 
     radius () {
@@ -654,6 +702,10 @@ export default {
 </script>
 
 <style>
+.pop-up-tree {
+  position: absolute;
+}
+
 .treeclass .nodetree  circle {
   fill: #999;
 }

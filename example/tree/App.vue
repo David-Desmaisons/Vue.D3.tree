@@ -201,6 +201,7 @@
       :duration="duration"
       :minZoom="minZoom"
       :maxZoom="maxZoom"
+      contextMenuPlacement="bottom-start"
       class="tree"
       @clickedText="onClick"
       @expand="onExpand"
@@ -225,6 +226,17 @@
       <!-- <template #behavior>
         <noBehavior/>
       </template> -->
+
+      <template #popUp="{data,node}">
+        <div class="btn-group-vertical">
+           <button type="button" class="btn btn-primary" @click="addFor(data)" data-toggle="tooltip" title="Add children">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-danger" @click="remove(data, node)" data-toggle="tooltip" title="Remove node">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+        </div>
+      </template>
     </tree>
   </div>
   
@@ -236,6 +248,15 @@ import {tree} from '../../src/'
 import data from '../../data/data'
 import {getGremlin} from './gremlinConfiguration'
 import noBehavior from '../../src/behaviors/noBehavior'
+let currentId = 500
+
+const removeElement = (arr, element) => {
+  const index = arr.indexOf(element)
+  if (index === -1) {
+    return
+  }
+  arr.splice(index, 1)
+}
 
 Object.assign(data, {
   type: 'tree',
@@ -304,6 +325,18 @@ export default {
     },
     onEvent (eventName, data) {
       this.events.push({eventName, data: data.data})
+    },
+    addFor (data) {
+      const newData = {
+        id: currentId++,
+        children: [],
+        text: Math.random().toString(36).substring(7)
+      }
+      data.children.push(newData)
+    },
+    remove (data, node) {
+      const parent = node.parent.data
+      removeElement(parent.children, data)
     },
     resetZoom () {
       if (!this.$refs['tree']) {

@@ -6,7 +6,7 @@
 [![MIT License](https://img.shields.io/github/license/David-Desmaisons/Vue.D3.tree.svg)](https://github.com/David-Desmaisons/Vue.D3.tree/blob/master/LICENSE)
 
 
-Update documentationVue components to display graphics based on [D3.js](https://d3js.org/) layout.
+Vue components to display graphics based on [D3.js](https://d3js.org/) layout.
 
 
 # Tree
@@ -65,6 +65,7 @@ export default {
 | nodeText   | no | `String`  | 'name' |  name of the property of the node to be used as a display name |
 | nodeTextDisplay    | no | 'all' 'leaves' or 'extremities' | 'all' | Determine wether all node texts are displayed or only leaf nodes or leaves and root node respectively. | 
 | nodeTextMargin    | no | `Number`           | 6            | margin in pixel for node text |
+| popUpPlacement    | no | `String`           | 'bottom-start'            | Pop-up position as defined by [popper.js](https://popper.js.org/) |
 | radius    | no | `Number`           | 3            | node circle radius in pixel |
 | selected    | no | `Object`           | `null`            | The selected node -on which a `selected` class is applied-. It can be bound using a `v-model` directive. By default, click on text to select a node but this behavior can be customized using the `behavior` slot. | 
 | strokeWidth    | no | `Number`           | 1.5            | The path stroke-width in pixel. | 
@@ -108,13 +109,45 @@ Example:
 </template>
 ```
 
+### popUp
+
+Use this slot to create a pop-up, tooltip or context menu for nodes. The position of the pop-up relative to its target is defined by the `popUpPlacement` prop.
+
+By default, pop-up will open when clicking on node text. This behavior can be overridden using behavioral slot. For example by using the `PopUpOnTextHover` component provides opening of pop-up when hovering the node test. See below for example.
+
+
+Slot-scope:
+
+
+| Name      | Type | Description  |
+| ---       | ---      | ---   |
+| data   | `Object` | node data as provided by the `data` props  |
+| close   | `Function` | function to close the pop-up |
+| node   | [D3.js node](https://github.com/d3/d3-hierarchy/tree/v1.1.8#hierarchy) | D3.js node to be displayed  |
+
+Example:
+```HTML
+<template #popUp="{data,node}">
+  <div class="btn-group-vertical">
+    <button @click="addFor(data)">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+    </button>
+    <button @click="remove(data, node)">
+      <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+</template>
+```
+
 ### behavior
 
-Behavior slot provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
+[Behavior slots](https://alligator.io/vuejs/renderless-behavior-slots/) provide an elegant way to customize the tree behavior by receiving as slot-scope both node information (including clicked node, hovered node, ...) and actions to alter the graph accordingly.
 
 The concept of this slot is to react to changes in node information by calling an action
 
 By design this slot is renderless.
+
+For more about this pattern, you can [check here](https://alligator.io/vuejs/renderless-behavior-slots/).
 
 Slot-scope:
 
@@ -124,14 +157,16 @@ Slot-scope:
 | on      | `Function`    | Value: $on method of the tree component, exposing all events |
 | actions   | `Object`    | Value: {collapse, collapseAll, expand, expandAll, setSelected, show, toggleExpandCollapse} where each property is a component method (see [below](#Methods) for detailed description) |
 
-By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clickin on its text.
+By default tree component use standardBehavior as component which provides toggle retract on node click and select the node on clicking on its text.
 
 Example:
 
 ```HTML
-<template #behavior="{on, actions}">
-  <CollapseOnClick v-bind="{on, actions}"/>
-</template>
+<tree>
+  <template #behavior="{on, actions}">
+    <CollapseOnClick v-bind="{on, actions}"/>
+  </template>
+</tree>
 ```
 
 With CollapseOnClick component:
@@ -151,23 +186,63 @@ export default {
 }
 ```
 
+
+To display pop-up on hover, use the built-in `PopUpOnTextHover`:
+
+```HTML
+<tree>
+  <template #behavior="{on, actions}">
+    <popUpOnTextHover v-bind="{on, actions}"/>
+  </template>
+</tree>
+```
+
+```javascript
+import {tree, popUpOnTextHover} from 'vued3tree'
+
+export default {
+  components: {
+    tree,
+    popUpOnTextHover
+  },
+  //...
+```
+
 ## Events
 
-### clicked
-  - Argument : `{element, data}` where `element` represents the node build by `D3.js` and `data` is the node raw data.
-  - Sent when the node name is clicked
+### change
+  - Argument : node raw data.
+  - Sent when the node is selected
+
+### clickedNode
+  - Argument : `{element, data, target}` where `element` represents the node build by `D3.js`, `data` is the node raw data and `target` the target DOM element.
+  - Sent when the node is clicked
+
+
+### clickOutside
+  - Argument: none
+  - Sent when mouse is clicked outside any geometry or text of the tree
+
+### clickedText
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when the node text is clicked
 
 ### expand
   - Argument : same as [clicked](#clicked).
   - Sent when the node is clicked and the node children are expanded
 
+### mouseOverText
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when mouse hovers the node text
+
+### onNodeTextLeave
+  - Argument: same as [mouseNodeOver](#mouseNodeOver)
+  - Sent when mouse leaves the node text
+
 ### retract
   - Argument : same as [clicked](#clicked).
   - Sent when the node is clicked and the node children are retracted
 
-### change
-  - Argument : node raw data.
-  - Sent when the node is selected
 
 For all these events, the argument passed is `{element, data}` .
 
@@ -185,12 +260,12 @@ For all these events, the argument passed is `{element, data}` .
 | collapse      | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node.|
 | collapseAll       | `D3.js node`      | a promise which resolve when animation is over                | Collapse the given node and all its children.|
 | resetZoom       | -      | a promise which resolve when animation is over                | Set zoom matrix to identity         |
+| resetPopUp       | - |  `undefined` | close pop-up |
+| setPopUp       | `{target, node}` |  `undefined` | Open pop-up for the corresponding node, using the target DOM element as reference. Designed to be called with event argument. |
 | setSelected       | `Object`: node data | `undefined`             | Select the given node by sending a `change` event. Should be used with a `v-model` binding|
 | show       | `D3.js node`      | a promise which resolve when animation is over             | Expand nodes if needed in order to show the given node. |
 | showOnly       | `D3.js node`      | a promise which resolve when animation is over             | Retract all node that are not in the path of the given node. |
 | toggleExpandCollapse       | `D3.js node`      | a promise which resolve when animation is over             | Retract or collapse the given node depending on its current state. |
-
-
 
 
 ## Gotchas
