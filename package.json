@@ -1,6 +1,6 @@
 {
   "name": "vued3tree",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "D3 tree components for vue",
   "author": "desmaisons_david <desmaisons_david@hotmail.com>",
   "scripts": {
