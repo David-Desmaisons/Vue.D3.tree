@@ -187,23 +187,23 @@ export default {
 ```
 
 
-To display pop-up on hover, use the built-in `PopUpOnTextHover`:
+To display pop-up on hover, use the built-in `popUpOnHoverText`:
 
 ```HTML
 <tree>
   <template #behavior="{on, actions}">
-    <popUpOnTextHover v-bind="{on, actions}"/>
+    <popUpOnHoverText v-bind="{on, actions}"/>
   </template>
 </tree>
 ```
 
 ```javascript
-import {tree, popUpOnTextHover} from 'vued3tree'
+import {tree, popUpOnHoverText} from 'vued3tree'
 
 export default {
   components: {
     tree,
-    popUpOnTextHover
+    popUpOnHoverText
   },
   //...
 ```
