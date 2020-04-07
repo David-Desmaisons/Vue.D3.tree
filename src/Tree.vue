@@ -83,7 +83,7 @@ const props = {
   },
   identifier: {
     type: Function,
-    default: () => i++
+    default: (i) => i++
   },
   zoomable: {
     type: Boolean,
