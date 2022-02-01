@@ -147,6 +147,7 @@ export default {
         d.layoutInfo = layoutNode(false, 6, d)
       })
 
+      newNodes.append('rect').attr('dy', '.35em')
       newNodes.append('text').attr('dy', '.35em')
 
       const text = allNodes.select('text')
