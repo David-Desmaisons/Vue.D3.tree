@@ -397,6 +397,14 @@ export default {
         .attr('class', 'node')
 
       newNodes
+        .append('rect')
+        .attr('dy', '.35em')
+        .attr('x', 0)
+        .attr('dx', 0)
+        .attr('dx', 0)
+        .attr('fill', 'blue')
+
+      newNodes
         .append('text')
         .attr('dy', '.35em')
         .attr('x', 0)
